@@ -1,0 +1,573 @@
+<?xml version="1.0"?>
+<sdf version='1.6'>
+	<model name="three_wheel_rover">
+		<pose>-1 0 1 0 0 0</pose>
+		<link name="base">
+			<inertial>
+				<pose>-0.05 0 -0.15 0 0 0</pose>
+				<mass>15</mass>
+				<inertia>
+					<ixx>0.10</ixx>
+					<ixy>0</ixy>
+					<ixz>0</ixz>
+					<iyy>0.14</iyy>
+					<iyz>0</iyz>
+					<izz>0.13</izz>
+				</inertia>
+			</inertial>
+			<visual name='visual'>
+				<pose>0 0 0 0 0 0</pose>
+				<geometry>
+					<mesh>
+						<uri>model://ThreeWheelRover/meshes/base.dae</uri>
+					</mesh>
+				</geometry>
+				<material>
+					<ambient>0.0 0.0 0.0 1</ambient>
+					<diffuse>0.5 0.5 0.5 1</diffuse>
+					<specular>0 0 0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+				<pose>0 0 0 0 0 0</pose>
+				<geometry>
+					<!-- <box size=""/> -->
+					<mesh>
+						<uri>model://ThreeWheelRover/meshes/base.dae</uri>
+					</mesh>
+				</geometry>
+			</collision>
+		</link>
+
+
+		<joint name="base_left_wheel_joint" type="revolute">
+			<pose>0 0 0 0 0 0</pose>
+			<!-- <pose>0 0.25 -0.21991 0 0 0</pose> -->
+			<parent>base</parent>
+			<child>left_wheel</child>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<use_parent_model_frame>0</use_parent_model_frame>
+				<limit>
+					<lower>-1.79769e+308</lower>
+					<upper>1.79769e+308</upper>
+					<effort>100</effort>
+					<velocity>-1</velocity>
+				</limit>
+				<!-- <dynamics>
+					<damping>100</damping>
+					<friction>1000</friction>
+					<spring_reference>0</spring_reference>
+					<spring_stiffness>1000</spring_stiffness>
+				</dynamics> -->
+			</axis>
+			<sensor name="force_torque_left" type="force_torque">
+				<update_rate>30</update_rate>
+				<force_torque>
+					<frame>parent</frame>
+				</force_torque>
+			</sensor>
+		</joint>
+		<link name="left_wheel">
+			<pose>0 0.25 -0.220 0 0 0</pose>
+			<inertial>
+				<pose>0 0 0 1.570796327 0 0</pose>
+				<mass>3</mass>
+				<inertia>
+					<ixx>0.0225</ixx>
+					<ixy>0</ixy>
+					<ixz>0</ixz>
+					<iyy>0.0225</iyy>
+					<iyz>0</iyz>
+					<izz>0.03</izz>
+				</inertia>
+			</inertial>
+			<visual name='visual'>
+				<pose>0 0 0 1.570796327 0 0</pose>
+				<geometry>
+					<mesh>
+						<uri>model://ThreeWheelRover/meshes/wheel_forehead.dae</uri>
+					</mesh>
+				</geometry>
+				<material>
+					<ambient>0.7 0.7 0.7 0.7</ambient>
+					<diffuse>0.9 0.9 0.9 1</diffuse>
+					<specular>1 1 1 0.8</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+				<pose>0 0 0 1.570796327 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.15</radius>
+						<length>0.15</length>
+					</cylinder>
+				</geometry>
+				<surface>
+					<friction>
+						<ode>
+							<mu>1</mu>
+							<mu2>1</mu2>
+							<slip1>0</slip1>
+							<slip2>0</slip2>
+						</ode>
+					</friction>
+					<contact>
+						<ode>
+							<kd>1</kd>
+						</ode>
+					</contact>
+					<soft_contact>
+						<dart>
+							<stiffness>100</stiffness>
+							<damping>10</damping>
+						</dart>
+					</soft_contact>
+				</surface>
+			</collision>
+		</link>
+
+		<joint name="base_right_wheel_joint" type="revolute">
+			<pose>0 0 0 0 0 0</pose>
+			<parent>base</parent>
+			<child>right_wheel</child>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<use_parent_model_frame>0</use_parent_model_frame>
+				<limit>
+					<lower>-1.79769e+308</lower>
+					<upper>1.79769e+308</upper>
+					<effort>100</effort>
+					<velocity>-1</velocity>
+				</limit>
+				<!-- <dynamics>
+					<damping>100</damping>
+					<friction>1000</friction>
+					<spring_reference>0</spring_reference>
+					<spring_stiffness>1000</spring_stiffness>
+				</dynamics> -->
+			</axis>
+			<sensor name="force_torque_right" type="force_torque">
+				<update_rate>30</update_rate>
+				<force_torque>
+					<frame>parent</frame>
+				</force_torque>
+			</sensor>
+		</joint>
+		<link name="right_wheel">
+			<pose>0 -0.25 -0.220 0 0 0</pose>
+			<inertial>
+				<pose>0 0 0 1.570796327 0 0</pose>
+				<mass>3</mass>
+				<inertia>
+					<ixx>0.0225</ixx>
+					<ixy>0</ixy>
+					<ixz>0</ixz>
+					<iyy>0.0225</iyy>
+					<iyz>0</iyz>
+					<izz>0.03</izz>
+				</inertia>
+			</inertial>
+			<visual name='visual'>
+				<pose>0 0 0 -1.570796327 0 0</pose>
+				<geometry>
+					<mesh>
+						<uri>model://ThreeWheelRover/meshes/wheel_forehead.dae</uri>
+					</mesh>
+				</geometry>
+				<material>
+					<ambient>0.7 0.7 0.7 0.7</ambient>
+					<diffuse>0.9 0.9 0.9 1</diffuse>
+					<specular>1 1 1 0.8</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+				<pose>0 0 0 1.570796327 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.15</radius>
+						<length>0.15</length>
+					</cylinder>
+				</geometry>
+				<surface>
+					<friction>
+						<ode>
+							<mu>1</mu>
+							<mu2>1</mu2>
+							<slip1>0</slip1>
+							<slip2>0</slip2>
+						</ode>
+					</friction>
+					<contact>
+						<ode>
+							<kd>1</kd>
+						</ode>
+					</contact>
+					<soft_contact>
+						<dart>
+							<stiffness>100</stiffness>
+							<damping>10</damping>
+						</dart>
+					</soft_contact>
+				</surface>
+			</collision>
+		</link>
+		<joint name="base_back_wheel_support_joint" type="fixed">
+			<pose>0 0 0 0 0 0</pose>
+			<parent>base</parent>
+			<child>back_wheel_support</child>
+			<axis>
+				<xyz>0 0 1</xyz>
+				<use_parent_model_frame>0</use_parent_model_frame>
+				<limit>
+					<lower>-1</lower>
+					<upper>1</upper>
+					<effort>-1</effort>
+					<velocity>-1</velocity>
+				</limit>
+				<!-- <dynamics>
+					<damping>100</damping>
+					<friction>1000</friction>
+					<spring_reference>0</spring_reference>
+					<spring_stiffness>1000</spring_stiffness>
+				</dynamics> -->
+			</axis>
+		</joint>
+		<link name="back_wheel_support">
+			<pose>-0.43789 0 -0.047 0 0 0</pose>
+			<inertial>
+				<pose>0 0 0 0 0 0</pose>
+				<mass>1.5</mass>
+				<inertia>
+					<ixx>0.001</ixx>
+					<ixy>0</ixy>
+					<ixz>0</ixz>
+					<iyy>0.001</iyy>
+					<iyz>0</iyz>
+					<izz>0.001</izz>
+				</inertia>
+			</inertial>
+			<visual name='visual'>
+				<pose>0 0 0 0 0 0</pose>
+				<geometry>
+					<mesh>
+						<uri>model://ThreeWheelRover/meshes/back_wheel_support.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+			<!-- <collision name='collision'>
+				<pose>-0.43789 0 -0.04 0 0 0</pose>
+				<geometry>
+					<mesh>
+						<uri>model://rover/meshes/back_wheel_support.dae</uri>
+					</mesh>
+				</geometry>
+			</collision> -->
+		</link>
+		
+		<joint name="back_wheel_support_back_wheel" type="revolute">
+			<pose>0 0 0 0 0 0</pose>
+			<parent>back_wheel_support</parent>
+			<child>back_wheel</child>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<use_parent_model_frame>0</use_parent_model_frame>
+				<limit>
+					<lower>-1.79769e+308</lower>
+					<upper>1.79769e+308</upper>
+					<effort>100</effort>
+					<velocity>-1</velocity>
+				</limit>
+				<!-- <dynamics>
+					<damping>100</damping>
+					<friction>1000</friction>
+					<spring_reference>0</spring_reference>
+					<spring_stiffness>1000</spring_stiffness>
+				</dynamics> -->
+			</axis>
+			<sensor name="force_torque_back" type="force_torque">
+				<update_rate>30</update_rate>
+				<force_torque>
+					<frame>parent</frame>
+				</force_torque>
+			</sensor>
+		</joint>
+		<link name="back_wheel">
+			<pose>-0.43789 0 -0.220 0 0 0</pose>
+			<inertial>
+				<pose>0 0 0 1.570796327 0 0</pose>
+				<mass>3</mass>
+				<inertia>
+					<ixx>0.0225</ixx>
+					<ixy>0</ixy>
+					<ixz>0</ixz>
+					<iyy>0.0225</iyy>
+					<iyz>0</iyz>
+					<izz>0.03</izz>
+				</inertia>
+			</inertial>
+			<visual name='visual'>
+				<pose>0 0 0 1.570796327 0 0</pose>
+				<geometry>
+					<mesh>
+						<uri>model://ThreeWheelRover/meshes/wheel_back.dae</uri>
+					</mesh>
+				</geometry>
+				<material>
+					<ambient>0.7 0.7 0.7 0.7</ambient>
+					<diffuse>0.9 0.9 0.9 1</diffuse>
+					<specular>1 1 1 0.8</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+				<pose>0 0 0 1.570796327 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.15</radius>
+						<length>0.15</length>
+					</cylinder>
+				</geometry>
+				<surface>
+					<friction>
+						<ode>
+							<mu>1</mu>
+							<mu2>1</mu2>
+							<slip1>0</slip1>
+							<slip2>0</slip2>
+						</ode>
+					</friction>
+					<contact>
+						<ode>
+							<kd>1</kd>
+						</ode>
+					</contact>
+					<soft_contact>
+						<dart>
+							<stiffness>100</stiffness>
+							<damping>10</damping>
+						</dart>
+					</soft_contact>
+				</surface>
+			</collision>
+		</link>
+		<joint name="base_camera_support_joint" type="fixed">
+			<pose>0 0 0 0 0 0</pose>
+			<parent>base</parent>
+			<child>camera_support</child>
+			<axis>
+				<xyz>0 0 1</xyz>
+				<use_parent_model_frame>0</use_parent_model_frame>
+				<limit>
+					<lower>-3.1415926</lower>
+					<upper>3.1415926</upper>
+					<effort>-1</effort>
+					<velocity>-1</velocity>
+				</limit>
+			</axis>
+		</joint>
+		<link name="camera_support">
+			<pose>0 0 0 0 0 0</pose>
+			<inertial>
+				<pose>0 0 0.2 0 0 0</pose>
+				<mass>1</mass>
+				<inertia>
+					<ixx>0.0136</ixx>
+					<ixy>0</ixy>
+					<ixz>0</ixz>
+					<iyy>0.0136</iyy>
+					<iyz>0</iyz>
+					<izz>0.0009</izz>
+				</inertia>
+			</inertial>
+			<visual name='visual'>
+				<pose>0 0 0 0 0 0</pose>
+				<geometry>
+					<mesh>
+						<uri>model://ThreeWheelRover/meshes/camera_support.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+			<collision name='collision'>
+				<pose>0 0 0 0 0 0</pose>
+				<geometry>
+					<mesh>
+						<uri>model://ThreeWheelRover/meshes/camera_support.dae</uri>
+					</mesh>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="camera_support_camera_joint" type="fixed">
+			<pose>0 0 0 0 0 0</pose>
+			<parent>camera_support</parent>
+			<child>camera</child>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<use_parent_model_frame>0</use_parent_model_frame>
+				<limit>
+					<lower>-1</lower>
+					<upper>1</upper>
+					<effort>-1</effort>
+					<velocity>-1</velocity>
+				</limit>
+			</axis>
+		</joint>
+		<link name="camera">
+			<pose>0 0 0.386 0 0 0</pose>
+			<inertial>
+				<pose>0 0 0.07 0 0 0</pose>
+				<mass>1</mass>
+				<inertia>
+					<ixx>0.0054</ixx>
+					<ixy>0</ixy>
+					<ixz>0</ixz>
+					<iyy>0.0004</iyy>
+					<iyz>0</iyz>
+					<izz>0.0054</izz>
+				</inertia>
+			</inertial>
+			<visual name='visual'>
+				<pose>0 0 0 0 0 0</pose>
+				<geometry>
+					<mesh>
+						<uri>model://ThreeWheelRover/meshes/camera.dae</uri>
+					</mesh>
+				</geometry>
+				<material>
+					<ambient>0.2 0.2 0.2 1</ambient>
+					<diffuse>0.4 0.4 0.4 1</diffuse>
+					<specular>0.6 0.6 0.6 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+				<pose>0 0 0 0 0 0</pose>
+				<geometry>
+					<mesh>
+						<uri>model://ThreeWheelRover/meshes/camera.dae</uri>
+					</mesh>
+				</geometry>
+			</collision>
+			<sensor type="depth" name="camera">
+				<always_on>true</always_on>
+				<update_rate>20.0</update_rate>
+				<camera>
+					<horizontal_fov>1.045</horizontal_fov>
+					<image>
+						<format>R8G8B8</format>
+						<width>640</width>
+						<height>480</height>
+					</image>
+					<clip>
+						<near>0.05</near>
+						<far>200</far>
+					</clip>
+				</camera>
+				<plugin name="kinect_controller" filename="/opt/ros/kinetic/lib/libgazebo_ros_openni_kinect.so">
+					<cameraName>camera</cameraName>
+					<alwaysOn>true</alwaysOn>
+					<updateRate>10</updateRate>
+					<imageTopicName>rgb/image_raw</imageTopicName>
+					<depthImageTopicName>depth/image_raw</depthImageTopicName>
+					<pointCloudTopicName>depth/points</pointCloudTopicName>
+					<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+					<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+					<frameName>camera_frame_optical</frameName>
+					<baseline>0.1</baseline>
+					<distortion_k1>0.0</distortion_k1>
+					<distortion_k2>0.0</distortion_k2>
+					<distortion_k3>0.0</distortion_k3>
+					<distortion_t1>0.0</distortion_t1>
+					<distortion_t2>0.0</distortion_t2>
+					<pointCloudCutoff>0.4</pointCloudCutoff>
+				</plugin>
+			</sensor>
+		</link>
+		<!-- <plugin name="${wheel_name}_terrain_interaction" filename="libTerramechanicsPlugin.so">
+			<base_link>${wheel_conector_name}</base_link>
+			<wheel_link>${wheel_name}</wheel_link>
+			<wheel_joint>${wheel_name}_joint</wheel_joint>
+			<sub_topic>/gazebo/wheel_cmd</sub_topic>
+			<wheel_r>0.15</wheel_r>
+			<wheel_b>0.2</wheel_b>
+			<wheel_h>0.00</wheel_h>
+			<FN_AVE>250</FN_AVE>
+		</plugin>
+		<plugin name="${wheel_name}_terrain_interaction" filename="libTerramechanicsPlugin.so">
+			<base_link>${wheel_conector_name}</base_link>
+			<wheel_link>${wheel_name}</wheel_link>
+			<wheel_joint>${wheel_name}_joint</wheel_joint>
+			<sub_topic>/gazebo/wheel_cmd</sub_topic>
+			<wheel_r>0.15</wheel_r>
+			<wheel_b>0.2</wheel_b>
+			<wheel_h>0.00</wheel_h>
+			<FN_AVE>250</FN_AVE>
+		</plugin>
+		<plugin name="${wheel_name}_terrain_interaction" filename="libTerramechanicsPlugin.so">
+			<base_link>${wheel_conector_name}</base_link>
+			<wheel_link>${wheel_name}</wheel_link>
+			<wheel_joint>${wheel_name}_joint</wheel_joint>
+			<sub_topic>/gazebo/wheel_cmd</sub_topic>
+			<wheel_r>0.15</wheel_r>
+			<wheel_b>0.2</wheel_b>
+			<wheel_h>0.00</wheel_h>
+			<FN_AVE>250</FN_AVE>
+		</plugin> -->
+		<plugin name="motor_plugin_LF" filename="libgazebo_ros_joint_motor.so">
+			<motor_shaft_joint>base_left_wheel_joint</motor_shaft_joint>
+			<motor_wrench_frame>left_wheel</motor_wrench_frame>
+			<ode_joint_motor_fmax>100.0</ode_joint_motor_fmax>
+			<ode_joint_fudge_factor>1.0</ode_joint_fudge_factor>
+			<command_topic>/gazebo/wheel_l_cmd</command_topic>
+			<velocity_topic>base_left_wheel_joint/velocity</velocity_topic>
+			<encoder_topic>base_left_wheel_joint/encoder</encoder_topic>
+			<publish_velocity>true</publish_velocity>
+			<publish_encoder>false</publish_encoder>
+			<publish_motor_joint_state>true</publish_motor_joint_state>
+			<update_rate>100.0</update_rate>
+			<encoder_ppr>4096</encoder_ppr>
+			<encoder_to_shaft_ratio>1.0</encoder_to_shaft_ratio>
+			<rosDebugLevel>Debug</rosDebugLevel>
+		</plugin>
+		<plugin name="motor_plugin_LF" filename="libgazebo_ros_joint_motor.so">
+			<motor_shaft_joint>base_right_wheel_joint</motor_shaft_joint>
+			<motor_wrench_frame>right_wheel</motor_wrench_frame>
+			<ode_joint_motor_fmax>100.0</ode_joint_motor_fmax>
+			<ode_joint_fudge_factor>1.0</ode_joint_fudge_factor>
+			<command_topic>/gazebo/wheel_r_cmd</command_topic>
+			<velocity_topic>base_right_wheel_joint/velocity</velocity_topic>
+			<encoder_topic>base_right_wheel_joint/encoder</encoder_topic>
+			<publish_velocity>true</publish_velocity>
+			<publish_encoder>false</publish_encoder>
+			<publish_motor_joint_state>true</publish_motor_joint_state>
+			<update_rate>100.0</update_rate>
+			<encoder_ppr>4096</encoder_ppr>
+			<encoder_to_shaft_ratio>1.0</encoder_to_shaft_ratio>
+			<rosDebugLevel>Debug</rosDebugLevel>
+		</plugin>
+		<plugin name="motor_plugin_LF" filename="libgazebo_ros_joint_motor.so">
+			<motor_shaft_joint>back_wheel_support_back_wheel</motor_shaft_joint>
+			<motor_wrench_frame>back_wheel</motor_wrench_frame>
+			<ode_joint_motor_fmax>100.0</ode_joint_motor_fmax>
+			<ode_joint_fudge_factor>1.0</ode_joint_fudge_factor>
+			<command_topic>/gazebo/wheel_b_cmd</command_topic>
+			<velocity_topic>back_wheel_support_back_wheel/velocity</velocity_topic>
+			<encoder_topic>back_wheel_support_back_wheel/encoder</encoder_topic>
+			<publish_velocity>true</publish_velocity>
+			<publish_encoder>false</publish_encoder>
+			<publish_motor_joint_state>true</publish_motor_joint_state>
+			<update_rate>100.0</update_rate>
+			<encoder_ppr>4096</encoder_ppr>
+			<encoder_to_shaft_ratio>1.0</encoder_to_shaft_ratio>
+			<rosDebugLevel>Debug</rosDebugLevel>
+		</plugin>
+		<!-- <plugin name="ControlCamera" filename="libCameraControl.so">
+			<CameraLink>camera</CameraLink>
+			<YawJoint>base_camera_support_joint</YawJoint>
+			<PitchJoint>camera_support_camera_joint</PitchJoint>
+			<YawControlCmd>/gazebo/camera_yaw</YawControlCmd>
+			<PitchControlCmd>/gazebo/camera_pitch</PitchControlCmd>
+			<PID_P>50</PID_P>
+			<PID_I>0.1</PID_I>
+			<PID_D>0.2</PID_D>
+		</plugin> -->
+	</model>
+</sdf>

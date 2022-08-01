@@ -1,0 +1,430 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<!-- ros_control plugin -->
+	<gazebo>
+		<plugin name="gazebo_ros_control" 
+						filename="libgazebo_ros_control.so">
+			<robotNamespace>/zhurong_mars_rover</robotNamespace>
+			<robotParam>/robot_description</robotParam>
+			<robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+		</plugin>
+	</gazebo>
+
+	<!--
+		The plugin broadcasts a body's pose and rates through ROS nav_msgs::Odometry message.
+		The plugin broadcasts pose and rate of a body named "chassis" over ROS topic name "zhurong_mars_rover/odom".
+	-->
+	<gazebo>
+		<plugin name="ground_truth"
+						filename="libgazebo_ros_p3d.so">
+			<frameName>world</frameName>
+			<bodyName>nav_base_link</bodyName>
+			<topicName>/zhurong_mars_rover/odom</topicName>
+			<updateRate>100.0</updateRate>
+		</plugin>
+	</gazebo>
+
+	
+
+	<gazebo reference="gald_camera">
+		<sensor type="depth" name="Camera">
+			<always_on>true</always_on>
+			<update_rate>10.0</update_rate>
+			<camera>
+				<horizontal_fov>1.045</horizontal_fov>
+				<image>
+					<format>R8G8B8</format>
+					<width>512</width>
+					<height>512</height>
+				</image>
+				<clip>
+					<near>0.2</near>
+					<far>200</far>
+				</clip>
+				<noise>
+					<type>gaussian</type>
+					<mean>0.0</mean>
+					<stddev>0.007</stddev>
+				</noise>
+			</camera>
+			<plugin name="kinect" filename="libgazebo_ros_openni_kinect.so">
+				<cameraName>sky_camera</cameraName>
+				<alwaysOn>true</alwaysOn>
+				<updateRate>10</updateRate>
+				<imageTopicName>rgb/image_raw</imageTopicName>
+				<depthImageTopicName>depth/image_raw</depthImageTopicName>
+				<pointCloudTopicName>depth/points</pointCloudTopicName>
+				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+				<frameName>camera_frame_optical</frameName>
+				<baseline>0.1</baseline>
+				<distortion_k1>0.0</distortion_k1>
+				<distortion_k2>0.0</distortion_k2>
+				<distortion_k3>0.0</distortion_k3>
+				<distortion_t1>0.0</distortion_t1>
+				<distortion_t2>0.0</distortion_t2>
+				<pointCloudCutoff>0.2</pointCloudCutoff>
+			</plugin>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="camera_nav_link">
+		<sensor type="depth" name="Camera">
+			<always_on>true</always_on>
+			<update_rate>10.0</update_rate>
+			<camera>
+				<horizontal_fov>1.91</horizontal_fov>
+				<image>
+					<format>R8G8B8</format>
+					<width>640</width>
+					<height>360</height>
+				</image>
+				<clip>
+					<near>0.2</near>
+					<far>200</far>
+				</clip>
+				<noise>
+					<type>gaussian</type>
+					<mean>0.0</mean>
+					<stddev>0.007</stddev>
+				</noise>
+			</camera>
+			<plugin name="kinect" filename="libgazebo_ros_openni_kinect.so">
+				<cameraName>ZED/camera_nav</cameraName>
+				<alwaysOn>true</alwaysOn>
+				<updateRate>10</updateRate>
+				<imageTopicName>rgb/image_raw</imageTopicName>
+				<depthImageTopicName>depth/image_raw</depthImageTopicName>
+				<pointCloudTopicName>depth/points</pointCloudTopicName>
+				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+				<frameName>camera_frame_optical</frameName>
+				<baseline>0.1</baseline>
+				<distortion_k1>0.0</distortion_k1>
+				<distortion_k2>0.0</distortion_k2>
+				<distortion_k3>0.0</distortion_k3>
+				<distortion_t1>0.0</distortion_t1>
+				<distortion_t2>0.0</distortion_t2>
+				<pointCloudCutoff>0.2</pointCloudCutoff>
+				<pointCloudCutoffMax>20</pointCloudCutoffMax>
+			</plugin>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="camera_obs_F_link">
+		<sensor type="depth" name="Camera">
+			<always_on>true</always_on>
+			<update_rate>10.0</update_rate>
+			<camera>
+				<horizontal_fov>1.91</horizontal_fov>
+				<image>
+					<format>R8G8B8</format>
+					<width>640</width>
+					<height>360</height>
+				</image>
+				<clip>
+					<near>0.2</near>
+					<far>200</far>
+				</clip>
+				<noise>
+					<type>gaussian</type>
+					<mean>0.0</mean>
+					<stddev>0.007</stddev>
+				</noise>
+			</camera>
+			<plugin name="kinect" filename="libgazebo_ros_openni_kinect.so">
+				<cameraName>ZED/camera_obs_f</cameraName>
+				<alwaysOn>true</alwaysOn>
+				<updateRate>10</updateRate>
+				<imageTopicName>rgb/image_raw</imageTopicName>
+				<depthImageTopicName>depth/image_raw</depthImageTopicName>
+				<pointCloudTopicName>depth/points</pointCloudTopicName>
+				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+				<frameName>camera_frame_optical</frameName>
+				<baseline>0.1</baseline>
+				<distortion_k1>0.0</distortion_k1>
+				<distortion_k2>0.0</distortion_k2>
+				<distortion_k3>0.0</distortion_k3>
+				<distortion_t1>0.0</distortion_t1>
+				<distortion_t2>0.0</distortion_t2>
+				<pointCloudCutoff>0.2</pointCloudCutoff>
+				<pointCloudCutoffMax>20</pointCloudCutoffMax>
+			</plugin>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="camera_obs_B_link">
+		<sensor type="depth" name="Camera">
+			<always_on>true</always_on>
+			<update_rate>10.0</update_rate>
+			<camera>
+				<horizontal_fov>1.045</horizontal_fov>
+				<image>
+					<format>R8G8B8</format>
+					<width>512</width>
+					<height>512</height>
+				</image>
+				<clip>
+					<near>0.2</near>
+					<far>200</far>
+				</clip>
+				<noise>
+					<type>gaussian</type>
+					<mean>0.0</mean>
+					<stddev>0.007</stddev>
+				</noise>
+			</camera>
+			<plugin name="kinect" filename="libgazebo_ros_openni_kinect.so">
+				<cameraName>ZED/camera_obs_b</cameraName>
+				<alwaysOn>true</alwaysOn>
+				<updateRate>10</updateRate>
+				<imageTopicName>rgb/image_raw</imageTopicName>
+				<depthImageTopicName>depth/image_raw</depthImageTopicName>
+				<pointCloudTopicName>depth/points</pointCloudTopicName>
+				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+				<frameName>camera_frame_optical</frameName>
+				<baseline>0.1</baseline>
+				<distortion_k1>0.0</distortion_k1>
+				<distortion_k2>0.0</distortion_k2>
+				<distortion_k3>0.0</distortion_k3>
+				<distortion_t1>0.0</distortion_t1>
+				<distortion_t2>0.0</distortion_t2>
+				<pointCloudCutoff>0.2</pointCloudCutoff>
+			</plugin>
+		</sensor>
+	</gazebo>
+
+
+	<gazebo>
+		<plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+			<alwaysOn>true</alwaysOn>
+			<bodyName>chassis</bodyName>
+			<frameName>imu_link</frameName>
+			<topicName>zhurong_mars_rover/imu</topicName>
+			<serviceName>imu_service</serviceName>
+			<gaussianNoise>0</gaussianNoise>
+			<updateRate>50</updateRate>
+			<imu>
+				<noise>
+					<type>gaussian</type>
+					<rate>
+						<mean>0.0</mean>
+						<stddev>2e-4</stddev>
+						<bias_mean>0.0000075</bias_mean>
+						<bias_stddev>0.0000008</bias_stddev>
+					</rate>
+					<accel>
+						<mean>0.0</mean>
+						<stddev>1.7e-2</stddev>
+						<bias_mean>0.1</bias_mean>
+						<bias_stddev>0.001</bias_stddev>
+					</accel>
+				</noise>
+			</imu>
+		</plugin>
+	</gazebo>
+
+	<gazebo reference="chassis">
+		<sensor name="main_bumper" type="contact">
+			<always_on>1</always_on>
+			<update_rate>20</update_rate>
+			<contact>
+				<collision>chassis_collision</collision>
+				<topic>/bumper_contact</topic>
+			</contact>
+			<plugin name="gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">   
+				<bumperTopicName>zhurong_mars_rover/chassis_collision</bumperTopicName>
+				<frameName>chassis</frameName>
+			</plugin>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="nav_base_link">
+		<sensor name="my_bumper" type="contact">
+			<always_on>1</always_on>
+			<update_rate>20</update_rate>
+			<contact>
+				<collision>chassis_fixed_joint_lump__nav_base_link_collision_1</collision>
+				<topic>/base_contact</topic>
+			</contact>
+			<plugin name="gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">   
+				<bumperTopicName>zhurong_mars_rover/base_collision</bumperTopicName>
+				<frameName>nav_base_link</frameName>
+			</plugin>
+		</sensor>
+	</gazebo>
+	
+
+
+	<gazebo reference="front_wheel_L_joint">
+		<sensor name="wheel_LF_force_torque" type="force_torque">
+			<always_on>true</always_on>
+			<update_rate>20.0</update_rate>
+			<visualize>false</visualize>
+			<force_torque>
+				<frame>parent</frame>
+				<measure_direction>child_to_parent</measure_direction>
+			</force_torque>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="middle_wheel_L_joint">
+		<sensor name="wheel_LM_force_torque" type="force_torque">
+			<always_on>true</always_on>
+			<update_rate>20.0</update_rate>
+			<visualize>false</visualize>
+			<force_torque>
+				<frame>parent</frame>
+				<measure_direction>child_to_parent</measure_direction>
+			</force_torque>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="back_wheel_L_joint">
+		<sensor name="wheel_LB_force_torque" type="force_torque">
+			<always_on>true</always_on>
+			<update_rate>20.0</update_rate>
+			<visualize>false</visualize>
+			<force_torque>
+				<frame>parent</frame>
+				<measure_direction>child_to_parent</measure_direction>
+			</force_torque>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="front_wheel_R_joint">
+		<sensor name="wheel_RF_force_torque" type="force_torque">
+			<always_on>true</always_on>
+			<update_rate>20.0</update_rate>
+			<visualize>false</visualize>
+			<force_torque>
+				<frame>parent</frame>
+				<measure_direction>child_to_parent</measure_direction>
+			</force_torque>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="middle_wheel_R_joint">
+		<sensor name="wheel_RM_force_torque" type="force_torque">
+			<always_on>true</always_on>
+			<update_rate>20.0</update_rate>
+			<visualize>false</visualize>
+			<force_torque>
+				<frame>parent</frame>
+				<measure_direction>child_to_parent</measure_direction>
+			</force_torque>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="back_wheel_R_joint">
+		<sensor name="wheel_RB_force_torque" type="force_torque">
+			<always_on>true</always_on>
+			<update_rate>20.0</update_rate>
+			<visualize>false</visualize>
+			<force_torque>
+				<frame>parent</frame>
+				<measure_direction>child_to_parent</measure_direction>
+			</force_torque>
+		</sensor>
+	</gazebo>
+	
+
+	<!-- Chassis -->
+	<gazebo reference="chassis">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+	<!-- Wheel Train -->
+
+	<gazebo reference="suspension_arm_F_L">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+
+	<gazebo reference="suspension_arm_F_R">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+	<gazebo reference="suspension_arm_B_L">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+	<gazebo reference="suspension_arm_B_R">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+
+	<gazebo reference="suspension_arm_B_L_to_B2_L">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+		<material>Gazebo/Black</material>
+	</gazebo>
+
+	<gazebo reference="suspension_arm_B_R_to_B2_R">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+		<material>Gazebo/Black</material>
+	</gazebo>
+
+
+	<gazebo reference="suspension_arm_B2_L">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+	<gazebo reference="suspension_arm_B2_R">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+
+	<gazebo reference="suspension_arm_F_L_to_suspension_steer_F_L">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+	<gazebo reference="suspension_arm_F_R_to_suspension_steer_F_R">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+	<gazebo reference="suspension_steer_F_L">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+		<gazebo reference="suspension_steer_F_R">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+
+	<gazebo reference="suspension_arm_B2_L_to_suspension_steer_B_L">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+	<gazebo reference="suspension_arm_B2_R_to_suspension_steer_B_R">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+	<gazebo reference="suspension_steer_B_L">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+	<gazebo reference="suspension_steer_B_R">
+		<mu1>0.3</mu1>
+		<mu2>0.3</mu2>
+	</gazebo>
+
+</robot>

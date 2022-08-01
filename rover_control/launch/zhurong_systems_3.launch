@@ -1,0 +1,10 @@
+<launch>
+ 		
+		<node name="cmd_node"
+		 pkg="rover_control"
+		 type="ackerman_3_wheels.py"
+		 respawn="false"
+		 output="screen"
+    	 args="">
+    	 </node>
+</launch>

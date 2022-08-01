@@ -1,0 +1,6 @@
+<launch>
+	<include file="$(find rover_gazebo)/launch/zhurong_spawn.launch"/>
+	<include file="$(find rover_control)/launch/zhurong_control.launch"/>
+	<include file="$(find rover_control)/launch/zhurong_systems.launch"/>
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rover_gazebo)/rviz/zhurong_simulation.rviz" />
+</launch>

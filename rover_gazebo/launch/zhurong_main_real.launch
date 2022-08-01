@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+	<!-- <env name="GAZEBO_MODEL_PATH" value="${GAZEBO_MODEL_PATH}:$(find rover_gazebo)/models"/> -->
+	<include file="$(find rover_gazebo)/launch/zhurong_real_world.launch"/>
+	<include file="$(find rover_gazebo)/launch/zhurong_start.launch"/>
+</launch>

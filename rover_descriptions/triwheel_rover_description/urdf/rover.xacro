@@ -1,0 +1,405 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+	<xacro:macro name="rover_body" params="">
+		<link name="base">
+			<inertial>
+				<origin xyz="-0.05 0 -0.15" rpy="0 0 0"/>
+				<mass value="15"/>
+				<inertia
+						ixx="0.10"
+						ixy="0"
+						ixz="0"
+						iyy="0.14"
+						iyz="0"
+						izz="0.13" />
+			</inertial>
+			<visual>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://triwheel_rover_description/meshes/base.dae"/>
+				</geometry>
+			</visual>
+			<collision>
+				<origin xyz="0.0 0 -0.125" rpy="0 0 0"/>
+				<geometry>
+					<box size="0.35 0.65 0.25"/>
+					<!-- <mesh filename="package://triwheel_rover_description/meshes/base.dae"/> -->
+				</geometry>
+			</collision>
+		</link>
+
+		<gazebo reference="base">
+			<visual name='v'>
+				<material>
+					<ambient>0.0 0.0 0.0 1</ambient>
+					<diffuse>0.5 0.5 0.5 1</diffuse>
+					<specular>0 0 0 1</specular>
+				</material>
+			</visual>
+		</gazebo>
+
+		<link name="nav_base_link" >
+		</link>
+
+		<joint name="base_joint" type="fixed">
+				<parent link="base"/>
+				<child link="nav_base_link"/>
+				<origin xyz="0.2 0 0" rpy="0 0 0"/>
+		</joint>
+
+		<joint name="base_left_wheel_joint" type="continuous">
+			<origin xyz="0 0.25 -0.220" rpy="0 0 0"/>
+			<parent link="base"/>
+			<child link="front_wheel_L"/>
+			<limit effort="10000" velocity="100"/>
+			<axis xyz="0 1 0"/>
+		</joint>
+
+		<transmission name="left_wheel_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="base_left_wheel_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="left_wheel_Motor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<link name="front_wheel_L">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertial>
+				<origin xyz="0 0 0" rpy="1.570796327 0 0"/>
+				<mass value="3"/>
+				<inertia
+						ixx="0.0225"
+						ixy="0"
+						ixz="0"
+						iyy="0.0225"
+						iyz="0"
+						izz="0.03" />
+			</inertial>
+			<visual>
+				<origin xyz="0 0 0" rpy="1.570796327 0 0"/>
+				<geometry>
+					<mesh filename="package://triwheel_rover_description/meshes/wheel_forehead.dae"/>
+				</geometry>
+			</visual>
+			<collision>
+				<origin xyz="0 0 0" rpy="1.570796327 0 0"/>
+				<geometry>
+					<cylinder radius="0.15" length="0.15"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<gazebo reference="front_wheel_L">
+			<visual name='v'>
+				<material>
+					<ambient>0.7 0.7 0.7 0.7</ambient>
+					<diffuse>0.9 0.9 0.9 1</diffuse>
+					<specular>1 1 1 0.8</specular>
+				</material>
+			</visual>
+		</gazebo>
+
+		<joint name="base_right_wheel_joint" type="continuous">
+			<origin xyz="0 -0.25 -0.220" rpy="0 0 0"/>
+			<parent link="base"/>
+			<child link="front_wheel_R"/>
+			<limit effort="10000" velocity="100"/>
+			<axis xyz="0 1 0"/>
+		</joint>
+
+		<transmission name="right_wheel_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="base_right_wheel_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="right_wheel_Motor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<link name="front_wheel_R">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertial>
+				<origin xyz="0 0 0" rpy="1.570796327 0 0"/>
+				<mass value="3"/>
+				<inertia
+						ixx="0.0225"
+						ixy="0"
+						ixz="0"
+						iyy="0.0225"
+						iyz="0"
+						izz="0.03" />
+			</inertial>
+			<visual>
+				<origin xyz="0 0 0" rpy="-1.570796327 0 0"/>
+				<geometry>
+					<mesh filename="package://triwheel_rover_description/meshes/wheel_forehead.dae"/>
+				</geometry>
+				
+			</visual>
+			<collision>
+				<origin xyz="0 0 0" rpy="1.570796327 0 0"/>
+				<geometry>
+					<cylinder radius="0.15" length="0.15"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<gazebo reference="front_wheel_R">
+			<visual name='v'>
+				<material>
+					<ambient>0.7 0.7 0.7 0.7</ambient>
+					<diffuse>0.9 0.9 0.9 1</diffuse>
+					<specular>1 1 1 0.8</specular>
+				</material>
+			</visual>
+		</gazebo>
+
+		<joint name="base_back_wheel_support_joint" type="revolute">
+			<origin xyz="-0.43789 0 -0.047" rpy="0 0 0"/>
+			<parent link="base"/>
+			<child link="back_wheel_support"/>
+			<limit lower="-1.5708" upper="1.5708" effort="10000" velocity="100"/>
+			<axis xyz="0 0 1"/>
+		</joint>
+
+		<transmission name="back_wheel_support_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="base_back_wheel_support_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="back_wheel_support_Motor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<link name="back_wheel_support">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertial>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<mass value="1.5"/>
+				<inertia
+						ixx="0.001"
+						ixy="0"
+						ixz="0"
+						iyy="0.001"
+						iyz="0"
+						izz="0.001" />
+			</inertial>
+			<visual>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://triwheel_rover_description/meshes/back_wheel_support.dae"/>
+				</geometry>
+			</visual>
+			<!-- <collision name='collision'>
+				<pose>-0.43789 0 -0.04 0 0 0</pose>
+				<geometry>
+					<mesh>
+						<uri>model://rover/meshes/back_wheel_support.dae</uri>
+					</mesh>
+				</geometry>
+			</collision> -->
+		</link>
+		
+		<joint name="back_wheel_support_back_wheel" type="continuous">
+			<origin xyz="0 0 -0.173" rpy="0 0 0"/>
+			<parent link="back_wheel_support"/>
+			<child link="back_wheel"/>
+			<limit effort="10000" velocity="100"/>
+			<axis xyz="0 1 0"/>
+		</joint>
+
+		<transmission name="back_wheel_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="back_wheel_support_back_wheel">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="back_wheel_Motor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<link name="back_wheel">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertial>
+				<origin xyz="0 0 0" rpy="1.570796327 0 0"/>
+				<mass value="3"/>
+				<inertia
+						ixx="0.0225"
+						ixy="0"
+						ixz="0"
+						iyy="0.0225"
+						iyz="0"
+						izz="0.03" />
+			</inertial>
+			<visual>
+				<origin xyz="0 0 0" rpy="1.570796327 0 0"/>
+				<geometry>
+					<mesh filename="package://triwheel_rover_description/meshes/wheel_back.dae"/>
+				</geometry>
+				
+			</visual>
+			<collision>
+				<origin xyz="0 0 0" rpy="1.570796327 0 0"/>
+				<geometry>
+					<cylinder radius="0.15" length="0.15"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<gazebo reference="back_wheel">
+			<visual name='v'>
+				<material>
+					<ambient>0.7 0.7 0.7 0.7</ambient>
+					<diffuse>0.9 0.9 0.9 1</diffuse>
+					<specular>1 1 1 0.8</specular>
+				</material>
+			</visual>
+		</gazebo>
+
+		<joint name="base_camera_support_joint" type="fixed">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<parent link="base"/>
+			<child link="camera_support"/>
+			<limit lower="-3" upper="3" effort="10000" velocity="100"/>
+			<axis xyz="0 0 1"/>
+		</joint>
+
+		<!-- <transmission name="camera_support_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="base_camera_support_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="camera_supportMotor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission> -->
+
+		<link name="camera_support">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertial>
+				<origin xyz="0 0 0.2" rpy="0 0 0"/>
+				<mass value="1"/>
+				<inertia
+						ixx="0.0136"
+						ixy="0"
+						ixz="0"
+						iyy="0.0136"
+						iyz="0"
+						izz="0.0009" />
+			</inertial>
+			<visual>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://triwheel_rover_description/meshes/camera_support.dae"/>
+				</geometry>
+			</visual>
+			<!-- <collision>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://triwheel_rover_description/meshes/camera_support.dae"/>
+				</geometry>
+			</collision> -->
+		</link>
+
+		<joint name="camera_support_camera_joint" type="fixed">
+			<origin xyz="0 0 0.386" rpy="0 0.61 0"/>
+			<parent link="camera_support"/>
+			<child link="camera"/>
+			<limit lower="-1.5708" upper="1.5708" effort="10000" velocity="100"/>
+			<axis xyz="0 1 0"/>
+		</joint>
+
+		<!-- <transmission name="camera_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="camera_support_camera_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="cameraMotor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission> -->
+
+		<link name="camera">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertial>
+				<origin xyz="0 0 0.07" rpy="0 0 0"/>
+				<mass value="1"/>
+				<inertia
+						ixx="0.0054"
+						ixy="0"
+						ixz="0"
+						iyy="0.0004"
+						iyz="0"
+						izz="0.0054" />
+			</inertial>
+			<visual>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://triwheel_rover_description/meshes/camera.dae"/>
+				</geometry>
+				
+			</visual>
+			<!-- <collision>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://triwheel_rover_description/meshes/camera.dae"/>
+				</geometry>
+			</collision> -->
+        </link>
+
+		<gazebo reference="camera">
+			<visual name='v'>
+				<material>
+					<ambient>0.2 0.2 0.2 1</ambient>
+					<diffuse>0.4 0.4 0.4 1</diffuse>
+					<specular>0.6 0.6 0.6 1</specular>
+				</material>
+			</visual>
+		</gazebo>
+
+		<gazebo>
+			<plugin name="left_terrain_interaction" filename="libTerramechanicsPlugin.so">
+				<base_link>base</base_link>
+				<wheel_link>front_wheel_L</wheel_link>
+				<wheel_joint>base_left_wheel_joint</wheel_joint>
+				<sub_topic>/gazebo/wheel_cmd</sub_topic>
+				<wheel_r>0.15</wheel_r>
+				<wheel_b>0.15</wheel_b>
+				<wheel_h>0.00</wheel_h>
+				<FN_AVE>100</FN_AVE>
+			</plugin>
+			<plugin name="right_terrain_interaction" filename="libTerramechanicsPlugin.so">
+				<base_link>base</base_link>
+				<wheel_link>front_wheel_R</wheel_link>
+				<wheel_joint>base_right_wheel_joint</wheel_joint>
+				<sub_topic>/gazebo/wheel_cmd</sub_topic>
+				<wheel_r>0.15</wheel_r>
+				<wheel_b>0.15</wheel_b>
+				<wheel_h>0.00</wheel_h>
+				<FN_AVE>100</FN_AVE>
+			</plugin>
+			<plugin name="back_terrain_interaction" filename="libTerramechanicsPlugin.so">
+				<base_link>back_wheel_support</base_link>
+				<wheel_link>back_wheel</wheel_link>
+				<wheel_joint>back_wheel_support_back_wheel</wheel_joint>
+				<sub_topic>/gazebo/wheel_cmd</sub_topic>
+				<wheel_r>0.15</wheel_r>
+				<wheel_b>0.15</wheel_b>
+				<wheel_h>0.00</wheel_h>
+				<FN_AVE>100</FN_AVE>
+			</plugin>
+		</gazebo>
+		
+	</xacro:macro>
+</robot>

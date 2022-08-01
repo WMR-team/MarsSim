@@ -1,0 +1,27 @@
+<launch>
+	<arg name="model" default="$(find zhurong_description)/urdf/zhurong_mars_rover.xacro"/>
+	
+	<!-- <param name="robot_description"
+			textfile="$(find zhurong_description)/urdf/zhurong_mars_rover.xacro" /> -->
+	<!-- <param name="use_gui" value="true"/> -->
+	
+	<param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)" />
+	
+	<node
+		name="joint_state_publisher_gui"
+		pkg="joint_state_publisher_gui"
+		type="joint_state_publisher_gui" />
+	<node 
+		name="joint_state_publisher" 
+		pkg="joint_state_publisher" 
+		type="joint_state_publisher" ></node>
+	<node
+		name="robot_state_publisher"
+		pkg="robot_state_publisher"
+		type="robot_state_publisher" />
+	<node
+		name="rviz"
+		pkg="rviz"
+		type="rviz"
+		args="$(find zhurong_description)/rviz/zhurong.rviz"/>
+</launch>

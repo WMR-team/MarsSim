@@ -1,0 +1,330 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:macro name="sensor_ZEDNav" params="">
+
+		<link name='PTZSupport_Link'>
+			<!-- <collision>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/PTZSupport_Link.STL" />
+				</geometry>
+			</collision> -->
+
+			<visual>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/PTZSupport_Link.STL" />
+				</geometry>
+			</visual>
+
+			<inertial>
+				<origin xyz="-2.27595720048157E-15 -2.31655085739012E-16 0.353081217105695"
+								rpy="0 0 0"/>
+				<mass value="${PTZSupport_Mass}"/>
+				<inertia
+					ixx="0.044580374"
+					ixy="14.851050058E-20"
+					ixz="29.511132172E-17"
+					iyy="0.044484268"
+					iyz="33.118142667E-18"
+					izz="42.483241595E-05" />
+			</inertial>
+		</link>
+
+		<gazebo reference="obsZED_B_Link">
+			<visual name = 'v'>
+				<material>
+					<ambient>0.51 0.38 0.15 1</ambient>
+					<diffuse>0.89 0.78 0.25 1</diffuse>
+					<specular>1 1 1 1</specular>
+				</material>
+			</visual>
+		</gazebo>
+
+
+		<joint name="mast_p_joint" type="fixed">
+			<parent link="chassis"/>
+			<child link="PTZSupport_Link"/>
+			<origin xyz="0.372 0 0.356" rpy="0 0 0"/>
+			<axis xyz="0 0 0"/>
+		</joint>
+
+		<link name="PTZBase_Link">
+			<inertial>
+				<origin xyz="8.70905887529472E-05 7.07492278497065E-16 0.00150397738889563"
+								rpy="0 0 0" />
+				<mass value="${PTZBase_Mass}" />
+				<inertia
+					ixx="6.27964922171517E-05"
+					ixy="-1.10838385180181E-19"
+					ixz="-1.52774232902549E-09"
+					iyy="2.59738615464247E-05"
+					iyz="-1.23821326998403E-20"
+					izz="8.86800459053053E-05" />
+			</inertial>
+			<visual>
+				<origin xyz="0 0 0"
+								rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/PTZBase_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+			<!-- <collision>
+				<origin xyz="0 0 0"
+								rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/PTZBase_Link.STL" />
+				</geometry>
+			</collision> -->
+		</link>
+
+		<gazebo reference="PTZBase_Link">
+			<visual name = 'v'>
+				<material>
+					<ambient>0 0 0 1</ambient>
+					<diffuse>0. 0. 0. 1</diffuse>
+					<specular>1 1 1 1</specular>
+				</material>
+			</visual>
+		</gazebo>
+
+		<joint name="PTZBase_joint" type="fixed">
+			<origin xyz="-0.00088022 0 0.669"
+							rpy="0 0 0" />
+			<parent link="PTZSupport_Link" />
+			<child link="PTZBase_Link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+		<link name="PTZYaw_Link">
+			<inertial>
+				<origin xyz="-0.382789740332848 0.0270566759335262 -1.06929765169036"
+								rpy="0 0 0" />
+				<mass value="${PTZYaw_Mass}" />
+				<inertia
+					ixx="0.298174505"
+					ixy="0.000102089"
+					ixz="-0.014789456"
+					iyy="0.254202064"
+					iyz="-0.000000982"
+					izz="0.46737384" />
+			</inertial>
+			<visual>
+				<origin xyz="0.016012 -0.027056 0"
+								rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/PTZYaw_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+			<!-- <collision>
+				<origin
+				xyz="0 0 0"
+				rpy="0 0 0" />
+				<geometry>
+				<mesh
+					filename="package://zhurong_description/meshes/PTZYaw_Link.STL" />
+				</geometry>
+			</collision> -->
+		</link>
+
+		<gazebo reference="PTZYaw_Link">
+			<visual name = 'v'>
+				<material>
+					<ambient>0 0 0 1</ambient>
+					<diffuse>0. 0. 0. 1</diffuse>
+					<specular>1 1 1 1</specular>
+				</material>
+			</visual>
+		</gazebo>
+
+		<joint name="PTZYaw_joint" type="fixed">
+			<origin xyz="0 0 0.023"
+							rpy="0 0 0" />
+			<parent link="PTZBase_Link" />
+			<child link="PTZYaw_Link" />
+			<axis xyz="0 0 1" />
+			<limit lower="-1" upper="1" effort="10" velocity="10" />
+			<dynamics damping="0.2" friction="0.2" />
+			<!-- <safety_controller soft_upper="2" soft_lower="1" k_position="1" k_velocity="2" /> -->
+		</joint>
+
+
+		<!-- <transmission name="PTZYaw_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="PTZYaw_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="PTZYawMotor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission> -->
+
+		<link name="PTZPitch_Link">
+			<inertial>
+				<origin xyz="-0.000172935884150793 -0.0596540249682297 0.0305000001731983"
+								rpy="0 0 0" />
+				<mass value="${PTZPitch_Mass}" />
+				<inertia
+					ixx="6.9767514673746E-05"
+					ixy="5.07556886556821E-08"
+					ixz="8.63935417987032E-14"
+					iyy="2.8421899918887E-05"
+					iyz="4.86583131063373E-13"
+					izz="9.80932640782171E-05" />
+			</inertial>
+			<visual>
+				<origin xyz="0 0 0"
+								rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/PTZPitch_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+			<!-- <collision>
+				<origin
+				xyz="0 0 0"
+				rpy="0 0 0" />
+				<geometry>
+				<mesh
+						filename="package://zhurong_description/meshes/PTZPitch_Link.STL" />
+				</geometry>
+			</collision> -->
+		</link>
+
+		<gazebo reference="PTZPitch_Link">
+			<visual name = 'v'>
+				<material>
+					<ambient>0 0 0 1</ambient>
+					<diffuse>0. 0. 0. 1</diffuse>
+					<specular>1 1 1 1</specular>
+				</material>
+			</visual>
+		</gazebo>
+
+		<joint name="PTZPitch_joint" type="fixed">
+			<origin xyz="0 0.055 0.062"
+							rpy="0 0.63 0" />
+			<parent link="PTZYaw_Link" />
+			<child link="PTZPitch_Link" />
+			<axis xyz="0 1 0" />
+			<limit lower="-1" upper="1" effort="10" velocity="10" />
+			<dynamics damping="0.2" friction="0.2" />
+			<!-- <safety_controller soft_upper="2" soft_lower="1" k_position="1" k_velocity="2" /> -->
+		</joint>
+
+		<!-- <transmission name="PTZPitch_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="PTZPitch_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="PTZPitchMotor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission> -->
+
+
+		<link name='ZEDNav_Link'>
+			<collision>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/ZEDNav_Link.STL" />
+				</geometry>
+			</collision>
+
+			<visual>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/ZEDNav_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="1 0.74118 0.59216 1" />
+				</material>
+			</visual>
+
+			<inertial>
+				<origin xyz="0.015509 -1.3957E-15 -0.00055344"
+								rpy="0 0 0"/>
+				<mass value="${ZEDNav_Mass}"/>
+				<inertia
+					ixx="0.0028827"
+					ixy="2.1261E-17"
+					ixz="4.6915E-07"
+					iyy="0.00018009"
+					iyz="-2.0732E-18"
+					izz="0.0029023" />
+			</inertial>
+		</link>
+
+		<gazebo reference="ZEDNav_Link">
+			<visual name = 'v'>
+				<material>
+					<ambient>0 0 0 1</ambient>
+					<diffuse>0. 0. 0. 1</diffuse>
+					<specular>1 1 1 1</specular>
+				</material>
+			</visual>
+		</gazebo>
+
+		<joint name="mast_cameras_joint" type="fixed">
+			<parent link="PTZPitch_Link"/>
+			<child link="ZEDNav_Link"/>
+			<origin xyz="0 -0.055 0.046963" rpy="0 0 0"/>
+			<axis xyz="0 0 0"/>
+		</joint>
+
+		<link name="camera_nav_link">
+			<!-- Inertial for gazebo to take it into account, Put 1gr weight -->
+			<inertial>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<mass value="0.001" />
+				<inertia ixx="9.1875e-09" ixy="0.0" ixz="0.0" iyy="9.1875e-09" iyz="0.0" izz="1.378125e-08"/>
+			</inertial>
+			<visual>
+				<origin rpy="0.0 0 0" xyz="0 0 0"/>
+				<geometry>
+					<box size="0.005 0.005 0.005"/>
+				</geometry>
+			</visual>
+		</link>
+
+
+		<joint name="head_camera_joint" type="fixed">
+			<parent link="ZEDNav_Link"/>
+			<child link="camera_nav_link"/>
+			<origin xyz="0.03 0 -0." rpy="0 0 0"/>
+		</joint>
+
+		<link name="gald_camera">
+		<!-- <pose>0 0 10 0 0 0</pose> -->
+		</link>
+		<joint name="camera_sky_joint" type="fixed">
+			<parent link="chassis"/>
+			<child link="gald_camera"/>
+			<origin xyz="-10 0 10" rpy="0 0.5 0"/>
+		</joint>
+
+
+	</xacro:macro>
+
+</robot>
+
+
+
+
+
+ 

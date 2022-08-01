@@ -1,0 +1,101 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:macro name="sensor_roLIDAR" params="">
+
+		<link name="roLODARSupport_Link">
+			<inertial>
+				<origin
+					xyz="0.00538863503056851 9.86240042394048E-15 0.146699574350179"
+					rpy="0 0 0" />
+				<mass
+					value="0.492174518038472" />
+				<inertia
+					ixx="0.00533662600139064"
+					ixy="-2.63484485658851E-18"
+					ixz="-4.8898830185858E-05"
+					iyy="0.00526781875119998"
+					iyz="-2.69247115975406E-16"
+					izz="0.000446320461987755" />
+			</inertial>
+			<visual>
+				<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+				<geometry>
+					<mesh
+						filename="package://zhurong_description/meshes/roLODARSupport_Link.STL" />
+				</geometry>
+				<material name="">
+					<color
+						rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+			<!-- <collision>
+				<origin
+				xyz="0 0 0"
+				rpy="0 0 0" />
+				<geometry>
+				<mesh
+						filename="package://zhurong_description/meshes/roLODARSupport_Link.STL" />
+				</geometry>
+			</collision> -->
+		</link>
+
+		<joint name="roLODARSupport_joint" type="fixed">
+			<origin
+				xyz="-0.0060705 0 0.356"
+				rpy="0 0 0" />
+			<parent link="chassis" />
+			<child link="roLODARSupport_Link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+		<link name="roLIDAR_Link">
+			<inertial>
+					<origin
+					xyz="-0.00029476699584187 4.3311848339724E-05 0.0357745048628205"
+					rpy="0 0 0" />
+					<mass
+					value="1.57971945934031" />
+					<inertia
+					ixx="0.00170407109765932"
+					ixy="1.1554696199845E-09"
+					ixz="-1.34022707924721E-05"
+					iyy="0.00174315121285582"
+					iyz="-1.34862664792592E-07"
+					izz="0.00205882585159933" />
+			</inertial>
+			<visual>
+				<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/roLIDAR_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="1 0.592156862745098 1 1" />
+				</material>
+			</visual>
+			<!-- <collision>
+				<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/roLIDAR_Link.STL" />
+				</geometry>
+			</collision> -->
+		</link>
+
+		<joint name="roLIDAR_joint" type="fixed">
+			<origin
+				xyz="0.0060705 -4.5898E-05 0.2555"
+				rpy="0 0 0" />
+			<parent link="roLODARSupport_Link" />
+			<child link="roLIDAR_Link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+	</xacro:macro>
+
+</robot>

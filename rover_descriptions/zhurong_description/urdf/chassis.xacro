@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:macro name="chassis_body" params="">
+		<!-- <link name='world'/>
+		<joint name="world_joint" type="floating">
+				<parent link="world"/>
+				<child link="chassis"/>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+		</joint> -->
+		
+		<link name='chassis'>
+			<collision>
+				<origin xyz="0.85 0 0.105"
+								rpy="0 0 0"/>
+				<geometry>
+					<!-- <box size="1.252 0.832 0.502"/> -->
+					<!-- <box size="1.8 1.6 0.502"/> -->
+					<box size="0.25 1.6 0.502"/>
+				</geometry>
+			</collision>
+
+			<visual>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/base_link.STL" />
+				</geometry>
+				<!-- <material name="">
+						<color rgba="0.79216 0.81961 0.93333 1" />
+				</material> -->
+			</visual>
+
+			<inertial>
+				<!-- <origin xyz="0.0048338 -3.38E-05 0.048249"
+								rpy="0 0 0"/> -->
+				<origin xyz="-0.055 0 0.048249"
+								rpy="0 0 0"/>
+				<mass value="${chassisMass}"/>
+				<!-- <box_inertia
+						m="${chassisMass}"
+						x="${chassisWidth*scale_XYZ}"
+						y="${chassisLength*scale_XYZ}"
+						z="${chassisHeight*scale_XYZ}"/> -->
+				<inertia
+						ixx="9.0675"
+						ixy="0.00018261"
+						ixz="-0.0011272"
+						iyy="11.333"
+						iyz="2.9296E-05"
+						izz="15.759" />
+			</inertial>
+		</link>
+		<gazebo reference="chassis">
+			<visual name='v'>
+				<material>
+					<ambient>0.51 0.38 0.15 1</ambient>
+					<diffuse>0.89 0.78 0.25 1</diffuse>
+					<specular>1 1 1 1</specular>
+				</material>
+			</visual>
+		</gazebo>
+
+		<!-- Used for fixing robot to Gazebo 'chassis' -->
+		<link name="nav_base_link" >
+			<collision>
+				<origin xyz="-0.3 0 0.105"
+								rpy="0 0 0"/>
+				<geometry>
+					<box size="1.5 1.6 0.502"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="base_joint" type="fixed">
+				<parent link="chassis"/>
+				<child link="nav_base_link"/>
+				<origin xyz="0.2 0 0" rpy="0 0 0"/>
+		</joint>
+		
+	</xacro:macro>
+</robot>

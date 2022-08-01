@@ -1,0 +1,93 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+		<xacro:macro name="wheel" params="wheel_name wheel_conector_name tY">
+				<!-- tY is Zero if left side, 1 if right side -->
+			<link name='${wheel_name}'>
+				<collision>
+					<origin xyz="0 0 0"
+									rpy="${0.5*PI} 0 0"/>
+					<geometry>
+						<cylinder radius="${wheelRadius}" length="${wheelWidth}"/>
+					</geometry>
+				</collision>
+
+				<visual>
+					<origin xyz="0 0 0"
+									rpy="${tY*PI} 0 0"/>
+					<geometry>
+						<mesh filename="package://zhurong_description/meshes/wheel_LB_Link.STL"/>
+					</geometry>
+				</visual>
+
+				<inertial>
+					<origin xyz="0 0 0"
+									rpy="0 0 0"/>
+					<mass value="${wheelMass}"/>
+					<!-- <cylinder_inertia
+							m="${wheelMass}"
+							r="${wheelRadius*scale_XYZ}"
+							h="${wheelWidth*scale_XYZ}"/> -->
+					<inertia
+						ixx="0.10115"
+						ixy="2.2033E-15"
+						ixz="3.4084E-15"
+						iyy="0.12709"
+						iyz="-3.2025E-15"
+						izz="0.10115" />
+				</inertial>
+			</link>
+
+			<gazebo reference="${wheel_name}">
+				<mu1 value="1.0"/>
+				<mu2 value="1.0"/>
+				<kp  value="10000000.0" />
+				<kd>100.0</kd>
+				<minDepth>0.001</minDepth>
+				<maxVel>1.0</maxVel>
+				<!--kd  value="1.0" />
+				<fdir1 value="1 0 0"/-->
+				<!-- <material>Gazebo/Black</material> -->
+				<visual name = 'v'>
+					<material>
+						<ambient>0.53 0.51 0.49 1</ambient>
+						<diffuse>0.74 0.74 0.72 1</diffuse>
+						<specular>1 1 1 1</specular>
+					</material>
+				</visual>
+			</gazebo>
+
+			<joint name="${wheel_name}_joint" type="continuous">
+				<parent link="${wheel_conector_name}"/>
+				<child link="${wheel_name}"/>
+				<origin xyz="0 0 -0.21" rpy="0 0 0"/>
+				<limit effort="10000.0" velocity="100.0"/>
+				<axis xyz="0 1 0"/>
+				<joint_properties damping="0.0" friction="0.0"/>
+				<!-- <safety_controller soft_upper="2" soft_lower="1" k_position="1" k_velocity="2" /> -->
+			</joint>
+
+			<transmission name="${wheel_name}_trans">
+				<type>transmission_interface/SimpleTransmission</type>
+				<joint name="${wheel_name}_joint">
+					<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				</joint>
+				<actuator name="${wheel_name}Motor">
+					<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+					<mechanicalReduction>1</mechanicalReduction>
+				</actuator>
+			</transmission>
+
+			<gazebo>
+				<plugin name="${wheel_name}_terrain_interaction" filename="libTerramechanicsPlugin.so">
+					<base_link>${wheel_conector_name}</base_link>
+					<wheel_link>${wheel_name}</wheel_link>
+					<wheel_joint>${wheel_name}_joint</wheel_joint>
+					<sub_topic>/gazebo/wheel_cmd</sub_topic>
+					<wheel_r>0.15</wheel_r>
+					<wheel_b>0.2</wheel_b>
+					<wheel_h>0.00</wheel_h>
+					<FN_AVE>250</FN_AVE>
+				</plugin>
+			</gazebo>
+		</xacro:macro>
+</robot>

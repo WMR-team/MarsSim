@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot name="zhurong_mars_rover" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:include filename="$(find triwheel_rover_description)/urdf/rover.xacro" />
+	<rover_body/>
+
+</robot>

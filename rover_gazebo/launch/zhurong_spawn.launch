@@ -1,0 +1,40 @@
+<launch>
+	
+	<arg name="x" default="0" />
+	<arg name="y" default="1" />
+	<arg name="z" default="5.5" />
+	<arg name="roll" default="0"/>
+	<arg name="pitch" default="0"/>
+	<arg name="yaw" default="0" />
+
+	<arg name="model" default="$(find rover_gazebo)/urdf/zhurong_gazebo.xacro"/>
+	
+	<!-- 
+		Converts the xacro robot information to UDRF and use it as a robot_description parameter
+	-->
+	<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+
+	
+	<!-- 
+		push robot_description to factory and spawn robot in gazebo 
+	-->
+	<node name="urdf_spawner"
+		 pkg="gazebo_ros"
+		 type="spawn_model"
+		 respawn="false"
+		 output="screen"
+		 args="-urdf -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -model zhurong_mars_rover -param robot_description 
+		 "/>
+
+ 	<node 
+		name="joint_state_publisher" 
+		pkg="joint_state_publisher" 
+		type="joint_state_publisher" ></node>
+	<!-- <node
+		name="robot_state_publisher"
+		pkg="robot_state_publisher"
+		type="robot_state_publisher" />	   -->
+
+	<node pkg="tf" type="static_transform_publisher" name="base_to_world" args="0.0 0.0 0.0 0 0 0.0 /chassis /world 100"/>
+
+</launch>

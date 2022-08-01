@@ -1,0 +1,355 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:macro name="right_wheel_tree" params="">
+		<link name='suspension_arm_F_R'>
+			<!-- <collision>
+					<origin xyz="0 0 0"
+									rpy="0 0 0"/>
+					<geometry>
+							<mesh filename="package://zhurong_description/meshes/rightMainRockerF_Link.STL" />
+					</geometry>
+			</collision> -->
+
+			<visual>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/rightMainRockerF_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+
+			<inertial>
+				<origin xyz="0.374406441189298 -0.0934153639972333 -6.89062960095574E-05"
+								rpy="0 0 0"/>
+				<mass value="${suspension_arm_F_L_Mass}"/>
+				<inertia
+						ixx="0.044936"
+						ixy="0.12729"
+						ixz="5.1728E-05"
+						iyy="0.52775"
+						iyz="-2.5537E-05"
+						izz="0.5667" />
+			</inertial>
+		</link>
+
+		<joint name="suspension_arm_F_R_joint" type="revolute">
+			<parent link="chassis"/>
+			<child link="suspension_arm_F_R"/>
+			<origin xyz="0 -0.425 0" rpy="0 0 0"/>
+			<limit lower="${-suspension_arm_F_L_limit}" upper="${suspension_arm_F_L_limit}" effort="${suspension_effort}" velocity="${suspension_speed}"/>
+			<axis xyz="0 1 0"/>
+			<joint_properties damping="${suspension_damping}" friction="${suspension_friction}"/>
+			<!-- <safety_controller soft_upper="2" soft_lower="1" k_position="1" k_velocity="2" /> -->
+		</joint>
+
+		<transmission name="suspension_arm_F_R_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="suspension_arm_F_R_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="suspension_arm_F_RMotor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<link name='suspension_arm_B_R'>
+			<!-- <collision>
+					<origin xyz="0 0 0"
+									rpy="0 0 0"/>
+					<geometry>
+						<mesh filename="package://zhurong_description/meshes/rightMainRockerB_Link.STL" />
+					</geometry>
+			</collision> -->
+
+			<visual>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/rightMainRockerB_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+
+			<inertial>
+				<origin xyz="-0.268660620879595 -0.0775517755962135 -0.034689037122949"
+								rpy="0 0 0"/>
+				<mass value="${suspension_arm_B_L_Mass}"/>
+				<inertia
+						ixx="0.0137200282558301"
+						ixy="-0.0224568861608378"
+						ixz="-0.012842474183811"
+						iyy="0.110106899722301"
+						iyz="-0.00290556321774427"
+						izz="0.111720459845369" />
+			</inertial>
+		</link>
+
+		<joint name="suspension_arm_B_R_joint" type="revolute">
+			<parent link="chassis"/>
+			<child link="suspension_arm_B_R"/>
+			<origin xyz="0 -0.4755 0" rpy="0 0 0"/>
+			<limit lower="${-suspension_arm_B_L_limit}" upper="${suspension_arm_B_L_limit}" effort="${suspension_effort}" velocity="${suspension_speed}"/>
+			<axis xyz="0 1 0"/>
+			<joint_properties damping="${suspension_damping}" friction="${suspension_friction}"/>
+			<!-- <safety_controller soft_upper="2" soft_lower="1" k_position="1" k_velocity="2" /> -->
+		</joint>
+
+		<transmission name="suspension_arm_B_R_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="suspension_arm_B_R_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="suspension_arm_B_RMotor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<link name='suspension_arm_B2_R'>
+			<!-- <collision>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/rightSubRocker_Link.STL" />
+				</geometry>
+			</collision> -->
+
+			<visual>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/rightSubRocker_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+
+			<inertial>
+				<origin xyz="3.57789992633251E-08 -0.0397199867449787 0.0277251288935328"
+								rpy="0 0 0"/>
+				<mass value="${suspension_arm_B2_L_Mass}"/>
+					<inertia
+						ixx="0.0141733870995389"
+						ixy="1.06708959653903E-08"
+						ixz="5.80841959901407E-09"
+						iyy="0.449323894577238"
+						iyz="-0.00176906235683086"
+						izz="0.445965845536852" />
+			</inertial>
+		</link>
+
+		<joint name="suspension_arm_B2_R_joint" type="revolute">
+			<parent link="suspension_arm_B_R"/>
+			<child link="suspension_arm_B2_R"/>
+			<origin xyz="-0.3875 -0.147 -0.049933" rpy="0 0 0"/>
+			<limit lower="${suspension_arm_B2_lower_limit}" upper="${suspension_arm_B2_upper_limit}" effort="${suspension_effort}" velocity="${suspension_speed}"/>
+			<axis xyz="0 1 0"/>
+			<joint_properties damping="${suspension_damping}" friction="${suspension_friction}"/>
+			<!-- <safety_controller soft_upper="2" soft_lower="1" k_position="1" k_velocity="2" /> -->
+		</joint>
+
+		<transmission name="suspension_arm_B2_R_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="suspension_arm_B2_R_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="suspension_arm_B2_RMotor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<!-- FRONT WHEEL RIGHT -->
+		<link name='suspension_steer_F_R'>
+			<!-- <collision>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/steerSupport_RF_Link.STL" />
+				</geometry>
+			</collision> -->
+
+			<visual>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/steerSupport_RF_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+
+			<inertial>
+				<origin xyz="-1.94007174769695E-08 -0.0742091442665408 -0.163200606270303"
+								rpy="0 0 0"/>
+				<mass value="${suspension_steer_F_L_Mass}"/>
+				<inertia
+						ixx="0.0296117729579466"
+						ixy="3.59264802325733E-09"
+						ixz="-8.13636278680828E-07"
+						iyy="0.023285150213064"
+						iyz="-0.00321331837233789"
+						izz="0.00955328884350218" />
+			</inertial>
+		</link>
+
+		<joint name="suspension_steer_F_R_joint" type="revolute">
+			<parent link="suspension_arm_F_R"/>
+			<child link="suspension_steer_F_R"/>
+			<origin xyz="0.775 -0.227 -0.04" rpy="0 0 0"/>
+			<limit lower="${-suspension_steer_limit}" upper="${suspension_steer_limit}" effort="${suspension_steer_effort}" velocity="${suspension_steer_velocity}"/>
+			<axis xyz="0 0 1"/>
+			<joint_properties damping="${suspension_damping}" friction="${suspension_friction}"/>
+			<!-- <safety_controller soft_upper="2" soft_lower="1" k_position="1" k_velocity="2" /> -->
+		</joint>
+
+		<transmission name="suspension_steer_F_R_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="suspension_steer_F_R_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="suspension_steer_F_RMotor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<wheel
+			wheel_name="front_wheel_R"
+			wheel_conector_name="suspension_steer_F_R"
+			tY="-1"/>
+
+			<!-- RIGHT MIDDLE WHEEL -->
+		<link name='suspension_steer_M_R'>
+			<!-- <collision>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/steerSupport_RM_Link.STL"/>
+				</geometry>
+			</collision> -->
+
+			<visual>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/steerSupport_RM_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+
+			<inertial>
+				<origin xyz="-1.94007174769695E-08 -0.0742091442665408 -0.163200606270303"
+								rpy="0 0 0"/>
+				<mass value="${suspension_steer_F_L_Mass}"/>
+				<inertia
+						ixx="0.0296117729579466"
+						ixy="3.59264802325733E-09"
+						ixz="-8.13636278680828E-07"
+						iyy="0.023285150213064"
+						iyz="-0.00321331837233789"
+						izz="0.00955328884350218" />
+			</inertial>
+		</link>
+
+		<joint name="suspension_steer_M_R_joint" type="revolute">
+			<parent link="suspension_arm_B2_R"/>
+			<child link="suspension_steer_M_R"/>
+			<origin xyz="0.3875 -0.0295 0.0099326" rpy="0 0 0"/>
+			<limit lower="${-suspension_steer_limit}" upper="${suspension_steer_limit}" effort="${suspension_steer_effort}" velocity="${suspension_steer_velocity}"/>
+			<axis xyz="0 0 1"/>
+			<joint_properties damping="${suspension_damping}" friction="${suspension_friction}"/>
+			<!-- <safety_controller soft_upper="2" soft_lower="1" k_position="1" k_velocity="2" /> -->
+		</joint>
+
+		<transmission name="suspension_steer_M_R_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="suspension_steer_M_R_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="suspension_steer_M_RMotor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<wheel
+			wheel_name="middle_wheel_R"
+			wheel_conector_name="suspension_steer_M_R"
+			tY="-1"/>
+
+			<!-- RIGHT BACK WHEEL -->
+		<link name='suspension_steer_B_R'>
+			<!-- <collision>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/steerSupport_RB_Link.STL" />
+				</geometry>
+			</collision> -->
+
+			<visual>
+				<origin xyz="0 0 0"
+								rpy="0 0 0"/>
+				<geometry>
+						<mesh filename="package://zhurong_description/meshes/steerSupport_RB_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+
+			<inertial>
+				<origin xyz="-1.94007171439026E-08 -0.074209144266541 -0.163200606270289"
+								rpy="0 0 0"/>
+				<mass value="${suspension_steer_B_L_Mass}"/>
+				<inertia
+						ixx="0.0296117729579466"
+						ixy="3.59264802325733E-09"
+						ixz="-8.13636278680828E-07"
+						iyy="0.023285150213064"
+						iyz="-0.00321331837233789"
+						izz="0.00955328884350218" />
+			</inertial>
+		</link>
+
+		<joint name="suspension_steer_B_R_joint" type="revolute">
+			<parent link="suspension_arm_B2_R"/>
+			<child link="suspension_steer_B_R"/>
+			<origin xyz="-0.3875 -0.0295 0.0099326" rpy="0 0 0"/>
+			<limit lower="${-suspension_steer_limit}" upper="${suspension_steer_limit}" effort="${suspension_steer_effort}" velocity="${suspension_steer_velocity}"/>
+			<axis xyz="0 0 1"/>
+			<joint_properties damping="${suspension_damping}" friction="${suspension_friction}"/>
+			<!-- <safety_controller soft_upper="2" soft_lower="1" k_position="1" k_velocity="2" /> -->
+		</joint>
+
+		<transmission name="suspension_steer_B_R_trans">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="suspension_steer_B_R_joint">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="suspension_steer_B_RMotor">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+
+		<wheel
+			wheel_name="back_wheel_R"
+			wheel_conector_name="suspension_steer_B_R"
+			tY="-1"/>
+
+			<!-- END BACK WHEEL RIGHT -->
+	</xacro:macro>
+</robot>

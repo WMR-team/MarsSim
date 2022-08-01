@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<robot name="zhurong_mars_rover" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Inertia matrices -->
+	<xacro:include filename="$(find zhurong_description)/urdf/macros.xacro" />
+	<!-- Robot constants and properties -->
+	<xacro:include filename="$(find zhurong_description)/urdf/zhurong_mars_rover_properties.xacro" />
+	<!-- Gazebo aspects of the robot -->
+	<!-- <xacro:include filename="$(find zhurong_description)/urdf/zhurong_mars_rover.gazebo" /> -->
+	<!-- Chasis -->
+	<xacro:include filename="$(find zhurong_description)/urdf/chassis.xacro" />
+	<!-- Wheel Groups -->
+	<xacro:include filename="$(find zhurong_description)/urdf/wheel.xacro" />
+	<xacro:include filename="$(find zhurong_description)/urdf/left_wheel_group.xacro" />
+	<xacro:include filename="$(find zhurong_description)/urdf/right_wheel_group.xacro" />
+	<!-- Sensor Mast -->
+	<xacro:include filename="$(find zhurong_description)/urdf/sensor_stereo_camera.xacro" />
+	<xacro:include filename="$(find zhurong_description)/urdf/sensor_LIDAR_group.xacro" />
+	<xacro:include filename="$(find zhurong_description)/urdf/sensor_obstacle_stereo_camera.xacro" />
+	<xacro:include filename="$(find zhurong_description)/urdf/sensor_roLIDAR.xacro" />
+
+	<chassis_body/>
+	<left_wheel_tree/>
+	<right_wheel_tree/>
+	<sensor_ZEDNav/>
+	<sensor_LIDAR/>
+	<sensor_obsZED/>
+	<sensor_roLIDAR/>
+
+
+</robot>

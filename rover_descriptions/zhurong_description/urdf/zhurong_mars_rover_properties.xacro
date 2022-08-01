@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<!-- Constants -->
+	<xacro:property name="PI" value="3.1415926535897931"/>
+	
+	<!-- Scaling -->
+	<xacro:property name="scale_XYZ" value="1.0"/>
+
+	<!-- Chassis properties -->
+	<!-- <xacro:property name="chassisMass" value="78.927"/> -->
+	<xacro:property name="chassisMass" value="115"/>
+
+	<xacro:property name="chassisHeight" value="0.502"/>
+	<xacro:property name="chassisLength" value="1.252"/>
+	<xacro:property name="chassisWidth" value="0.832"/>
+
+
+	<!-- Wheel Trees -->
+	<!-- <xacro:property name="TreeMass" value="${63/2.0}"/>
+	<xacro:property name="TreeParts" value="5.0"/> -->
+
+	<xacro:property name="suspension_arm_F_L_Mass" value="5.9162"/>
+	<!-- <xacro:property name="suspension_arm_F_L_X" value="0.39606"/>
+	<xacro:property name="suspension_arm_F_L_Y" value="1.02203"/>
+	<xacro:property name="suspension_arm_F_L_Z" value="0.30536"/> -->
+	<xacro:property name="suspension_arm_F_L_limit" value="0.4"/>
+
+	<xacro:property name="suspension_arm_B_L_Mass" value="4.49196094850844"/>
+	<!-- <xacro:property name="suspension_arm_B_L_X" value="0.123524"/>
+	<xacro:property name="suspension_arm_B_L_Y" value="0.852108"/>
+	<xacro:property name="suspension_arm_B_L_Z" value="0.348354"/> -->
+	<xacro:property name="suspension_arm_B_L_limit" value="0.4"/>
+
+	<xacro:property name="suspension_arm_B2_L_Mass" value="6.22012749694192"/>
+	<!-- <xacro:property name="suspension_arm_B2_L_X" value="0.400262"/>
+	<xacro:property name="suspension_arm_B2_L_Y" value="1.22113"/>
+	<xacro:property name="suspension_arm_B2_L_Z" value="0.631338"/> -->
+	<xacro:property name="suspension_arm_B2_lower_limit" value="-1.2"/>
+	<xacro:property name="suspension_arm_B2_upper_limit" value="0.1"/>
+
+	<xacro:property name="suspension_steer_F_L_Mass" value="3.46609266765695"/>
+	<!-- <xacro:property name="suspension_steer_F_L_X" value="0.528399"/>
+	<xacro:property name="suspension_steer_F_L_Y" value="0.21019"/>
+	<xacro:property name="suspension_steer_F_L_Z" value="0.450036"/> -->
+
+	<xacro:property name="suspension_steer_M_L_Mass" value="3.46609266765695"/>
+	<!-- <xacro:property name="suspension_steer_F_L_X" value="0.528399"/>
+	<xacro:property name="suspension_steer_F_L_Y" value="0.21019"/>
+	<xacro:property name="suspension_steer_F_L_Z" value="0.450036"/> -->
+
+	<xacro:property name="suspension_steer_B_L_Mass" value="3.46609266765695"/>
+	<!-- <xacro:property name="suspension_steer_B_L_X" value="0.528399"/>
+	<xacro:property name="suspension_steer_B_L_Y" value="0.21019"/>
+	<xacro:property name="suspension_steer_B_L_Z" value="0.450036"/> -->
+
+	<xacro:property name="suspension_steer_limit" value="0.6"/>
+	<xacro:property name="suspension_steer_effort" value="10000.0"/>
+	<xacro:property name="suspension_steer_velocity" value="10.0"/>
+
+	<xacro:property name="suspension_effort" value="10000.0"/>
+	<xacro:property name="suspension_speed" value="10.0"/>
+	<xacro:property name="suspension_damping" value="0.5"/>
+	<xacro:property name="suspension_friction" value="0.5"/>
+
+	<!-- Wheels properties -->
+	<xacro:property name="wheelWidth" value="0.2"/>
+	<xacro:property name="wheelRadius" value="0.15"/>
+	<xacro:property name="wheelMass" value="9.86840134378537"/>
+
+	<!-- Mast -->
+
+	<!-- <xacro:property name="mastMass" value="50.0"/>
+	<xacro:property name="MastParts" value="3.0"/> -->
+
+	<xacro:property name="PTZSupport_Mass" value="0.687122587"/>
+
+	<xacro:property name="PTZBase_Mass" value="0.0603401078147047"/>
+
+	<xacro:property name="PTZYaw_Mass" value="1"/>
+
+	<xacro:property name="PTZPitch_Mass" value="0.0640993648047983"/>
+
+	<xacro:property name="ZEDNav_Mass" value="0.3"/>
+
+		
+</robot>

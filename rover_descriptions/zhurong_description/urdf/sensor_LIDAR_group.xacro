@@ -1,0 +1,321 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:macro name="sensor_LIDAR" params="">
+
+		<link name="rightLIDARSupport_Link">
+			<inertial>
+				<origin
+					xyz="0.011031 -0.0030285 0.02221"
+					rpy="0 0 0" />
+				<mass value="0.71699" />
+				<inertia
+					ixx="0.0013889"
+					ixy="4.9797E-05"
+					ixz="0.00011017"
+					iyy="0.0011592"
+					iyz="2.1053E-05"
+					izz="0.0018995" />
+				</inertial>
+			<visual>
+				<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/rightLIDARSupport_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.79216 0.81961 0.93333 1" />
+				</material>
+			</visual>
+			<!-- <collision>
+					<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+					<geometry>
+					<mesh
+							filename="package://zhurong_description/meshes/rightLIDARSupport_Link.STL" />
+					</geometry>
+			</collision> -->
+		</link>
+		<joint name="base_rightLIDARSupport_joint" type="fixed">
+			<origin
+				xyz="0.57582 -0.36983 0.355"
+				rpy="0 0 -1.3963" />
+			<parent link="chassis" />
+			<child link="rightLIDARSupport_Link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+		<link name="rightLIDAR_Link">
+			<inertial>
+				<origin
+					xyz="-0.0014938 8.2546E-05 0.045338"
+					rpy="0 0 0" />
+				<mass value="0.63292022019795" />
+				<inertia
+					ixx="0.000595621216348257"
+					ixy="4.10908053215545E-06"
+					ixz="1.09920381678368E-06"
+					iyy="0.0010240787240272"
+					iyz="-1.90143159712689E-06"
+					izz="0.000999086055250354" />
+			</inertial>
+			<visual>
+				<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/rightLIDAR_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.79216 0.81961 0.93333 1" />
+				</material>
+		</visual>
+		<!-- <collision>
+				<origin
+				xyz="0 0 0"
+				rpy="0 0 0" />
+				<geometry>
+				<mesh
+						filename="package://zhurong_description/meshes/rightLIDAR_Link.STL" />
+				</geometry>
+		</collision> -->
+		</link>
+		<joint name="rightLIDAR_joint" type="fixed">
+			<origin
+				xyz="0.0240653471793943 -0.00451829795636155 0.0419761917318945"
+				rpy="0 0.505887468643377 0" />
+			<parent link="rightLIDARSupport_Link" />
+			<child link="rightLIDAR_Link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+		<link name="rightLIDAR_ray_Link"/>
+
+		<joint name="rightLIDAR_ray_joint" type="fixed">
+			<origin
+				xyz="0.02 0 0.05"
+				rpy="0 0.175 0" />
+			<parent link="rightLIDAR_Link" />
+			<child link="rightLIDAR_ray_Link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+		<link name="leftLIDARSupport_link">
+			<inertial>
+				<origin
+					xyz="0.0110314286038745 -0.0030285261958341 0.0222099739016789"
+					rpy="0 0 0" />
+				<mass value="0.716994313139609" />
+				<inertia
+					ixx="0.00138893841577108"
+					ixy="4.979658168138E-05"
+					ixz="0.000110169186218363"
+					iyy="0.00115916947666226"
+					iyz="2.10533639411033E-05"
+					izz="0.00189953785633002" />
+			</inertial>
+			<visual>
+				<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/leftLIDARSupport_link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+			<!-- <collision>
+					<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+					<geometry>
+					<mesh
+							filename="package://zhurong_description/meshes/leftLIDARSupport_link.STL" />
+					</geometry>
+			</collision> -->
+		</link>
+
+		<joint name="base_leftLIDARSupport_joint" type="fixed">
+			<origin
+				xyz="0.56692 0.3714 0.355"
+				rpy="0 0 1.3963" />
+			<parent link="chassis" />
+			<child link="leftLIDARSupport_link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+		<link name="leftLIDAR_Link">
+			<inertial>
+				<origin
+					xyz="-0.00149376316186201 8.25464800668363E-05 0.0453375226537512"
+					rpy="0 0 0" />
+				<mass value="0.620510023815792" />
+				<inertia
+					ixx="0.000583942373546342"
+					ixy="4.02851054933105E-06"
+					ixz="1.07764677134589E-06"
+					iyy="0.00100399875224317"
+					iyz="-1.86414891118875E-06"
+					izz="0.000979496130748514" />
+			</inertial>
+			<visual>
+				<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/leftLIDAR_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+		</visual>
+			<!-- <collision>
+					<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+					<geometry>
+					<mesh
+							filename="package://zhurong_description/meshes/leftLIDAR_Link.STL" />
+					</geometry>
+			</collision> -->
+		</link>
+
+		<joint name="leftLIDAR_joint" type="fixed">
+			<origin xyz="0.024597 -0.0045183 0.042611" rpy="0 0.5236 0" />
+			<parent link="leftLIDARSupport_link" />
+			<child link="leftLIDAR_Link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+		<link name="leftLIDAR_ray_Link">
+			<origin
+				xyz="0 0 0"
+				rpy="0 0 0" />
+			<inertial>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<mass value="0.001" />
+				<inertia ixx="9.1875e-09" ixy="0.0" ixz="0.0" iyy="9.1875e-09" iyz="0.0" izz="1.378125e-08"/>
+			</inertial>
+			<visual>
+				<origin rpy="0.0 0 0" xyz="0 0 0"/>
+				<geometry>
+					<box size="0.005 0.005 0.005"/>
+				</geometry>
+			</visual>
+		</link>
+
+		<joint name="leftLIDAR_ray_joint" type="fixed">
+			<origin
+				xyz="0.02 0 0.05"
+				rpy="0 0.175 0" />
+			<parent link="leftLIDAR_Link" />
+			<child link="leftLIDAR_ray_Link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+		<link name="midLIDARSupport_Link">
+			<inertial>
+				<origin
+					xyz="0.00466354860861118 -1.62714158561421E-16 0.0220115521580108"
+					rpy="0 0 0" />
+				<mass value="0.736128368270855" />
+				<inertia
+					ixx="0.00135194155364146"
+					ixy="3.28404252552773E-20"
+					ixz="0.000153548931640673"
+					iyy="0.0010530440544955"
+					iyz="6.30210900151177E-19"
+					izz="0.00171414174872708" />
+			</inertial>
+			<visual>
+				<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/midLIDARSupport_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+			<!-- <collision>
+					<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+					<geometry>
+					<mesh
+							filename="package://zhurong_description/meshes/midLIDARSupport_Link.STL" />
+					</geometry>
+			</collision> -->
+		</link>
+		<joint name="base_midLIDARSupport_joint" type="fixed">
+			<origin
+				xyz="0.58319 0 0.355"
+				rpy="0 0 0" />
+			<parent link="chassis" />
+			<child link="midLIDARSupport_Link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+		<link name="midLIDAR_Link">
+			<inertial>
+				<origin
+					xyz="-0.00149376315746558 8.25464448372778E-05 0.0453375226663766"
+					rpy="0 0 0" />
+				<mass
+					value="0.620510023273858" />
+				<inertia
+					ixx="0.000583942373197608"
+					ixy="4.0285103659128E-06"
+					ixz="1.07764739887328E-06"
+					iyy="0.00100399875229627"
+					iyz="-1.86414983718085E-06"
+					izz="0.000979496130560259" />
+			</inertial>
+			<visual>
+				<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+				<geometry>
+					<mesh filename="package://zhurong_description/meshes/midLIDAR_Link.STL" />
+				</geometry>
+				<material name="">
+					<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+				</material>
+			</visual>
+			<!-- <collision>
+					<origin
+					xyz="0 0 0"
+					rpy="0 0 0" />
+					<geometry>
+					<mesh
+							filename="package://zhurong_description/meshes/midLIDAR_Link.STL" />
+					</geometry>
+			</collision> -->
+		</link>
+
+		<joint name="midLIDAR_joint" type="fixed">
+			<origin
+					xyz="0.014976 0 0.042611"
+					rpy="0 0.5236 0" />
+			<parent link="midLIDARSupport_Link" />
+			<child link="midLIDAR_Link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+		<link name="midLIDAR_ray_Link"/>
+		
+		<joint name="midLIDAR_ray_joint" type="fixed">
+			<origin
+					xyz="0.02 0 0.05"
+					rpy="0 0.175 0" />
+			<parent link="midLIDAR_Link" />
+			<child link="midLIDAR_ray_Link" />
+			<axis xyz="0 0 0" />
+		</joint>
+
+	</xacro:macro>
+</robot>
