@@ -1,5 +1,6 @@
 DTM_params: 10
 FirstDampCoef: 5000
+Plugin: libTerramechanicsPlugin_new.so
 PrintStep: 1000000
 PublishRate: 20
 SecondDampCoef: 5000
@@ -12,6 +13,7 @@ c_T1: 0.214
 c_d1: -0.626
 c_d2: 0.308
 c_d3: -0.224
+enable_plugin: true
 sinkage_max: 0.15
 x_grids: 641
 x_max: 40.0

@@ -17,22 +17,31 @@ namespace gazebo
     }
     void TerramachanicsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
+        // 读取sdf文件中的参数
+        GetSDFParam(_model, _sdf);
+
         if (!ros::isInitialized())
         {
             int argc = 0;
             char **argv = NULL;
             ros::init(argc, argv, "terramechanics_node", ros::init_options::NoSigintHandler);
         }
-        // ROS_WARN("1");
 
-        this->rosNode.reset(new ros::NodeHandle("wheel_terrain_contact"));
+        this->rosNode.reset(new ros::NodeHandle(this->robot_namespace_));
 
         GetSimulationParam();
-        TerrainData = new double[x_grids*y_grids*DTM_params];
+        InitTerrain();
 
-        // ROS_WARN("2");
+        this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+            std::bind(&TerramachanicsPlugin::OnUpdate, this));
 
-        // 读取sdf文件中的参数
+        InitSubPub();
+    }
+    void TerramachanicsPlugin::GetSDFParam(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+    {
+        this->robot_namespace_ = "";
+        if (_sdf->HasElement("robotNamespace"))
+            this->robot_namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>() + "/";
         this->model = _model;
         this->BaseLink = this->model->GetLink(
             _sdf->GetElement("base_link")->Get<std::string>());
@@ -41,7 +50,7 @@ namespace gazebo
         this->WheelJoint = this->model->GetJoint(
             _sdf->GetElement("wheel_joint")->Get<std::string>());
 
-        std::string WheelName = _sdf->GetElement("wheel_link")->Get<std::string>();
+        // std::string WheelName = _sdf->GetElement("wheel_link")->Get<std::string>();
 
         this->SubTopic = _sdf->GetElement("sub_topic")->Get<std::string>();
         this->r = _sdf->GetElement("wheel_r")->Get<double>();
@@ -49,20 +58,14 @@ namespace gazebo
         this->h = _sdf->GetElement("wheel_h")->Get<double>();
         this->FN_AVE = _sdf->GetElement("FN_AVE")->Get<double>();
         this->WheelName = _sdf->GetElement("wheel_link")->Get<std::string>();
-
-        // ROS_WARN("3");
-
-        this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-            std::bind(&TerramachanicsPlugin::OnUpdate, this));
-
-        // std::cout<<TerrainMapFileName<<std::endl;
-
+    }
+    void TerramachanicsPlugin::InitTerrain()
+    {
+        TerrainData = new double[x_grids*y_grids*DTM_params];
         TerrainMapFile.open(TerrainMapFileName);
-        // ROS_WARN("YES");
         std::string data;
         getline(TerrainMapFile, data);
         x_0 = std::stod(data);
-        // std::cout<<x_0<<std::endl;
         y_0 = x_0;
         // getline(TerrainMapFile, data);
         // y_0 = std::stod(data);
@@ -74,9 +77,6 @@ namespace gazebo
         getline(TerrainMapFile, data);
         Node_Coef = std::stoi(data);
 
-        // ROS_WARN("4");
-        cmd_vel = 0;
-
         while (getline(TerrainMapFile, data))
         {
             this->TerrainDataVec.push_back(std::stod(data));
@@ -85,7 +85,9 @@ namespace gazebo
         {
             this->TerrainData[i] = TerrainDataVec[i];
         }
-
+    }
+    void TerramachanicsPlugin::InitSubPub()
+    {
         ros::SubscribeOptions so =
             ros::SubscribeOptions::create<std_msgs::Float64>(
                 SubTopic,
@@ -95,10 +97,10 @@ namespace gazebo
                 &this->rosQueue);
         this->rosSub = this->rosNode->subscribe(so);
         this->rosQueueThread = std::thread(std::bind(&TerramachanicsPlugin::QueueThread, this));
-        rosPub_z = this->rosNode->advertise<std_msgs::Float32>(WheelName+"/sinkage", 20);
-        rosPub_s = this->rosNode->advertise<std_msgs::Float32>(WheelName+"/slip", 20);
-        rosPub_beta = this->rosNode->advertise<std_msgs::Float32>(WheelName+"/beta", 20);
-        rosPub_FT = this->rosNode->advertise<geometry_msgs::Wrench>(WheelName+"/force_torque",20);
+        rosPub_z = this->rosNode->advertise<std_msgs::Float32>(this->WheelName+"/sinkage", 20);
+        rosPub_s = this->rosNode->advertise<std_msgs::Float32>(this->WheelName+"/slip", 20);
+        rosPub_beta = this->rosNode->advertise<std_msgs::Float32>(this->WheelName+"/beta", 20);
+        rosPub_FT = this->rosNode->advertise<geometry_msgs::Wrench>(this->WheelName+"/force_torque",20);
     }
     void TerramachanicsPlugin::OnRosMsg(const std_msgs::Float64ConstPtr &msg)
     {
@@ -106,31 +108,34 @@ namespace gazebo
     }
     void TerramachanicsPlugin::OnUpdate()
     {
-        SimulateCount++;
-        force_torque = TerramachanicsPlugin::CalculationWheelForce(this->TerrainData, SimulateCount);
-
-        wheel_force = ignition::math::Vector3d(force_torque.Force[0], force_torque.Force[1], force_torque.Force[2]);
-        this->WheelLink->AddForce(wheel_force);
-        
-        wheel_torque = ignition::math::Vector3d(force_torque.Torque[0], force_torque.Torque[1], force_torque.Torque[2]);
-        this->WheelLink->AddTorque(wheel_torque);
-        int PublishStep = 1000/PublishRate;
-        if (SimulateCount%PublishStep ==0)
+        if(enable_plugin)
         {
-            wrech = this->WheelJoint->GetForceTorque(0);
-            force = wrech.body1Force;
-            torque = wrech.body1Torque;
-            Wheel_FT_msg.force.x = -force.X();
-            Wheel_FT_msg.force.y = -force.Y();
-            Wheel_FT_msg.force.z = -force.Z();
-            Wheel_FT_msg.torque.x = -torque.X();
-            Wheel_FT_msg.torque.y = -torque.Y();
-            Wheel_FT_msg.torque.z = -torque.Z();
+            SimulateCount++;
+            force_torque = TerramachanicsPlugin::CalculationWheelForce(this->TerrainData, SimulateCount);
 
-            rosPub_z.publish(Sinkage_msg);
-            rosPub_s.publish(Slip_msg);
-            rosPub_beta.publish(Beta_msg);
-            rosPub_FT.publish(Wheel_FT_msg);
+            wheel_force = ignition::math::Vector3d(force_torque.Force[0], force_torque.Force[1], force_torque.Force[2]);
+            this->WheelLink->AddForce(wheel_force);
+            
+            wheel_torque = ignition::math::Vector3d(force_torque.Torque[0], force_torque.Torque[1], force_torque.Torque[2]);
+            this->WheelLink->AddTorque(wheel_torque);
+            int PublishStep = 1000/PublishRate;
+            if (SimulateCount%PublishStep ==0)
+            {
+                wrech = this->WheelJoint->GetForceTorque(0);
+                force = wrech.body1Force;
+                torque = wrech.body1Torque;
+                Wheel_FT_msg.force.x = -force.X();
+                Wheel_FT_msg.force.y = -force.Y();
+                Wheel_FT_msg.force.z = -force.Z();
+                Wheel_FT_msg.torque.x = -torque.X();
+                Wheel_FT_msg.torque.y = -torque.Y();
+                Wheel_FT_msg.torque.z = -torque.Z();
+
+                rosPub_z.publish(Sinkage_msg);
+                rosPub_s.publish(Slip_msg);
+                rosPub_beta.publish(Beta_msg);
+                rosPub_FT.publish(Wheel_FT_msg);
+            }
         }
 
     }
@@ -139,12 +144,8 @@ namespace gazebo
         if (iter % PrintStep == 0)
             std::cout << "=======================" << WheelName << "======================" << std::endl;
         FT ForceTorque;
-        double rs = r + 0.5 * h;
-
-        static int FrictionFlag = 0;
-        static double deltajLength;
         static double FriDirection[3];
-        ignition::math::Vector3d Friction;
+        
 
         // if (FrictionFlag == 0)
         // {
@@ -222,8 +223,8 @@ namespace gazebo
         Velocity_Local_Real[1] = wheel_v.Dot(wheel_y_axis);
         Velocity_Local_Real[2] = wheel_v.Dot(wheel_z_axis);
 
-        double s_flag;
-        double beta_flag;
+        // double s_flag;
+        // double beta_flag;
         s = CalculateSlip(AngleVelocity, Velocity_Local_Real);
         Slip_msg.data = s;
         if (iter % PrintStep == 0)
@@ -232,10 +233,8 @@ namespace gazebo
             // std::cout << "phi_yaw= " << phi_yaw << std::endl;
         }
 
-        s_flag = CalculateS_flag(s);
         beta = CalculateBeta(Velocity_Local_Real);
         Beta_msg.data = beta;
-        beta_flag = CalculateBeta_flag(beta);
 
         sinkage = CalculationSinkage(WheelPos, NodePosition, NormalVector, sinkage_LastStep);
         Sinkage_msg.data = sinkage;
@@ -259,16 +258,16 @@ namespace gazebo
         }
         else
         {
-            double z_prediction;
-            double rz_remain;
-            double Dz;
-            Dz = LimitDampingCoef(Velocity_Local_Real);
-            z_prediction = r - r * cos(theta1);
-            rz_remain = r - z_prediction;
+            double Dz = LimitDampingCoef(Velocity_Local_Real);
             double Rs = CalculateRj(s);
-            double theta2 = c3 * theta1;
-            double thetam = ((c1 + c2 * s) * theta1 + theta2) / 2;
-            // theta1 = theta1 + theta2;
+            theta2 = c3 * theta1;
+            // double wheel_terrain_pitch = wheel_terrain_x_axis[2]/fabs(wheel_terrain_x_axis[2]+1e-6)*acos(sqrt(wheel_terrain_x_axis[0] * wheel_terrain_x_axis[0] + wheel_terrain_x_axis[1] * wheel_terrain_x_axis[1]));
+            // theta2 = -wheel_terrain_pitch;
+            // if(theta2>0)
+            //     theta2 = 0;
+            // double thetam = ((c1 + c2 * s) * theta1 + theta2) / 2;
+            thetam = (c1 + c2 * s) * theta1;
+            // thetam = (theta1) / 2;
 
             double theta_m2 = thetam - theta2;
             double theta_1m = theta1 - thetam;
@@ -276,209 +275,24 @@ namespace gazebo
 
             double A_1 = (cos(thetam) - cos(theta2)) / theta_m2;
             double A_2 = (cos(thetam) - cos(theta1)) / theta_1m;
-            double A = A_1 + A_2;
+            A = A_1 + A_2;
             double B_1 = (sin(thetam) - sin(theta2)) / theta_m2;
             double B_2 = (sin(thetam) - sin(theta1)) / theta_1m;
-            double B = B_1 + B_2;
-            double C = theta_12 / 2;
+            B = B_1 + B_2;
+            C = theta_12 / 2;
 
-            double theta11 = acos(rz_remain / Rs);
-            double sigmam_temp = (Kc / b + Kphi) * (pow(r, (n))) * pow((cos(thetam) - cos(theta1)), (n));
-            double j = rs * ((theta11 - thetam) - (1 - fabs(s)) * (sin(theta11) - sin(thetam)));
-            double one_jdk = 1 - (exp(-j / K));
-            double taom_temp = (c + sigmam_temp * tan(phi)) * one_jdk;
-
-            double FX_Local;
-            double FY_Local;
-            double FZ_Local;
-            double MX_Local;
-            double MY_Local;
-            double MZ_Local;
-
-            if (fabs(AngleVelocity) >= 0.001)
+            double theta11 = acos(r * cos(theta1) / Rs);
+            sigma_m = (Kc / b + Kphi) * (pow(r, (n))) * pow((cos(thetam) - cos(theta1)), (n));
+            // std::cout<< this->WheelName << "sigma_m=" << sigma_m << std::endl;
+            if (fabs(AngleVelocity) >= 0.01)
             {
-
-                double Fs1;
-                double Fs_add1;
-                Fs_add1 = 1 - exp(-r * (1 - s) * (theta11 - thetam) * tan(fabs(beta)) / K);
-                // std::cout<<beta<<std::endl;
-                Fs1 = r * b * C * (c + sigmam_temp * tan(0.5 * phi)) * Fs_add1;
-
-                double Fn1;
-                double Fn;
-                Fn1 = r * b * A * sigmam_temp + rs * b * taom_temp * B;
-                Fn = LimitSustainForce(Fn1);
-                // if (iter % PrintStep == 0)
-                // {
-                //     std::cout<<A<<"\t"<<B<<"\t"<<sigmam_temp<<"\t"<<taom_temp<<std::endl;
-                // }
-
-                double coef_tempT;
-                double Mr;
-                double Mr1;
-                double Mr2;
-                coef_tempT = 1 + (c_T1 * ((FN_AVE - Fn) / FN_AVE));
-                Mr1 = rs * rs * C * (b * c + coef_tempT * Fn * tan(phi) / (r * A)) * one_jdk;
-                Mr2 = 1 + rs * B * tan(phi) * one_jdk / (r * A);
-                Mr = Mr1 / Mr2;
-                // Mr = r*C*r*b*taom_temp;
-
-                double coef_s;
-                double coef_temp;
-                double Fdp1;
-                double Fdp;
-                coef_s = c_d1 + c_d2 * s;
-                double coef_t = (c_d3 * ((FN_AVE - Fn) / FN_AVE));
-
-                Fdp1 = (A / C + B * B / (A * C)) * Mr / rs - B * Fn / A;
-                Fdp = Fdp1 * ((1 + coef_s) * (1 + coef_t));
-                // Fdp = r * b * A * taom_temp - rs * b * sigmam_temp * B;
-
-                // Fn = r * b * A * sigmam_temp + r * b * taom_temp * B;
-                // Fdp = r * b * A * taom_temp - r * b * sigmam_temp * B;
-                // Mr = r*r*b*C*taom_temp;
-
-                FX_Local = Fdp * s_flag;
-                if (s_flag < 0)
-                {
-                    if (FX_Local > 0)
-                    {
-                        FX_Local = 0;
-                    }
-                    FX_Local = FX_Local - 200 * fabs(Velocity_Local_Real[0]);
-                }
-                if (s_flag > 0)
-                {
-                    if (FX_Local < -100)
-                    {
-                        FX_Local = -100;
-                    }
-                }
-                FY_Local = 1.0 * Fs1 * beta_flag;
-                if (AngleVelocity < -0.0)
-                {
-                    FY_Local = -FY_Local;
-                    Mr = -Mr;
-                }
-                double FY_sub = 200 * Velocity_Local_Real[1];
-                if (fabs(FY_sub) > 1000)
-                {
-                    if (FY_sub > 0)
-                    {
-                        FY_sub = 1000;
-                    }
-                    else
-                    {
-                        FY_sub = -1000;
-                    }
-                }
-                double FZ_sub = Dz * Velocity_Local_Real[2];
-                if (fabs(FZ_sub) > Dz * 5)
-                {
-                    if (FZ_sub > 0)
-                    {
-                        FZ_sub = Dz * 5;
-                    }
-                    else
-                    {
-                        FZ_sub = -Dz * 5;
-                    }
-                }
-                FY_Local = FY_Local - FY_sub;
-                FZ_Local = 1.0 * Fn - FZ_sub;
-
-                MX_Local = 1.0 * r * FY_Local;
-                MY_Local = -Mr;
-                double yita2;
-                //yita2 = SteerAngle / (2 * M_PI);
-                MZ_Local = sin(thetam) * r * FY_Local; //+ yita2 * b * FX_Local;
-
-                if (AngleVelocity < -0.00)
-                {
-                    if (iter % PrintStep == 0)
-                        std::cout << "车轮反转!" << std::endl;
-                    FX_Local = -FX_Local;
-                    MZ_Local = -MZ_Local;
-                }
-                if (AngleVelocity * Velocity_Local_Real[0]<0)
-                {
-                    FX_Local -= 200*Velocity_Local_Real[0];
-                }
-                FrictionFlag = 0;
+                WheelTerrainInteraction(theta11);   
             }
             else
             {
-                double Fn1;
-                double Fn;
-                Fn1 = r * b * A * sigmam_temp /*+rs*b*taom_temp*B*/;
-                Fn = LimitSustainForce(Fn1);
-
-                // ignition::math::Vector3d deltaj = CalculateFrictionDirectionNew(NormalVector, WheelPos_Org, WheelPos);
-                ignition::math::Vector3d deltaj = WheelPos-WheelPos_Org;
-                deltajLength = deltaj.Length();
-                ignition::math::Vector3d FriDirectionV;
-                if (deltajLength > 0.0001)
-                {
-                    FriDirectionV = -deltaj / deltajLength;
-                }
-
-                double FrictionForce;
-                FrictionForce = (r * b * theta_12 * c + Fn * tan(phi)) * (1 - exp(-deltajLength / K));
-                Friction = FrictionForce * FriDirectionV;
-
-                ignition::math::Vector3d FrctionL;
-                FrctionL = Rot_0_2.Inverse() * Friction;
-                double FX_sub = 2000 * Velocity_Local_Real[0];
-                if (fabs(FX_sub) > 1000)
-                {
-                    if (FX_sub > 0)
-                    {
-                        FX_sub = 1000;
-                    }
-                    else
-                    {
-                        FX_sub = -1000;
-                    }
-                }
-                double FY_sub = 2000 * Velocity_Local_Real[1];
-                if (fabs(FY_sub) > 1000)
-                {
-                    if (FY_sub > 0)
-                    {
-                        FY_sub = 1000;
-                    }
-                    else
-                    {
-                        FY_sub = -1000;
-                    }
-                }
-                double FZ_sub = Dz * Velocity_Local_Real[2];
-                if (fabs(FZ_sub) > Dz * 5)
-                {
-                    if (FZ_sub > 0)
-                    {
-                        FZ_sub = Dz * 5;
-                    }
-                    else
-                    {
-                        FZ_sub = -Dz * 5;
-                    }
-                }
-
-                FX_Local = FrctionL.X() - FX_sub;
-                FY_Local = FrctionL.Y() - FY_sub;
-                FZ_Local = 1.0 * Fn - FZ_sub;
-
-                MX_Local = 1.0 * r * FY_Local;
-                MY_Local = -(r * FX_Local + 0 * r * FZ_Local);
-                MZ_Local = sin(thetam) * r * FY_Local + 0 * b * FX_Local;
-                WheelPos_Org = WheelPos;
-                FrictionFlag = 1;
+                StaticModel(Rot_0_2);
             }
 
-            forcelocal.X() = FX_Local;
-            forcelocal.Y() = FY_Local;
-            forcelocal.Z() = FZ_Local;
             forceworld = Rot_0_2 * forcelocal;
             Force_W[0] = forceworld.X();
             Force_W[1] = forceworld.Y();
@@ -488,9 +302,6 @@ namespace gazebo
                 exit(0);
             }
 
-            torquelocal.X() = MX_Local;
-            torquelocal.Y() = MY_Local;
-            torquelocal.Z() = MZ_Local;
             torqueworld = Rot_0_2 * torquelocal;
             Torque_W[0] = torqueworld.X();
             Torque_W[1] = torqueworld.Y();
@@ -544,30 +355,242 @@ namespace gazebo
         }
         return ForceTorque;
     }
+
+    void TerramachanicsPlugin::WheelTerrainInteraction(double theta11)
+    {
+        double FX_Local;
+        double FY_Local;
+        double FZ_Local;
+        double MX_Local;
+        double MY_Local;
+        double MZ_Local;
+        double jx, jy;
+        double exp_jk_x, exp_jk_y;
+        double Dz = LimitDampingCoef(Velocity_Local_Real);
+        double s_flag = CalculateS_flag(s);
+        double beta_flag = CalculateBeta_flag(beta);
+        double rs = r + 0.5 * h;
+        // double j = rs * ((theta11 - thetam) - (1 - fabs(s)) * (sin(theta11) - sin(thetam)));
+        // double one_jdk = 1 - exp(-j / K);
+        // double tao_m = (c + sigma_m * tan(phi)) * one_jdk;
+
+        if (s_flag >= 0)
+        {
+            jx = rs * ((theta11 - thetam) - (1 - s) * (sin(theta11) - sin(thetam)));
+            jy = r * (1 - s) * (theta11 - thetam) * tan(fabs(beta));
+        }
+        else
+        {
+            jx = -rs * ((theta11 - thetam) - (sin(theta11) - sin(thetam)) / (1+0.9*s));
+            jy = r * (theta11 - thetam) * tan(fabs(beta)) / (1+0.99*s);
+            // jx = rs * ((theta11 - thetam) - (1 - s) * (sin(theta11) - sin(thetam)));
+            // jy = r * (1 - s) * (theta11 - thetam) * tan(fabs(beta));
+        }
+
+        exp_jk_x = 1 - exp(-jx / K);
+        exp_jk_y = 1 - exp(-jy / K);
+        tao_m = (c + sigma_m * tan(phi)) * exp_jk_x;
+
+        // std::cout << "exp_jk_x=" << exp_jk_x << std::endl;
+        // std::cout << "exp_jk_y=" << exp_jk_y << std::endl;
+
+        double Fs = r * b * C * (c + sigma_m * tan(0.5 * phi)) * exp_jk_y;
+
+        double Fn1 = r * b * A * sigma_m + rs * b * tao_m * B;
+        double Fn = LimitSustainForce(Fn1);
+
+        double coef_tempT = 1 + (c_T1 * ((FN_AVE - Fn) / FN_AVE));
+        double Mr1 = rs * rs * C * (b * c + coef_tempT * Fn * tan(phi) / (r * A)) * exp_jk_x;
+        double Mr2 = 1 + rs * B * tan(phi) * exp_jk_x / (r * A);
+        double Mr = Mr1 / Mr2;
+        // Mr = r*C*r*b*tao_m;
+
+        double coef_s = c_d1 + c_d2 * s;
+        double coef_t = c_d3 * ((FN_AVE - Fn) / FN_AVE);
+
+        double Fdp1 = (A / C + B * B / (A * C)) * Mr / rs - B * Fn / A;
+        double Fdp = Fdp1 * ((1 + coef_s) * (1 + coef_t));
+        // Fdp = r * b * A * tao_m - rs * b * sigma_m * B;
+
+        // Fn = r * b * A * sigma_m + r * b * tao_m * B;
+        // Fdp = r * b * A * tao_m - r * b * sigma_m * B;
+        // Mr = r*r*b*C*tao_m;
+
+        FX_Local = Fdp * s_flag;
+        if (s_flag < 0)
+        {
+            if (FX_Local > 0)
+            {
+                FX_Local = 0;
+            }
+            FX_Local = FX_Local - 200 * fabs(Velocity_Local_Real[0]);
+        }
+        if (s_flag >= 0)
+        {
+            if (FX_Local < -100)
+            {
+                FX_Local = -100;
+            }
+        }
+        FY_Local = Fs;
+        if(Velocity_Local_Real[1]>=0)
+        {
+            FY_Local = -FY_Local;
+        } 
+        if (AngleVelocity < -0.0)
+        {
+            // FY_Local = -FY_Local;
+            Mr = -Mr;
+        }
+        double FY_sub = 200 * Velocity_Local_Real[1];
+        if (fabs(FY_sub) > 1000)
+        {
+            if (FY_sub > 0)
+            {
+                FY_sub = 1000;
+            }
+            else
+            {
+                FY_sub = -1000;
+            }
+        }
+        double FZ_sub = Dz * Velocity_Local_Real[2];
+        if (fabs(FZ_sub) > Dz * 5)
+        {
+            if (FZ_sub > 0)
+            {
+                FZ_sub = Dz * 5;
+            }
+            else
+            {
+                FZ_sub = -Dz * 5;
+            }
+        }
+        FY_Local = FY_Local - FY_sub;
+        FZ_Local = 1.0 * Fn - FZ_sub;
+
+        MX_Local = 1.0 * r * FY_Local;
+        MY_Local = -Mr;
+        // double yita2;
+        //yita2 = SteerAngle / (2 * M_PI);
+        MZ_Local = sin(thetam) * r * FY_Local; //+ yita2 * b * FX_Local;
+
+        if (AngleVelocity < -0.00)
+        {
+            // if (iter % PrintStep == 0)
+            //     std::cout << "车轮反转!" << std::endl;
+            FX_Local = -FX_Local;
+            MZ_Local = -MZ_Local;
+        }
+        if (AngleVelocity * Velocity_Local_Real[0]<0)
+        {
+            FX_Local -= 200*Velocity_Local_Real[0];
+        }
+        FrictionFlag = 0;
+
+        forcelocal.X() = FX_Local;
+        forcelocal.Y() = FY_Local;
+        forcelocal.Z() = FZ_Local;
+        torquelocal.X() = MX_Local;
+        torquelocal.Y() = MY_Local;
+        torquelocal.Z() = MZ_Local;
+    }
+
+    void TerramachanicsPlugin::StaticModel(ignition::math::Matrix3d Rot_0_2)
+    {
+        double FX_Local;
+        double FY_Local;
+        double FZ_Local;
+        double MX_Local;
+        double MY_Local;
+        double MZ_Local;
+        static double deltajLength;
+        ignition::math::Vector3d Friction;
+        double Dz = LimitDampingCoef(Velocity_Local_Real);
+        double theta_12 = theta1 - theta2;
+        // std::cout<<"STATIC"<<std::endl;
+
+        double Fn1 = r * b * A * sigma_m /*+rs*b*tao_m*B*/;
+        double Fn = LimitSustainForce(Fn1);
+
+        // ignition::math::Vector3d deltaj = CalculateFrictionDirectionNew(NormalVector, WheelPos_Org, WheelPos);
+        ignition::math::Vector3d deltaj = WheelPos-WheelPos_Org;
+        deltajLength = deltaj.Length();
+        ignition::math::Vector3d FriDirectionV;
+        if (deltajLength > 0.0001)
+        {
+            FriDirectionV = -deltaj / deltajLength;
+        }
+
+        double FrictionForce;
+        FrictionForce = (r * b * theta_12 * c + Fn * tan(phi)) * (1 - exp(-deltajLength / K));
+        Friction = FrictionForce * FriDirectionV;
+
+        ignition::math::Vector3d FrctionL;
+        FrctionL = Rot_0_2.Inverse() * Friction;
+        double FX_sub = 2000 * Velocity_Local_Real[0];
+        if (fabs(FX_sub) > 1000)
+        {
+            if (FX_sub > 0)
+            {
+                FX_sub = 1000;
+            }
+            else
+            {
+                FX_sub = -1000;
+            }
+        }
+        double FY_sub = 10000 * Velocity_Local_Real[1];
+        if (fabs(FY_sub) > 1000)
+        {
+            if (FY_sub > 0)
+            {
+                FY_sub = 1000;
+            }
+            else
+            {
+                FY_sub = -1000;
+            }
+        }
+        double FZ_sub = Dz * Velocity_Local_Real[2];
+        if (fabs(FZ_sub) > Dz * 5)
+        {
+            if (FZ_sub > 0)
+            {
+                FZ_sub = Dz * 5;
+            }
+            else
+            {
+                FZ_sub = -Dz * 5;
+            }
+        }
+
+        FX_Local = FrctionL.X() - FX_sub;
+        FY_Local = FrctionL.Y() - FY_sub;
+        FZ_Local = 1.0 * Fn - FZ_sub;
+
+        MX_Local = 1.0 * r * FY_Local;
+        MY_Local = -(r * FX_Local + 0 * r * FZ_Local);
+        MZ_Local = sin(thetam) * r * FY_Local + 0 * b * FX_Local;
+        WheelPos_Org = WheelPos;
+        FrictionFlag = 1;
+
+        forcelocal.X() = FX_Local;
+        forcelocal.Y() = FY_Local;
+        forcelocal.Z() = FZ_Local;
+        torquelocal.X() = MX_Local;
+        torquelocal.Y() = MY_Local;
+        torquelocal.Z() = MZ_Local;
+    }
+
     TerramachanicsPlugin::NodeZandTerrainParams TerramachanicsPlugin::GetTouchNodes(double px, double py, double Terrain_Data[])
     {
         if (px > x_min && px < x_max && py > y_min && y_max)
         {
             double pz_node;
-            int x_node1_num;
-            int x_node2_num;
-            int x_node3_num;
-            int y_node1_num;
-            int y_node2_num;
-            int y_node3_num;
-
-            double A_t;
-            double B_t;
-            double C_t;
 
             int px_num = int(floor((px - x_min) / x_step));
             int py_num = int(floor((py - y_min) / y_step));
-
-            x_node1_num = px_num;
-            x_node2_num = px_num;
-
-            double x_relative = px - (x_min + px_num * x_step);
-            double y_relative = py - (y_min + py_num * y_step);
 
             double delta_x0 = px - (x_min + px_num * x_step);
             double delta_x1 = x_step - delta_x0;
@@ -883,6 +906,14 @@ namespace gazebo
         while (!rosNode->hasParam("/zhurong/c1"))
         {
             std::cout<<"wait"<<std::endl;
+        }
+        if (!rosNode->hasParam("/zhurong/enable_plugin"))
+        {
+            ROS_WARN("No param named 'enable_plugin'");
+        }
+        else
+        {
+            rosNode->getParam("/zhurong/enable_plugin", enable_plugin);
         }
         if (!rosNode->hasParam("/zhurong/c1"))
         {

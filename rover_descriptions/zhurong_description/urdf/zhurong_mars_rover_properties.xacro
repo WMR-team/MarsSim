@@ -83,5 +83,7 @@
 
 	<xacro:property name="ZEDNav_Mass" value="0.3"/>
 
-		
+	<xacro:property name="YAML_FILE" value="$(find rover_gazebo_plugins)/config/TerramechanicsPluginParam.yaml" />
+	<xacro:property name="PLUGINS" value="${load_yaml(YAML_FILE)}"/>
+	<xacro:arg name="Plugin" default="Plugin" />
 </robot>

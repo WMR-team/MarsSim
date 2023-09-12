@@ -21,14 +21,14 @@ def generate_rocks_model(DEM, param_data, terrain_class_mat, save_path='', seed=
     
     random.seed(seed)
     np.random.seed(int(seed))
-    generate_config('mars_rocks', save_path=save_path)
+    generate_config('mars_rocks_lbl', save_path=save_path)
     rock_list = calculate_rock_distribution(DEM, param_data, terrain_class_mat, rock_dis_rate, return_record)
     step = DEM[0, 0, 1] - DEM[0, 0, 0]
     min_l = DEM[0, 0, 0]
     max_l = DEM[0, 0, -1]
     l = max_l-min_l
     # 根据岩石二维分布生成岩石model
-    model_name = 'mars_rocks'
+    model_name = 'mars_rocks_lbl'
     sdf = ET.Element("sdf", version="1.5")
     model = ET.SubElement(sdf, "model", name=model_name)
     static = ET.SubElement(model, "static")
@@ -63,10 +63,10 @@ def generate_rocks_model(DEM, param_data, terrain_class_mat, save_path='', seed=
         uri = ET.SubElement(mesh_geometry, "uri")
         rock_choose = random.randint(1,param_data['rock_count'])
         if is_label:
-            rock_name = 'model://mars_rocks/mars_rock_' + \
+            rock_name = 'model://mars_rocks_lbl/mars_rock_' + \
                 str(rock_choose)+'/rock'+str(rock_choose)+'_c.obj'
         else:
-            rock_name = 'model://mars_rocks/mars_rock_' + \
+            rock_name = 'model://mars_rocks_lbl/mars_rock_' + \
                 str(rock_choose)+'/rock'+str(rock_choose)+'.obj'
         uri.text = rock_name
         # Visual element of the model
@@ -98,14 +98,14 @@ def generate_rocks_model_cylinder(DEM, param_data, terrain_class_mat, save_path=
     
     random.seed(seed)
     np.random.seed(int(seed))
-    generate_config('mars_rocks', save_path=save_path)
+    generate_config('mars_rocks_lbl', save_path=save_path)
     rock_list = calculate_rock_distribution(DEM, param_data, terrain_class_mat, rock_dis_rate, return_record)
     step = DEM[0, 0, 1] - DEM[0, 0, 0]
     min_l = DEM[0, 0, 0]
     max_l = DEM[0, 0, -1]
     l = max_l-min_l
     # 根据岩石二维分布生成岩石model
-    model_name = 'mars_rocks'
+    model_name = 'mars_rocks_lbl'
     sdf = ET.Element("sdf", version="1.5")
     model = ET.SubElement(sdf, "model", name=model_name)
     static = ET.SubElement(model, "static")
@@ -141,10 +141,10 @@ def generate_rocks_model_cylinder(DEM, param_data, terrain_class_mat, save_path=
         length = ET.SubElement(cylinder_geometry, "length")
         rock_choose = random.randint(1,param_data['rock_count'])
         if is_label:
-            rock_name = 'model://mars_rocks/mars_rock_' + \
+            rock_name = 'model://mars_rocks_lbl/mars_rock_' + \
                 str(rock_choose)+'/rock'+str(rock_choose)+'_c.obj'
         else:
-            rock_name = 'model://mars_rocks/mars_rock_' + \
+            rock_name = 'model://mars_rocks_lbl/mars_rock_' + \
                 str(rock_choose)+'/rock'+str(rock_choose)+'.obj'
         length.text = str(3*D)
         # Visual element of the model
@@ -176,14 +176,14 @@ def generate_rocks_model_no_collision(DEM, param_data, terrain_class_mat, save_p
     
     random.seed(seed)
     np.random.seed(int(seed))
-    generate_config('mars_rocks', save_path=save_path)
+    generate_config('mars_rocks_lbl', save_path=save_path)
     rock_list = calculate_rock_distribution(DEM, param_data, terrain_class_mat, rock_dis_rate, return_record)
     step = DEM[0, 0, 1] - DEM[0, 0, 0]
     min_l = DEM[0, 0, 0]
     max_l = DEM[0, 0, -1]
     l = max_l-min_l
     # 根据岩石二维分布生成岩石model
-    model_name = 'mars_rocks'
+    model_name = 'mars_rocks_lbl'
     sdf = ET.Element("sdf", version="1.5")
     model = ET.SubElement(sdf, "model", name=model_name)
     static = ET.SubElement(model, "static")
@@ -212,10 +212,10 @@ def generate_rocks_model_no_collision(DEM, param_data, terrain_class_mat, save_p
  
         rock_choose = random.randint(1,param_data['rock_count'])
         if is_label:
-            rock_name = 'model://mars_rocks/mars_rock_' + \
+            rock_name = 'model://mars_rocks_lbl/mars_rock_' + \
                 str(rock_choose)+'/rock'+str(rock_choose)+'_c.obj'
         else:
-            rock_name = 'model://mars_rocks/mars_rock_' + \
+            rock_name = 'model://mars_rocks_lbl/mars_rock_' + \
                 str(rock_choose)+'/rock'+str(rock_choose)+'.obj'
         # Visual element of the model
         visual = ET.SubElement(link, "visual", name="visual")
@@ -392,7 +392,7 @@ def generate_terrain_model_exp(heightmap_name, length, height, save_path='', see
     texture_num4 = 1
     
     min_height_list = [height/5, height/2, height/5*4]
-    if param_data['terrain_classes'] == 2:
+    if param_data['terrain_classes'] == 4:
         ii = [i+1 for i in range(3)]
         random.shuffle(ii)
         texture_num1 = 1
@@ -411,7 +411,7 @@ def generate_terrain_model_exp(heightmap_name, length, height, save_path='', see
             if s >= h*w*hs/4:
                 min_height_list.append(hh/255*height)
                 hs += 1
-    min_height_list[-2] = height*0.91
+    min_height_list[-1] = height*0.91
     print(min_height_list)
     
     return_record['min_heights'] = min_height_list
@@ -468,6 +468,47 @@ def generate_terrain_model_exp(heightmap_name, length, height, save_path='', see
     tree.write(save_file, pretty_print=True, xml_declaration=True)
     
     return min_height_list, texture_num_list
+
+def generate_flat_terrain_model(heightmap_name, length, height, save_path='', seed=1, texture_count=26, param_data={}):
+    
+    # 生成config文件
+    generate_config('mars_terrain', save_path=save_path)
+
+    sdf = ET.Element("sdf", version="1.6")
+    model = ET.SubElement(sdf, "model", name='mars_terrain')
+    model_pose = ET.SubElement(model, "pose")
+    model_pose.text = '0 0 0 0 0 0'
+    static = ET.SubElement(model, "static")
+    static.text = 'true'
+    link = ET.SubElement(model, "link", name='link')
+
+    visual = ET.SubElement(link, "visual", name="visual")
+    geometry = ET.SubElement(visual, 'geometry')
+    heightmap = ET.SubElement(geometry, 'heightmap')
+
+    texture = ET.SubElement(heightmap, 'texture')
+    diffuse = ET.SubElement(texture, 'diffuse')
+    normal = ET.SubElement(texture, 'normal')
+    texture_path = param_data['texture_path']
+    diffuse.text = 'model://mars_terrain/'+ texture_path + '4.jpg'
+    normal.text = 'model://mars_terrain/'+ texture_path + '4_NRM.png'
+    size = ET.SubElement(texture, 'size')
+    size.text = '1'
+
+
+    uri = ET.SubElement(heightmap, 'uri')
+    heightmap_int8_path = param_data['heightmap_int8_path']
+    uri.text = 'model://mars_terrain/'+heightmap_int8_path+heightmap_name
+    # uri.text = 'model://mars_terrain/heightmaps_int8/'+heightmap_name
+    size = ET.SubElement(heightmap, 'size')
+    terrain_size = str(length)+' '+str(length)+' '+str(height)
+    size.text = terrain_size
+    pos = ET.SubElement(heightmap, 'pos')
+    pos.text = '0 0 0'
+
+    tree = ET.ElementTree(sdf)
+    save_file = os.path.join(save_path, 'model.sdf')
+    tree.write(save_file, pretty_print=True, xml_declaration=True)
 
 # def generate_terrain_model_exp(heightmap_name, length, height, save_path='', seed=1, is_label=False, texture_count=26, return_record={}, use_whole_tex=False, param_data={}):
 #     '''生成地形model文件

@@ -12,6 +12,8 @@ roscpp
 rospy
 sensor_msgs
 dynamic_reconfigure
+nav_msgs
+tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -226,3 +228,9 @@ ${catkin_INCLUDE_DIRS}
 # catkin_add_nosetests(test)
 add_library(TerramechanicsPlugin src/TerramechanicsPlugin.cpp)
 target_link_libraries(TerramechanicsPlugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+add_library(TerramechanicsPlugin_new src/TerramechanicsPlugin_new.cpp)
+target_link_libraries(TerramechanicsPlugin_new ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} TerramechanicsPlugin)
+add_executable(tf_odom_pub src/tf_odom_pub.cpp)
+target_link_libraries(tf_odom_pub ${catkin_LIBRARIES})
+add_executable(PathRVIZ src/PathRVIZ.cpp)
+target_link_libraries(PathRVIZ ${catkin_LIBRARIES})

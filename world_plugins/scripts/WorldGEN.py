@@ -101,7 +101,7 @@ def generate_Mars_wolrd(save_path='', return_record={}):
 
     include_rock = ET.SubElement(world, "include")
     uri = ET.SubElement(include_rock, "uri")
-    uri.text = 'model://mars_rocks'
+    uri.text = 'model://mars_rocks_lbl'
 
     include_camera = ET.SubElement(world, "include")
     uri = ET.SubElement(include_camera, "uri")

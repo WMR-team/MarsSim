@@ -4,7 +4,7 @@ heightmap_int8_path: heightmaps_int8/
 texture_path: simulation_tex/
 
 terrain_model_save_path: /home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain
-rock_model_save_path: /home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_rocks
+rock_model_save_path: /home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_rocks_lbl
 world_save_path: /home/fwh/FWH/MarsSim_v2/src/rover_gazebo/worlds
 launch_file: /home/fwh/FWH/MarsSim_v2/src/rover_gazebo/launch/image_collect.launch
 
@@ -18,11 +18,11 @@ plugin_config_file: /home/fwh/FWH/MarsSim_v2/src/rover_gazebo_plugins/config/Ter
 terrain_data_file: /home/fwh/FWH/MarsSim_v2/src/world_plugins/config/terrain_data.csv
 
 terrain_height: 0.1
-terrain_length: 10
+terrain_length: 80
 parameters_num: 7
 
-heightmap_count: 3
-rock_count: 3
+heightmap_count: 7
+rock_count: 35
 texture_count: 4
 
 terrain_classes: 1
@@ -34,3 +34,6 @@ param_4: 462.3
 param_5: 0.61
 param_6: 0.015
 
+camera_point_num: 100
+
+terrain_class_file: /home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/whole_tex/terrain_class.npy

@@ -14,7 +14,7 @@
 	<xacro:include filename="$(find zhurong_description)/urdf/left_wheel_group.xacro" />
 	<xacro:include filename="$(find zhurong_description)/urdf/right_wheel_group.xacro" />
 	<!-- Sensor Mast -->
-	<xacro:include filename="$(find zhurong_description)/urdf/sensor_stereo_camera.xacro" />
+	<xacro:include filename="$(find zhurong_description)/urdf/sensor_stereo_camera2.xacro" />
 	<xacro:include filename="$(find zhurong_description)/urdf/sensor_LIDAR_group.xacro" />
 	<xacro:include filename="$(find zhurong_description)/urdf/sensor_obstacle_stereo_camera.xacro" />
 	<xacro:include filename="$(find zhurong_description)/urdf/sensor_roLIDAR.xacro" />

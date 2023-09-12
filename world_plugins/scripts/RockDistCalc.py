@@ -91,11 +91,13 @@ def calculate_rock_distribution(DEM, param_data, terrain_class_mat, rock_dis_rat
                 y = random.random()*(l-4)+2
                 # x = random.random()*l
                 # y = random.random()*l
-                flag_2 = (np.sqrt((x-l/2)**2+(y-l/2)**2)<4)
+                flag_2 = (np.sqrt((x-l/2)**2+(y-l/2)**2)<4) or (np.sqrt((x-l/2)**2+(y-l/2)**2)>68 and np.sqrt((x-l/2)**2+(y-l/2)**2)<72)
                 flag = check_collision(rock_list, x, y, D)
                 # 如果有冲突，继续循环
-                if flag or flag_2:
+                if flag:
                     pass
+                if flag_2:
+                    j +=1
                 # 如果没有冲突，就将该点添加进列表，同时j+1
                 else:
                     if terrain_class_mat[int(x/step), int(y/step)] == c:

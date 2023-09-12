@@ -34,7 +34,7 @@
       <uri>model://mars_terrain</uri>
     </include>
     <include>
-      <uri>model://mars_rocks</uri>
+      <uri>model://mars_rocks_lbl</uri>
     </include>
     <include>
       <uri>model://ai_camera</uri>

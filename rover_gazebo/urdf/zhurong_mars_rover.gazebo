@@ -5,8 +5,8 @@
 	<gazebo>
 		<plugin name="gazebo_ros_control" 
 						filename="libgazebo_ros_control.so">
-			<robotNamespace>/zhurong_mars_rover</robotNamespace>
-			<robotParam>/robot_description</robotParam>
+			<!-- <robotNamespace>/zhurong_mars_rover</robotNamespace>
+			<robotParam>/robot_description</robotParam> -->
 			<robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
 		</plugin>
 	</gazebo>
@@ -20,14 +20,14 @@
 						filename="libgazebo_ros_p3d.so">
 			<frameName>world</frameName>
 			<bodyName>nav_base_link</bodyName>
-			<topicName>/zhurong_mars_rover/odom</topicName>
+			<topicName>odom</topicName>
 			<updateRate>100.0</updateRate>
 		</plugin>
 	</gazebo>
 
 	
 
-	<gazebo reference="gald_camera">
+	<!-- <gazebo reference="gald_camera">
 		<sensor type="depth" name="Camera">
 			<always_on>true</always_on>
 			<update_rate>10.0</update_rate>
@@ -67,7 +67,7 @@
 				<pointCloudCutoff>0.2</pointCloudCutoff>
 			</plugin>
 		</sensor>
-	</gazebo>
+	</gazebo> -->
 
 	<gazebo reference="camera_nav_link">
 		<sensor type="depth" name="Camera">
@@ -99,7 +99,7 @@
 				<pointCloudTopicName>depth/points</pointCloudTopicName>
 				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
 				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
-				<frameName>camera_frame_optical</frameName>
+				<frameName>camera_nav_pointcloud_link</frameName>
 				<baseline>0.1</baseline>
 				<distortion_k1>0.0</distortion_k1>
 				<distortion_k2>0.0</distortion_k2>
@@ -155,7 +155,7 @@
 		</sensor>
 	</gazebo>
 
-	<gazebo reference="camera_obs_B_link">
+	<!-- <gazebo reference="camera_obs_B_link">
 		<sensor type="depth" name="Camera">
 			<always_on>true</always_on>
 			<update_rate>10.0</update_rate>
@@ -195,7 +195,7 @@
 				<pointCloudCutoff>0.2</pointCloudCutoff>
 			</plugin>
 		</sensor>
-	</gazebo>
+	</gazebo> -->
 
 
 	<gazebo>
@@ -203,7 +203,7 @@
 			<alwaysOn>true</alwaysOn>
 			<bodyName>chassis</bodyName>
 			<frameName>imu_link</frameName>
-			<topicName>zhurong_mars_rover/imu</topicName>
+			<topicName>imu</topicName>
 			<serviceName>imu_service</serviceName>
 			<gaussianNoise>0</gaussianNoise>
 			<updateRate>50</updateRate>
@@ -236,7 +236,7 @@
 				<topic>/bumper_contact</topic>
 			</contact>
 			<plugin name="gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">   
-				<bumperTopicName>zhurong_mars_rover/chassis_collision</bumperTopicName>
+				<bumperTopicName>chassis_collision</bumperTopicName>
 				<frameName>chassis</frameName>
 			</plugin>
 		</sensor>
@@ -251,7 +251,7 @@
 				<topic>/base_contact</topic>
 			</contact>
 			<plugin name="gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">   
-				<bumperTopicName>zhurong_mars_rover/base_collision</bumperTopicName>
+				<bumperTopicName>base_collision</bumperTopicName>
 				<frameName>nav_base_link</frameName>
 			</plugin>
 		</sensor>

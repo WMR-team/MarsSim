@@ -149,7 +149,7 @@
 			</visual>
 		</gazebo>
 
-		<joint name="PTZYaw_joint" type="fixed">
+		<joint name="PTZYaw_joint" type="revolute">
 			<origin xyz="0 0 0.023"
 							rpy="0 0 0" />
 			<parent link="PTZBase_Link" />
@@ -161,7 +161,7 @@
 		</joint>
 
 
-		<!-- <transmission name="PTZYaw_trans">
+		<transmission name="PTZYaw_trans">
 			<type>transmission_interface/SimpleTransmission</type>
 			<joint name="PTZYaw_joint">
 				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
@@ -170,7 +170,7 @@
 				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
 				<mechanicalReduction>1</mechanicalReduction>
 			</actuator>
-		</transmission> -->
+		</transmission>
 
 		<link name="PTZPitch_Link">
 			<inertial>
@@ -216,9 +216,10 @@
 			</visual>
 		</gazebo>
 
-		<joint name="PTZPitch_joint" type="fixed">
+		<joint name="PTZPitch_joint" type="revolute">
+		<!-- 0.63 -->
 			<origin xyz="0 0.055 0.062"
-							rpy="0 0.63 0" />
+							rpy="0 0.5 0" />
 			<parent link="PTZYaw_Link" />
 			<child link="PTZPitch_Link" />
 			<axis xyz="0 1 0" />
@@ -227,7 +228,7 @@
 			<!-- <safety_controller soft_upper="2" soft_lower="1" k_position="1" k_velocity="2" /> -->
 		</joint>
 
-		<!-- <transmission name="PTZPitch_trans">
+		<transmission name="PTZPitch_trans">
 			<type>transmission_interface/SimpleTransmission</type>
 			<joint name="PTZPitch_joint">
 				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
@@ -236,7 +237,7 @@
 				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
 				<mechanicalReduction>1</mechanicalReduction>
 			</actuator>
-		</transmission> -->
+		</transmission>
 
 
 		<link name='ZEDNav_Link'>
@@ -312,13 +313,19 @@
 			<origin xyz="0.03 0 -0." rpy="0 0 0"/>
 		</joint>
 
-		<link name="gald_camera">
-		<!-- <pose>0 0 10 0 0 0</pose> -->
+		<!-- <link name="gald_camera">
 		</link>
 		<joint name="camera_sky_joint" type="fixed">
 			<parent link="chassis"/>
 			<child link="gald_camera"/>
 			<origin xyz="-10 0 10" rpy="0 0.5 0"/>
+		</joint> -->
+
+		<link name="camera_nav_pointcloud_link"/>
+		<joint name="camera_nav_pointcloud_joint" type="fixed">
+			<origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+			<parent link="camera_nav_link"/>
+			<child link="camera_nav_pointcloud_link"/>
 		</joint>
 
 

@@ -3,4 +3,11 @@
 	<!-- <env name="GAZEBO_MODEL_PATH" value="${GAZEBO_MODEL_PATH}:$(find rover_gazebo)/models"/> -->
 	<include file="$(find rover_gazebo)/launch/zhurong_real_world.launch"/>
 	<include file="$(find rover_gazebo)/launch/zhurong_start.launch"/>
+	<node name="path_viz"
+		pkg="rover_gazebo_plugins"
+		type="PathRVIZ"
+		respawn="false"
+		output="screen"
+		args="">
+	</node>
 </launch>

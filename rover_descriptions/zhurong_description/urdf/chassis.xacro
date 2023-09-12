@@ -2,12 +2,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
 	<xacro:macro name="chassis_body" params="">
-		<!-- <link name='world'/>
-		<joint name="world_joint" type="floating">
-				<parent link="world"/>
-				<child link="chassis"/>
-				<origin xyz="0 0 0" rpy="0 0 0"/>
-		</joint> -->
+
 		
 		<link name='chassis'>
 			<collision>
@@ -26,9 +21,9 @@
 				<geometry>
 					<mesh filename="package://zhurong_description/meshes/base_link.STL" />
 				</geometry>
-				<!-- <material name="">
-						<color rgba="0.79216 0.81961 0.93333 1" />
-				</material> -->
+				<material name="">
+						<color rgba="0.51 0.38 0.15 1" />
+				</material>
 			</visual>
 
 			<inertial>
@@ -60,6 +55,13 @@
 				</material>
 			</visual>
 		</gazebo>
+
+		<link name="imu_link"/>
+		<joint name="imu_joint" type="fixed">
+				<parent link="chassis"/>
+				<child link="imu_link"/>
+				<origin xyz="0.0 0 0" rpy="0 0 0"/>
+		</joint>
 
 		<!-- Used for fixing robot to Gazebo 'chassis' -->
 		<link name="nav_base_link" >

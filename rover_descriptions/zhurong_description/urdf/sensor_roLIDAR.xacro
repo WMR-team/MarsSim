@@ -74,7 +74,7 @@
 					<mesh filename="package://zhurong_description/meshes/roLIDAR_Link.STL" />
 				</geometry>
 				<material name="">
-					<color rgba="1 0.592156862745098 1 1" />
+					<color rgba="1 1 1 1" />
 				</material>
 			</visual>
 			<!-- <collision>
