@@ -4,7 +4,7 @@ Plugin: libTerramechanicsPlugin_new.so
 PrintStep: 1000000
 PublishRate: 20
 SecondDampCoef: 5000
-TerrainMapFileName: /home/fwh/FWH/MarsSim_v2/src/rover_gazebo/data/simulated_terrain_data.txt
+TerrainMapFileName: /home/fwh/FWH/MarsSim_ws/src/rover_gazebo/data/simulated_terrain_data.txt
 TerrainParamsNum: 7
 c1: 0.5
 c2: -0.3

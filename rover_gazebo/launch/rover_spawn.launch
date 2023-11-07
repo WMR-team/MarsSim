@@ -12,7 +12,7 @@
 	<!-- 
 		Converts the xacro robot information to UDRF and use it as a robot_description parameter
 	-->
-	<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+	<param name="robot_description" command="$(find xacro)/xacro -i $(arg model)" />
 
 	
 	<!-- 
