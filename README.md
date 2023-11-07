@@ -4,8 +4,9 @@
 
 ## 安装依赖
 
-- Ubuntu 18.04
-- [ROS Melodic](http://wiki.ros.org/melodic/Installation/Ubuntu)
+- Ubuntu 20.04
+- Python3
+- [ROS Neotic](http://wiki.ros.org/neotic/Installation/Ubuntu)
 - catkin_tools
 - pyyaml
 - cv2
@@ -23,7 +24,7 @@
     $ cd src
     $ git clone https://github.com/fengwh123/MarsSim_v2
     $ cd ..
-    $ catkin build
+    $ catkin build -DPYTHON_EXECUTABLE=/usr/bin/python3
     $ source ./devel/setup.bash
 
 ### 2. 找我拷贝模型文件
@@ -48,7 +49,7 @@
     $ roslaunch rover_gazebo zhurong_main_simple.launch
 
 ## 6. 键盘控制火星车移动
-在terminal窗口中输入如下键盘控制指令，控制火星车移动：
+在terminal窗口中输入如下键盘控制指令,并回车，控制火星车移动：
 - w: 前进
 - s: 后退
 - a: 左转
@@ -78,10 +79,6 @@
   - config
   - include
   - src
-- rover_navigation: 火星车导航程序包
-  - config
-  - launch
-  - scripts
 - world_plugins: 生成仿真场景的插件
   - config
   - scripts
