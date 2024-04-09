@@ -1,21 +1,21 @@
-heightmap_name: /home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_terrain/heightmaps_int16/HM1.png
-heightmap_path: /home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_terrain/heightmaps_int16
+heightmap_name: /home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo/models/mars_terrain/heightmaps_int16/HM1.png
+heightmap_path: /home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo/models/mars_terrain/heightmaps_int16
 heightmap_int8_path: heightmaps_int8/
 texture_path: simulation_tex/
 
-terrain_model_save_path: /home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_terrain
-rock_model_save_path: /home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_rocks_lbl
-world_save_path: /home/fwh/FWH/MarsSim_ws/src/rover_gazebo/worlds
-launch_file: /home/fwh/FWH/MarsSim_ws/src/rover_gazebo/launch/image_collect.launch
+terrain_model_save_path: /home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo/models/mars_terrain
+rock_model_save_path: /home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo/models/mars_rocks_lbl
+world_save_path: /home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo/worlds
+launch_file: /home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo/launch/image_collect.launch
 
-DTM_save_path: /home/fwh/FWH/MarsSim_ws/src/rover_gazebo/data
+DTM_save_path: /home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo/data
 DTM_save_name: simulated_terrain_data.txt
 
-dataset_images_save_path: /home/fwh/FWH/MarsSim_ws/src/rover_gazebo/results/dataset_0425
+dataset_images_save_path: /home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo/results/dataset_0425
 
-plugin_config_file: /home/fwh/FWH/MarsSim_ws/src/rover_gazebo_plugins/config/TerramechanicsPluginParam.yaml
+plugin_config_file: /home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo_plugins/config/TerramechanicsPluginParam.yaml
 
-terrain_data_file: /home/fwh/FWH/MarsSim_ws/src/world_plugins/config/terrain_data.csv
+terrain_data_file: /home/ruyi/catkin_ws/src/MarsSim_v2/world_plugins/config/terrain_data.csv
 
 terrain_height: 0.1
 terrain_length: 80
@@ -36,4 +36,4 @@ param_6: 0.015
 
 camera_point_num: 100
 
-terrain_class_file: /home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_terrain/whole_tex/terrain_class.npy
+terrain_class_file: /home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo/models/mars_terrain/whole_tex/terrain_class.npy

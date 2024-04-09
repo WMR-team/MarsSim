@@ -8,7 +8,7 @@ from numpy.random import default_rng
 import yaml
 import cv2
 import sys
-sys.path.append('/home/fwh/FWH/MarsSim_ws/src/world_plugins/scripts')
+sys.path.append('/home/ruyi/catkin_ws/src/MarsSim_v2/world_plugins/scripts')
 from TerrainGEN import *
 from ModelGEN import *
 # from CameraProcess import *
@@ -19,7 +19,7 @@ import pandas as pd
 
 def change_world(seed, use_user_H=False, default_height=1.5, default_rock_dis=None, use_label=False, mode='height', heightmap_num=5, collide_mode='origin', terrain_len=80):
     random.seed(seed)
-    yaml_file_name = '/home/fwh/FWH/MarsSim_ws/src/world_plugins/config/mars_terrain_params.yaml'
+    yaml_file_name = '/home/ruyi/catkin_ws/src/MarsSim_v2/world_plugins/config/mars_terrain_params.yaml'
     
     # 读取配置yaml文件
     param_file = open(yaml_file_name)

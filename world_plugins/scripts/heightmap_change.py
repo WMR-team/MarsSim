@@ -42,8 +42,8 @@ def gen_heightmap(img_num):
 
     l_min = int(0.8/10*640)
 
-    file_path_16 = '/home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_terrain/choose/heightmaps_int16'
-    file_path_8 = '/home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_terrain/choose/heightmaps_int8'
+    file_path_16 = '/home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo/models/mars_terrain/choose/heightmaps_int16'
+    file_path_8 = '/home/ruyi/catkin_ws/src/MarsSim_v2/rover_gazebo/models/mars_terrain/choose/heightmaps_int8'
     # img_name = 'HM8.png'
     img = cv2.imread(os.path.join(file_path_16,'HM'+str(img_num)+'.png'), -1)
     ii = random.randint(0,3)
