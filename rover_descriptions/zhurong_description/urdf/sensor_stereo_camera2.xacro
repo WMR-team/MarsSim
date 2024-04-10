@@ -321,11 +321,11 @@
 			<origin xyz="-10 0 10" rpy="0 0.5 0"/>
 		</joint> -->
 
-		<link name="camera_nav_pointcloud_link"/>
+		<link name="camera_nav_optical_frame"/>
 		<joint name="camera_nav_pointcloud_joint" type="fixed">
 			<origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
 			<parent link="camera_nav_link"/>
-			<child link="camera_nav_pointcloud_link"/>
+			<child link="camera_nav_optical_frame"/>
 		</joint>
 
 
