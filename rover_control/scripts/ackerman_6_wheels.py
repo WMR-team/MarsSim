@@ -52,7 +52,10 @@ class ZhurongMarsRoverControl(object):
                                 ]
 
         for controller_name in self.controllers_list:
-            topic_name = "/"+self.controller_ns+"/"+controller_name+"/"+self.controller_command
+            if len(self.controller_ns) > 0:
+                topic_name = "/"+self.controller_ns+"/"+controller_name+"/"+self.controller_command
+            else:
+                topic_name = "/"+controller_name+"/"+self.controller_command
             self.zhurong_publishers[controller_name] = rospy.Publisher(
                 topic_name,
                 Float64,
@@ -374,7 +377,7 @@ class ZhurongMarsRoverControl(object):
 
 if __name__ == "__main__":
     
-    zhurong_mars_rover_control = ZhurongMarsRoverControl("zhurong_mars_rover")
+    zhurong_mars_rover_control = ZhurongMarsRoverControl()
     # rover2_control = ZhurongMarsRoverControl("rover_2")
     rate = rospy.Rate(100.0)
     while not rospy.is_shutdown():

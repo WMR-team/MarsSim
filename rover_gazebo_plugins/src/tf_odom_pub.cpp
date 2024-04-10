@@ -27,13 +27,6 @@ class RoverOdomTF
 
 };
 
-// RoverOdomTF::RoverOdomTF(string robot_ns)
-// {
-//   // this->robot_ns = robot_ns;
-//   // this->rosNode.reset(new ros::NodeHandle(robot_ns));
-//   odom_sub = node.subscribe("/"+robot_ns+"/odom", 10, &RoverOdomTF::callback, this);
-// }
-
 void callback(nav_msgs::OdometryPtr msg)
 {
   static tf::TransformBroadcaster odom_broadcaster;
@@ -45,7 +38,8 @@ void callback(nav_msgs::OdometryPtr msg)
   odom_trans.header.stamp = current_time;
   
   odom_trans.header.frame_id = "odom";
-  odom_trans.child_frame_id = robot_ns+"/chassis";
+  // odom_trans.child_frame_id = robot_ns+"/chassis";
+  odom_trans.child_frame_id = "base_link";
 
   odom_trans.transform.translation.x = msg->pose.pose.position.x;
   odom_trans.transform.translation.y = msg->pose.pose.position.y;
@@ -56,7 +50,8 @@ void callback(nav_msgs::OdometryPtr msg)
   odom_broadcaster.sendTransform(odom_trans);
 
   geometry_msgs::PoseWithCovarianceStamped pose_msg;
-  pose_msg.header.frame_id = robot_ns+"/chassis";
+  // pose_msg.header.frame_id = robot_ns+"/chassis";
+  pose_msg.header.frame_id = "base_link";
   pose_msg.header.stamp = current_time;
   pose_msg.pose = msg->pose;
   pose_pub.publish(pose_msg);
@@ -65,13 +60,15 @@ void callback(nav_msgs::OdometryPtr msg)
 
 int main(int argc, char** argv){
   ros::init(argc, argv, "tf_odom_pub");
-  stringstream ss;
-  ss << argv[1];
-  robot_ns = ss.str();
+  // stringstream ss;
+  // ss << argv[1];
+  // robot_ns = ss.str();
   // RoverOdomTF rover_odom(robot_ns);
   ros::NodeHandle node;
-  ros::Subscriber odom_sub = node.subscribe("/"+robot_ns+"/odom", 10, &callback);
-  pose_pub = node.advertise<geometry_msgs::PoseWithCovarianceStamped>("/"+robot_ns+"/pose",10);
+  // ros::Subscriber odom_sub = node.subscribe("/"+robot_ns+"/odom", 10, &callback);
+  ros::Subscriber odom_sub = node.subscribe("/odom", 10, &callback);
+  // pose_pub = node.advertise<geometry_msgs::PoseWithCovarianceStamped>("/"+robot_ns+"/pose",10);
+  pose_pub = node.advertise<geometry_msgs::PoseWithCovarianceStamped>("/pose", 10);
 
   ros::spin();
   return 0;
