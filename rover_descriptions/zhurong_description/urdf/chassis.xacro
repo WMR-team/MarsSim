@@ -11,12 +11,15 @@
 		</joint>
 		<link name='chassis'>
 			<collision>
-				<origin xyz="0.85 0 0.105"
+				<!-- <origin xyz="0.85 0 0.105"
+								rpy="0 0 0"/> -->
+				<origin xyz="0 0 0"
 								rpy="0 0 0"/>
 				<geometry>
+					<mesh filename="package://zhurong_description/meshes/base_link.STL" />
 					<!-- <box size="1.252 0.832 0.502"/> -->
 					<!-- <box size="1.8 1.6 0.502"/> -->
-					<box size="0.25 1.6 0.502"/>
+					<!-- <box size="0.25 1.6 0.502"/> -->
 				</geometry>
 			</collision>
 
@@ -70,13 +73,13 @@
 
 		<!-- Used for fixing robot to Gazebo 'chassis' -->
 		<link name="nav_base_link" >
-			<collision>
+			<!-- <collision>
 				<origin xyz="-0.3 0 0.105"
 								rpy="0 0 0"/>
 				<geometry>
 					<box size="1.5 1.6 0.502"/>
 				</geometry>
-			</collision>
+			</collision> -->
 		</link>
 
 		<joint name="base_joint" type="fixed">
