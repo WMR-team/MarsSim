@@ -308,6 +308,8 @@ class ZhurongMarsRoverControl(object):
             vel_arr = abs(self.body_omega) * r_arr / self.r
             if self.body_velocity < 0:
                 vel_arr = -vel_arr
+            elif self.body_velocity == 0 and self.body_omega < 0:
+                vel_arr = -vel_arr
             # print(vel_arr)
 
             theta = np.zeros(6)
