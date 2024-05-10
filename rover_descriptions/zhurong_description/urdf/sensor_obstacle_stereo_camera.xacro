@@ -223,7 +223,7 @@
     <joint name="obsZED_B_joint" type="fixed">
       <origin
         xyz="0.035358 0 -0.036993"
-        rpy="0 0.45 0" />  <!--0.92502-->
+        rpy="0 0.40 0" />  <!--0.92502-->
       <parent link="obsZEDSupport_B_Link" />
       <child link="obsZED_B_Link" />
       <axis xyz="0 0 0" />
