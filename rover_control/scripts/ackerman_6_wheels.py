@@ -4,7 +4,7 @@ import time
 import rospy
 import numpy as np
 from std_msgs.msg import Float64
-from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import Twist
 from std_srvs.srv import SetBool, SetBoolResponse
 
 
@@ -61,15 +61,15 @@ class ZhurongMarsRoverControl(object):
                 Float64,
                 queue_size=1)
     
-        self.cmd_vel_msg = TwistStamped()
+        self.cmd_vel_msg = Twist()
         cmd_vel_topic = "/mars_environment/cmd_vel"
-        rospy.Subscriber(cmd_vel_topic, TwistStamped, self.cmd_vel_callback)
-        rospy.Subscriber("/wheel_LF_cmd", TwistStamped, self.wheel_LF_cmd_callback)
-        rospy.Subscriber("/wheel_RF_cmd", TwistStamped, self.wheel_RF_cmd_callback)
-        rospy.Subscriber("/wheel_LM_cmd", TwistStamped, self.wheel_LM_cmd_callback)
-        rospy.Subscriber("/wheel_RM_cmd", TwistStamped, self.wheel_RM_cmd_callback)
-        rospy.Subscriber("/wheel_LB_cmd", TwistStamped, self.wheel_LB_cmd_callback)
-        rospy.Subscriber("/wheel_RB_cmd", TwistStamped, self.wheel_RB_cmd_callback)
+        rospy.Subscriber(cmd_vel_topic, Twist, self.cmd_vel_callback)
+        rospy.Subscriber("/wheel_LF_cmd", Twist, self.wheel_LF_cmd_callback)
+        rospy.Subscriber("/wheel_RF_cmd", Twist, self.wheel_RF_cmd_callback)
+        rospy.Subscriber("/wheel_LM_cmd", Twist, self.wheel_LM_cmd_callback)
+        rospy.Subscriber("/wheel_RM_cmd", Twist, self.wheel_RM_cmd_callback)
+        rospy.Subscriber("/wheel_LB_cmd", Twist, self.wheel_LB_cmd_callback)
+        rospy.Subscriber("/wheel_RB_cmd", Twist, self.wheel_RB_cmd_callback)
         rospy.Subscriber('/mars_environment/cam_ctl', Float64, self.cam_ctl_callback)
         rospy.Service('/init_controller', SetBool, self.init_response)
         self.control_msg.data=0
@@ -81,46 +81,46 @@ class ZhurongMarsRoverControl(object):
   
         rospy.logwarn("ZhurongMarsRoverControl...READY")
 
-    def cmd_vel_callback(self, msg):
+    def cmd_vel_callback(self, msg: Twist):
         # print('received!!!')
-        self.body_velocity = msg.twist.linear.x
-        self.body_omega = msg.twist.angular.z
+        self.body_velocity = msg.linear.x
+        self.body_omega = msg.angular.z
         self.move_with_cmd_vel()
         
-    def wheel_LF_cmd_callback(self, msg):
-        self.wheel_velocity_msg[0].data = msg.twist.linear.x
+    def wheel_LF_cmd_callback(self, msg: Twist):
+        self.wheel_velocity_msg[0].data = msg.linear.x
         self.wheel_publisher[0].publish(self.wheel_velocity_msg[0])
-        self.wheel_steer_msg[0].data = msg.twist.angular.z
+        self.wheel_steer_msg[0].data = msg.angular.z
         self.steer_publisher[0].publish(self.wheel_steer_msg[0])
         
-    def wheel_RF_cmd_callback(self, msg):
-        self.wheel_velocity_msg[1].data = msg.twist.linear.x
+    def wheel_RF_cmd_callback(self, msg: Twist):
+        self.wheel_velocity_msg[1].data = msg.linear.x
         self.wheel_publisher[1].publish(self.wheel_velocity_msg[1])
-        self.wheel_steer_msg[1].data = msg.twist.angular.z
+        self.wheel_steer_msg[1].data = msg.angular.z
         self.steer_publisher[1].publish(self.wheel_steer_msg[1])
         
-    def wheel_LM_cmd_callback(self, msg):
-        self.wheel_velocity_msg[2].data = msg.twist.linear.x
+    def wheel_LM_cmd_callback(self, msg: Twist):
+        self.wheel_velocity_msg[2].data = msg.linear.x
         self.wheel_publisher[2].publish(self.wheel_velocity_msg[2])
-        self.wheel_steer_msg[2].data = msg.twist.angular.z
+        self.wheel_steer_msg[2].data = msg.angular.z
         self.steer_publisher[2].publish(self.wheel_steer_msg[2])
         
-    def wheel_RM_cmd_callback(self, msg):
-        self.wheel_velocity_msg[3].data = msg.twist.linear.x
+    def wheel_RM_cmd_callback(self, msg: Twist):
+        self.wheel_velocity_msg[3].data = msg.linear.x
         self.wheel_publisher[3].publish(self.wheel_velocity_msg[3])
-        self.wheel_steer_msg[3].data = msg.twist.angular.z
+        self.wheel_steer_msg[3].data = msg.angular.z
         self.steer_publisher[3].publish(self.wheel_steer_msg[3])
         
-    def wheel_LB_cmd_callback(self, msg):
-        self.wheel_velocity_msg[4].data = msg.twist.linear.x
+    def wheel_LB_cmd_callback(self, msg: Twist):
+        self.wheel_velocity_msg[4].data = msg.linear.x
         self.wheel_publisher[4].publish(self.wheel_velocity_msg[4])
-        self.wheel_steer_msg[4].data = msg.twist.angular.z
+        self.wheel_steer_msg[4].data = msg.angular.z
         self.steer_publisher[4].publish(self.wheel_steer_msg[4])
         
-    def wheel_RB_cmd_callback(self, msg):
-        self.wheel_velocity_msg[5].data = msg.twist.linear.x
+    def wheel_RB_cmd_callback(self, msg: Twist):
+        self.wheel_velocity_msg[5].data = msg.linear.x
         self.wheel_publisher[5].publish(self.wheel_velocity_msg[5])
-        self.wheel_steer_msg[5].data = msg.twist.angular.z
+        self.wheel_steer_msg[5].data = msg.angular.z
         self.steer_publisher[5].publish(self.wheel_steer_msg[5])
 
     def cam_ctl_callback(self, msg):
