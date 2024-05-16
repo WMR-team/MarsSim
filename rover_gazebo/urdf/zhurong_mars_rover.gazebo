@@ -233,7 +233,7 @@
 			<always_on>1</always_on>
 			<update_rate>20</update_rate>
 			<contact>
-				<collision>chassis_collision</collision>
+				<collision>base_link_fixed_joint_lump__chassis_collision</collision>
 				<topic>/bumper_contact</topic>
 			</contact>
 			<plugin name="gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">   
