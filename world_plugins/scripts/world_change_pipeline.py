@@ -17,7 +17,7 @@ from utils import delete_paging
 import pandas as pd
 
 
-def change_world(seed, use_user_H=False, default_height=1.5, default_rock_dis=None, use_label=False, mode='height', heightmap_num=5, collide_mode='origin', terrain_len=80):
+def change_world(seed, use_user_H=False, default_height=1.5, default_rock_dis=None, use_label=False, mode='height', heightmap_num="5", collide_mode='origin', terrain_len=80):
     random.seed(seed)
     yaml_file_name = '/home/fwh/FWH/MarsSim_v2/src/world_plugins/config/mars_terrain_params.yaml'
     
