@@ -225,7 +225,7 @@
 			</actuator>
 		</transmission>
 
-		<wheel
+		<xacro:wheel
 			wheel_name="front_wheel_L"
 			wheel_conector_name="suspension_steer_F_L"
 			tY="0"/>
@@ -286,7 +286,7 @@
 			</actuator>
 		</transmission>
 
-		<wheel
+		<xacro:wheel
 			wheel_name="middle_wheel_L"
 			wheel_conector_name="suspension_steer_M_L"
 			tY="0"/>
@@ -349,7 +349,7 @@
 			</actuator>
 		</transmission>
 
-		<wheel
+		<xacro:wheel
 			wheel_name="back_wheel_L"
 			wheel_conector_name="suspension_steer_B_L"
 			tY="0"/>
