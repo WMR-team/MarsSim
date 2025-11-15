@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="hunter_se_description2" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find rover_gazebo)/urdf/hunter_gazebo.xacro" />
+
+  <link
+    name="base_link">
+  </link>
+
+  <joint
+    name="base_rear_center"
+    type="fixed">
+    <origin
+      xyz="0.2078 0 0.158"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="hunter_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link
+    name="hunter_link">
+  </link>
+
+  <joint
+    name="base_footprint_joint"
+    type="fixed">
+    <origin
+      xyz="0.0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="hunter_link" />
+    <child
+      link="base_footprint" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link
+    name="base_footprint">
+    <inertial>
+      <origin
+        xyz="0.0374140021041951 0 -0.0771282894414029"
+        rpy="0 0 0" />
+      <mass
+        value="24.73" />
+      <inertia
+        ixx="0.123215829336501"
+        ixy="-2.51201031615063E-06"
+        ixz="0.00480100638469038"
+        iyy="0.219144715482931"
+        iyz="-1.0329581476775E-05"
+        izz="0.313606030126045" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- fr roll link -->
+  <link
+    name="fr_roll_link">
+    <inertial>
+      <origin
+        xyz="0 0 0" />
+      <mass
+        value="0.5" />
+      <inertia
+        ixx="0.00222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.00222"
+        iyz="0.0"
+        izz="0.00378075" />
+    </inertial>
+  </link>
+
+  <joint
+    name="fr_roll_joint"
+    type="fixed">
+    <origin
+      xyz="0.34058 0 -0.1535"
+      rpy="0 0 0" />
+    <parent
+      link="hunter_link" />
+    <child
+      link="fr_roll_link" />
+    <!-- <axis
+      xyz="1 0 0" /> -->
+    <!-- roll angle limit-->
+    <!-- <limit
+      lower="-0.1"
+      upper="0.1"
+      effort="30"
+      velocity="0.5" /> -->
+  </joint>
+
+  <link
+    name="fr_steer_left_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.223529411764706 0.223529411764706 0.223529411764706 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_steer_left_joint"
+    type="revolute">
+    <origin
+      xyz="0 0.24619 0"
+      rpy="0 0 0" />
+    <parent
+      link="fr_roll_link" />
+    <child
+      link="fr_steer_left_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.69"
+      upper="0.69"
+      effort="50"
+      velocity="1.57" />
+  </joint>
+
+  <link
+    name="fr_left_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/fr_left_link.STL" />
+      </geometry>
+      <material
+name="">
+        <color
+          rgba="0.223529411764706 0.223529411764706 0.223529411764706 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/wheel.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_left_joint"
+    type="continuous">
+    <origin
+      xyz="0 0 0"
+      rpy="1.5707963267948966 0 0" />
+    <parent
+      link="fr_steer_left_link" />
+    <child
+      link="fr_left_link" />
+    <axis
+      xyz="0 0 -1" />
+     <dynamics damping="0.0" friction="0"/>
+  </joint>
+
+  <link
+    name="fr_steer_right_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_steer_right_joint"
+    type="revolute">
+    <origin
+      xyz="0 -0.24619 0"
+      rpy="0 0 0" />
+    <parent
+      link="fr_roll_link" />
+    <child
+      link="fr_steer_right_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.69"
+      upper="0.69"
+      effort="50"
+      velocity="1.57" />
+  </joint>
+  <link
+    name="fr_right_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/fr_right_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.223529411764706 0.223529411764706 0.223529411764706 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/wheel.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_right_joint"
+    type="continuous">
+    <origin
+      xyz="0 0 0"
+      rpy="-1.5707963267948966 0 0" />
+    <parent
+      link="fr_steer_right_link" />
+    <child
+      link="fr_right_link" />
+    <axis
+      xyz="0 0 1" />
+    <dynamics damping="0.0" friction="0"/>
+  </joint>
+
+  <link
+    name="re_left_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/re_left_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.223529411764706 0.223529411764706 0.223529411764706 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0.005"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/wheel.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="re_left_joint"
+    type="continuous">
+    <origin
+      xyz="0 0.252 0"
+      rpy="1.5707963267948966 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="re_left_link" />
+    <axis
+      xyz="0 0 -1" />
+    <dynamics damping="0.0" friction="15"/>
+  </joint>
+  <link
+    name="re_right_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="3.149" />
+      <inertia
+        ixx="0.0222"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.0222"
+        iyz="0.0"
+        izz="0.0378075" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/re_right_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.223529411764706 0.223529411764706 0.223529411764706 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0.005"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/wheel.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="re_right_joint"
+    type="continuous">
+    <origin
+      xyz="0 -0.252 0"
+      rpy="-1.5707963267948966 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="re_right_link" />
+    <axis
+      xyz="0 0 1" />
+    <dynamics damping="0.0" friction="15"/>
+  </joint>
+
+  <link
+    name="rear_center_link">
+    <inertial>
+      <origin
+        xyz="0.26958 0 0.31877"
+        rpy="0 0 0" />
+      <mass
+        value="3" />
+      <inertia
+        ixx="0.002542"
+        ixy="-1.7823E-05"
+        ixz="2.8456E-06"
+        iyy="1.7793"
+        iyz="-1.8979E-05"
+        izz="0.059624" />
+    </inertial>
+  </link>
+
+  <link
+    name="imu">
+    <inertial>
+      <origin
+        xyz="-0.0102880274365691 0.0993290636796851 -6.92304854288395E-05"
+        rpy="0 0 0" />
+      <mass
+        value="9.62573790254133" />
+      <inertia
+        ixx="0.0345675058791809"
+        ixy="4.48263732536653E-05"
+        ixz="-6.01527522965323E-05"
+        iyy="0.0708692422669791"
+        iyz="-1.26946054719956E-05"
+        izz="0.0406161376594187" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/imu.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/imu.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu_joint"
+    type="fixed">
+    <origin
+      xyz="0.269 0 0.199"
+      rpy="1.57 0 0" />
+    <parent
+      link="rear_center_link" />
+    <child
+      link="imu" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <joint
+    name="shelf_joint"
+    type="fixed">
+    <origin
+      xyz="-0.2078 0 -0.158"
+      rpy="0 0 0" />
+    <parent
+      link="hunter_link" />
+    <child
+      link="rear_center_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+<link
+    name="zed2_base_link">
+    <inertial>
+      <origin
+        xyz="-0.016107603491136 -2.71922496075661E-06 -0.000517891957394379"
+        rpy="0 0 0" />
+      <mass
+        value="0.152258490332087" />
+      <inertia
+        ixx="0.000372329596495051"
+        ixy="2.3551469429661E-09"
+        ixz="-1.10324742466511E-07"
+        iyy="2.28182494287698E-05"
+        iyz="6.51618326958984E-09"
+        izz="0.000374737306982768" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/ZED.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.627450980392157 0.627450980392157 0.627450980392157 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/ZED.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu2ZED"
+    type="fixed">
+    <origin
+      xyz="0.377016067967343 0.146404030146616 -4.9943378971129E-05"
+      rpy="-1.57079632679489 0 -0.261822377113013" />
+    <parent
+      link="imu" />
+    <child
+      link="zed2_base_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link name="zed_optical_frame"></link>
+
+  <joint name="zed_camera_optical_joint" type="fixed">
+      <!-- 父链接是物理链接 -->
+      <parent link="zed2_base_link"/>
+      <!-- 子链接是光学坐标系 -->
+      <child link="zed_optical_frame"/>
+      <!-- 原点重合 -->
+      <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+  </joint>
+
+
+  <link
+    name="rtk_front">
+    <inertial>
+      <origin
+        xyz="5.86197757002083E-14 -3.64153152077051E-14 0.0629926442551023"
+        rpy="0 0 0" />
+      <mass
+        value="1.10251601732188" />
+      <inertia
+        ixx="0.00150084463353842"
+        ixy="-1.0842021724855E-19"
+        ixz="-5.62452718417312E-19"
+        iyy="0.00150084463353842"
+        iyz="-7.39256972450518E-19"
+        izz="0.00258111195272864" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/rtk_front.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/rtk_front.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu2rtk_front"
+    type="fixed">
+    <origin
+      xyz="0.320680000000001 0.179 -5.0000000002548E-05"
+      rpy="-1.5707963267949 0 0" />
+    <parent
+      link="imu" />
+    <child
+      link="rtk_front" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="rtk_back">
+    <inertial>
+      <origin
+        xyz="0 2.66453525910038E-15 0.0629926442551051"
+        rpy="0 0 0" />
+      <mass
+        value="1.10251601732187" />
+      <inertia
+        ixx="0.0015008446335384"
+        ixy="-1.62630325872826E-19"
+        ixz="-4.2627856185925E-19"
+        iyy="0.0015008446335384"
+        iyz="-4.86018849724583E-19"
+        izz="0.0025811119527286" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/rtk_back.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/rtk_back.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu2rtk_back"
+    type="fixed">
+    <origin
+      xyz="-0.37932000000008 0.178999999999998 -5.00000000664969E-05"
+      rpy="-1.5707963267949 0 0" />
+    <parent
+      link="imu" />
+    <child
+      link="rtk_back" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="velodyne">
+    <inertial>
+      <origin
+        xyz="-0.000294784572360651 -2.5801771492695E-06 0.0357745256715885"
+        rpy="0 0 0" />
+      <mass
+        value="0.585082155092443" />
+      <inertia
+        ixx="0.000629066958885107"
+        ixy="1.1291564505514E-10"
+        ixz="6.84862392776488E-08"
+        iyy="0.000630263916092117"
+        iyz="-5.00500254304793E-08"
+        izz="0.000749251775812556" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/vlp.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/vlp.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu2vlp"
+    type="fixed">
+    <origin
+      xyz="0.000681587736344191 0.362999999999995 -5.00000001224521E-05"
+      rpy="-1.5707963267949 0 0" />
+    <parent
+      link="imu" />
+    <child
+      link="velodyne" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="livox">
+    <inertial>
+      <origin
+        xyz="-0.0580540411673436 1.50914756567033E-05 -0.0127132680006796"
+        rpy="0 0 0" />
+      <mass
+        value="0.732248175141318" />
+      <inertia
+        ixx="0.000549654923963519"
+        ixy="1.42145193411055E-06"
+        ixz="-9.65869949643662E-06"
+        iyy="0.000965376397688835"
+        iyz="4.19157243552525E-06"
+        izz="0.0011291561864709" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/livox.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_se_description/meshes/livox.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu2livox"
+    type="fixed">
+    <origin
+      xyz="0.0835272864611989 0.528956093524004 -5.00000014973523E-05"
+      rpy="-1.54441826879916 0 -0.349065850396752" />
+    <parent
+      link="imu" />
+    <child
+      link="livox" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>

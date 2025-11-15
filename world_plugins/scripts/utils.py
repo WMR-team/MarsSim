@@ -18,5 +18,5 @@ def quaternion_from_euler(r, p, y):
 
 def delete_paging():
     '''删除gazebo paging文件夹'''
-    if os.path.exists('/home/fwh/.gazebo/paging'):
-        shutil.rmtree('/home/fwh/.gazebo/paging')
+    if os.path.exists('/home/xyt/.gazebo/paging'):
+        shutil.rmtree('/home/xyt/.gazebo/paging')

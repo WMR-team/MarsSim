@@ -1,0 +1,4 @@
+<launch>
+	<include file="$(find rover_gazebo)/launch/hunter_spawn.launch"/>
+	<include file="$(find rover_control)/launch/hunter_control.launch"/>
+</launch>

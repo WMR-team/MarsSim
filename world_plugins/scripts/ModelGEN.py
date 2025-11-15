@@ -299,7 +299,7 @@ def generate_terrain_model(heightmap_name, length, height, save_path='', seed=1,
     lbl_viz = colormap[sem_img]
     lbl_viz = lbl_viz.astype(np.uint8)
     # lbl_viz = lbl_viz[:,:,::-1]
-    cv2.imwrite('/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/whole_tex/class.png',lbl_viz)
+    cv2.imwrite('/home/xyt/marsim_ws/src/MarsSim_v2/rover_gazebo/models/mars_terrain/whole_tex/class.png',lbl_viz)
     
     return_record['min_heights'] = min_height_list
     

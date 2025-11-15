@@ -1,10 +1,10 @@
 DTM_params: 10
 FirstDampCoef: 5000
-Plugin: libTerramechanicsPlugin_new.so
+Plugin: libTerramechanicsPlugin.so
 PrintStep: 1000000
 PublishRate: 20
 SecondDampCoef: 5000
-TerrainMapFileName: /home/fwh/FWH/MarsSim_v2/src/rover_gazebo/data/simulated_terrain_data.txt
+TerrainMapFileName: /home/xyt/marsim_ws/src/MarsSim_v2/rover_gazebo/data/simulated_terrain_data.txt
 TerrainParamsNum: 7
 c1: 0.5
 c2: -0.3

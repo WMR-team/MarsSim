@@ -15,6 +15,9 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
   gazebo_ros
   message_generation
+  tf
+  std_msgs
+  geometry_msgs
 )
 
 find_package(roslaunch)
@@ -225,3 +228,6 @@ install(DIRECTORY launch worlds models
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(control_node src/control_node.cpp)
+target_link_libraries(control_node   ${catkin_LIBRARIES}  )

@@ -1,0 +1,48 @@
+<launch>
+	
+	<arg name="x" default="0" />
+	<arg name="y" default="0" />
+	<arg name="z" default="1.5" />
+	<arg name="roll" default="0"/>
+	<arg name="pitch" default="0"/>
+	<arg name="yaw" default="0" />
+
+	<arg name="model" default="$(find rover_gazebo)/urdf/hunter_description.xacro"/>
+	
+	<group ns = "hunter_rover">
+
+		<!-- 
+			Converts the xacro robot information to UDRF and use it as a robot_description parameter
+		-->
+		<param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+
+		
+		<!-- 
+			push robot_description to factory and spawn robot in gazebo 
+		-->
+		<node name="urdf_spawner"
+			pkg="gazebo_ros"
+			type="spawn_model"
+			respawn="false"
+			output="screen"
+			args="-urdf -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -model hunter_rover -param robot_description 
+			"/>
+
+		<node 
+			name="joint_state_publisher" 
+			pkg="joint_state_publisher" 
+			type="joint_state_publisher" ></node>
+		<!-- <node
+			name="robot_state_publisher"
+			pkg="robot_state_publisher"
+			type="robot_state_publisher" />	   -->
+
+		<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+			<param name="publish_frequency" type="double" value="50.0" />
+        	<param name="tf_prefix" value="hunter_rover" />	
+		</node>
+
+		<node pkg="tf" type="static_transform_publisher" name="base_to_world" args="0.0 0.0 0.0 0 0 0.0 odom map 100"/>
+		<node name="tf_odom_pub" pkg="rover_gazebo_plugins" type="tf_odom_pub" args="hunter_rover"></node>
+	</group>
+</launch>
