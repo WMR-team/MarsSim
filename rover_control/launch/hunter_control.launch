@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+  <rosparam file="$(find rover_control)/config/hunter_controllers.yaml"
+            command="load" ns="hunter_rover"/>
+
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+        output="screen" args="--namespace=/hunter_rover
+                                joint_states_controller
+                                fr_steer_left_joint_controller
+                                fr_steer_right_joint_controller
+
+                                re_left_joint_controller
+                                re_right_joint_controller
+                                fr_left_joint_controller
+                                fr_right_joint_controller
+
+                              --shutdown-timeout 3">
+  </node>
+  <node name="control_node" pkg="rover_control" type="control_node" output="screen"/>
+</launch>

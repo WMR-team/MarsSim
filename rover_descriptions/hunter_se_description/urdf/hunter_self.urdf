@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="hunter_self">
+  <link
+    name="imu">
+    <inertial>
+      <origin
+        xyz="-0.0102880274365691 0.0993290636796851 -6.92304854288395E-05"
+        rpy="0 0 0" />
+      <mass
+        value="9.62573790254133" />
+      <inertia
+        ixx="0.0345675058791809"
+        ixy="4.48263732536653E-05"
+        ixz="-6.01527522965323E-05"
+        iyy="0.0708692422669791"
+        iyz="-1.26946054719956E-05"
+        izz="0.0406161376594187" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/imu.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/imu.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="ZED">
+    <inertial>
+      <origin
+        xyz="-0.016107603491136 -2.71922496075661E-06 -0.000517891957394379"
+        rpy="0 0 0" />
+      <mass
+        value="0.152258490332087" />
+      <inertia
+        ixx="0.000372329596495051"
+        ixy="2.3551469429661E-09"
+        ixz="-1.10324742466511E-07"
+        iyy="2.28182494287698E-05"
+        iyz="6.51618326958984E-09"
+        izz="0.000374737306982768" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/ZED.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.627450980392157 0.627450980392157 0.627450980392157 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/ZED.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu2ZED"
+    type="fixed">
+    <origin
+      xyz="0.377016067967343 0.146404030146616 -4.9943378971129E-05"
+      rpy="-1.57079632679489 0 -0.261822377113013" />
+    <parent
+      link="imu" />
+    <child
+      link="ZED" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="rtk_front">
+    <inertial>
+      <origin
+        xyz="5.86197757002083E-14 -3.64153152077051E-14 0.0629926442551023"
+        rpy="0 0 0" />
+      <mass
+        value="1.10251601732188" />
+      <inertia
+        ixx="0.00150084463353842"
+        ixy="-1.0842021724855E-19"
+        ixz="-5.62452718417312E-19"
+        iyy="0.00150084463353842"
+        iyz="-7.39256972450518E-19"
+        izz="0.00258111195272864" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/rtk_front.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/rtk_front.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu2rtk_front"
+    type="fixed">
+    <origin
+      xyz="0.320680000000001 0.179 -5.0000000002548E-05"
+      rpy="-1.5707963267949 0 0" />
+    <parent
+      link="imu" />
+    <child
+      link="rtk_front" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="rtk_back">
+    <inertial>
+      <origin
+        xyz="0 2.66453525910038E-15 0.0629926442551051"
+        rpy="0 0 0" />
+      <mass
+        value="1.10251601732187" />
+      <inertia
+        ixx="0.0015008446335384"
+        ixy="-1.62630325872826E-19"
+        ixz="-4.2627856185925E-19"
+        iyy="0.0015008446335384"
+        iyz="-4.86018849724583E-19"
+        izz="0.0025811119527286" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/rtk_back.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/rtk_back.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu2rtk_back"
+    type="fixed">
+    <origin
+      xyz="-0.37932000000008 0.178999999999998 -5.00000000664969E-05"
+      rpy="-1.5707963267949 0 0" />
+    <parent
+      link="imu" />
+    <child
+      link="rtk_back" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="vlp">
+    <inertial>
+      <origin
+        xyz="-0.000294784572360651 -2.5801771492695E-06 0.0357745256715885"
+        rpy="0 0 0" />
+      <mass
+        value="0.585082155092443" />
+      <inertia
+        ixx="0.000629066958885107"
+        ixy="1.1291564505514E-10"
+        ixz="6.84862392776488E-08"
+        iyy="0.000630263916092117"
+        iyz="-5.00500254304793E-08"
+        izz="0.000749251775812556" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/vlp.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/vlp.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu2vlp"
+    type="fixed">
+    <origin
+      xyz="0.000681587736344191 0.362999999999995 -5.00000001224521E-05"
+      rpy="-1.5707963267949 0 0" />
+    <parent
+      link="imu" />
+    <child
+      link="vlp" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="livox">
+    <inertial>
+      <origin
+        xyz="-0.0580540411673436 1.50914756567033E-05 -0.0127132680006796"
+        rpy="0 0 0" />
+      <mass
+        value="0.732248175141318" />
+      <inertia
+        ixx="0.000549654923963519"
+        ixy="1.42145193411055E-06"
+        ixz="-9.65869949643662E-06"
+        iyy="0.000965376397688835"
+        iyz="4.19157243552525E-06"
+        izz="0.0011291561864709" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/livox.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://hunter_self/meshes/livox.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="imu2livox"
+    type="fixed">
+    <origin
+      xyz="0.0835272864611989 0.528956093524004 -5.00000014973523E-05"
+      rpy="-1.54441826879916 0 -0.349065850396752" />
+    <parent
+      link="imu" />
+    <child
+      link="livox" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>

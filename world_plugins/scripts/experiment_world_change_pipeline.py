@@ -8,7 +8,14 @@ from numpy.random import default_rng
 import yaml
 import cv2
 import sys
-sys.path.append('/home/fwh/FWH/MarsSim_v2/src/world_plugins/scripts')
+import rospkg
+
+rospack = rospkg.RosPack()
+pkg_path = rospack.get_path('world_plugins')
+scripts_file = os.path.join(pkg_path, 'scripts')
+sys.path.append(scripts_file)
+pkg_path_r = rospack.get_path('rover_gazebo')
+
 from ModelGEN import *
 from TerrainGEN import *
 # from CameraProcess import *
@@ -18,7 +25,8 @@ from heightmap_change import gen_heightmap
 
 def change_world(seed, use_user_H=False, default_height=0.1, use_label=False, mode='height', rock_num=3, bedrock_num=3, BN=(-4.4,4.4,-2.4,2.4)):
     random.seed(seed)
-    yaml_file_name = '/home/fwh/FWH/MarsSim_v2/src/world_plugins/config/mars_terrain_params_real.yaml'
+
+    yaml_file_name = os.path.join(pkg_path, 'config/mars_terrain_params_real.yaml')
     
     # 读取配置yaml文件
     param_file = open(yaml_file_name)
@@ -56,7 +64,7 @@ def change_world(seed, use_user_H=False, default_height=0.1, use_label=False, mo
     save_path = param_data['terrain_model_save_path']
     length = param_data['terrain_length']
     height = param_data['terrain_height']
-    save_path = '/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/experiment_terrain'
+    save_path = os.path.join(pkg_path, 'models/experiment_terrain')
     # generate_terrain_model_exp(length, height, save_path=save_path, param_data=param_data)
     min_height_list, _ = generate_terrain_model_exp(heightmap_name_c, length, height, save_path=save_path, seed=seed_terrain, texture_count=param_data['texture_count'], return_record=return_record, param_data=param_data)
     param_data['texture_nums'] = return_record['texture_nums']

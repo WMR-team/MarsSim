@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+	<!-- <env name="GAZEBO_MODEL_PATH" value="${GAZEBO_MODEL_PATH}:$(find rover_gazebo)/models"/> -->
+    <!-- <node name="world_change_pipeline" pkg="world_plugins" type="world_change_pipeline.py" output="screen"/> -->
+	<include file="$(find rover_gazebo)/launch/zhurong_real_world.launch"/>
+
+	<include file="$(find rover_gazebo)/launch/hunter_start.launch"/>
+	<node name="path_viz"
+		pkg="rover_gazebo_plugins"
+		type="PathRVIZ"
+		respawn="false"
+		output="screen"
+		args="">
+	</node>
+</launch>

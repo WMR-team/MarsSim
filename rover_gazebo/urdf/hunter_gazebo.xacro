@@ -1,0 +1,262 @@
+<?xml version="1.0"?>
+<robot name="hunter_se_description2" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+  <xacro:property name="vehicle_width" value="0.25"/>
+  <xacro:property name="wheel_radius" value="0.15"/>
+
+  <xacro:arg name="laser_visual" default="false"/>
+
+	<xacro:property name="YAML_FILE" value="$(find rover_gazebo_plugins)/config/TerramechanicsPluginParam.yaml" />
+	<xacro:property name="PLUGINS" value="${load_yaml(YAML_FILE)}"/>
+	<xacro:arg name="Plugin" default="Plugin" />
+
+  <gazebo reference="imu">
+    <sensor type="imu" name="imu">
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+    </sensor>
+    <material>Gazebo/FlatBlack</material>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+      <alwaysOn>true</alwaysOn>
+      <bodyName>imu</bodyName>  
+      <frameName>imu</frameName>
+      <topicName>imu</topicName>
+      <serviceName>imu_service</serviceName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <updateRate>0</updateRate>
+      <imu>
+        <noise>
+          <type>gaussian</type>
+          <rate>
+            <mean>0.0</mean>
+            <stddev>2e-4</stddev>
+            <bias_mean>0.0000075</bias_mean>
+            <bias_stddev>0.0000008</bias_stddev>
+          </rate>
+          <accel>
+            <mean>0.0</mean>
+            <stddev>1.7e-2</stddev>
+            <bias_mean>0.1</bias_mean>
+            <bias_stddev>0.001</bias_stddev>
+          </accel>
+        </noise>
+      </imu>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="velodyne">
+    <sensor type="ray" name="velodyne-VLP16">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>$(arg laser_visual)</visualize>
+      <update_rate>7</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>0.0</min_angle>
+            <max_angle>6.28319</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>16</samples>
+            <resolution>1</resolution>
+            <min_angle>-${15.0*M_PI/180.0}</min_angle>
+            <max_angle> ${15.0*M_PI/180.0}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.30</min>
+          <max>130.0</max>
+          <resolution>0.015</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.008</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_velodyne_laser.so">
+        <topicName>point_cloud</topicName>
+        <frameName>velodyne</frameName>
+        <min_range>0.9</min_range>
+        <max_range>130.0</max_range>
+        <gaussianNoise>0.008</gaussianNoise>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <plugin name="p3d_plugin" filename="libgazebo_ros_p3d.so">
+    <robotNamespace>/</robotNamespace>
+    <topicName>/gazebo_pose</topicName>
+    <frameName>world</frameName>
+    <bodyName>base_link</bodyName>
+    <xyzOffset>0 0 0</xyzOffset>
+    <rpyOffset>0 0 0</rpyOffset>
+    <updateRate>50</updateRate>
+    <gaussianNoise>0.005 0.005 0.005 0.001 0.001 0.001</gaussianNoise>
+  </plugin>
+
+  <!-- 自定义双目相机模型 -->
+  <gazebo reference="zed2_base_link">
+      <sensor type="multicamera" name="zed_stereo">
+          <update_rate>30.0</update_rate>
+          <camera name="left">
+              <pose>0 0 0 0 0 0</pose>
+              <horizontal_fov>1.047</horizontal_fov>
+              <image>
+                  <width>640</width>
+                  <height>480</height>
+                  <format>R8G8B8</format>
+              </image>
+              <clip>
+                  <near>0.1</near>
+                  <far>100</far>
+              </clip>
+          </camera>
+          <camera name="right">
+              <pose>0 -0.12 0 0 0 0</pose>
+              <horizontal_fov>1.047</horizontal_fov>
+              <image>
+                  <width>640</width>
+                  <height>480</height>
+                  <format>R8G8B8</format>
+              </image>
+              <clip>
+                  <near>0.1</near>
+                  <far>100</far>
+              </clip>
+          </camera>
+          <plugin name="zed_stereo_controller" filename="libgazebo_ros_multicamera.so">
+              <cameraName>zed</cameraName>
+              <alwaysOn>true</alwaysOn>
+              <updateRate>30</updateRate>
+              <imageTopicName>image_raw</imageTopicName>
+              <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+              <frameName>zed_optical_frame</frameName>
+              <baseline>0.12</baseline>
+              <distortion_k1>0.0</distortion_k1>
+              <distortion_k2>0.0</distortion_k2>
+              <distortion_k3>0.0</distortion_k3>
+              <distortion_t1>0.0</distortion_t1>
+              <distortion_t2>0.0</distortion_t2>
+          </plugin>
+      </sensor>
+  </gazebo>
+
+
+  <xacro:macro name="driving_joint_trans" params="joint_name">
+      <transmission name="${joint_name}_trans">
+          <type>transmission_interface/SimpleTransmission</type>
+          <joint name="${joint_name}">
+              <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+          </joint>
+          <actuator name="${joint_name}_motor">
+              <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+              <mechanicalReduction>1</mechanicalReduction>
+          </actuator>
+      </transmission>
+  </xacro:macro>
+
+  <!-- 实例化宏 -->
+  <xacro:driving_joint_trans joint_name="fr_steer_left_joint" />
+  <xacro:driving_joint_trans joint_name="fr_steer_right_joint" />
+  <xacro:driving_joint_trans joint_name="re_left_joint" />
+  <xacro:driving_joint_trans joint_name="re_right_joint" />
+  <xacro:driving_joint_trans joint_name="fr_left_joint" />
+  <xacro:driving_joint_trans joint_name="fr_right_joint" />
+
+  <xacro:macro name="wheel_terrain" params="wheel_name wheel_conector_name wheel_joint_name">
+    <gazebo>
+      <plugin name="${wheel_name}_terrain_interaction" filename="${PLUGINS['$(arg Plugin)']}">
+        <base_link>${wheel_conector_name}</base_link>
+        <wheel_link>${wheel_name}</wheel_link>
+        <wheel_joint>${wheel_joint_name}</wheel_joint>
+        <sub_topic>/gazebo/wheel_cmd</sub_topic>
+        <wheel_r>0.137</wheel_r>
+        <wheel_b>0.1</wheel_b>
+        <wheel_h>0.0</wheel_h>
+        <FN_AVE>120</FN_AVE>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:wheel_terrain wheel_name="re_left_link" wheel_conector_name="base_link"
+   wheel_joint_name="re_left_joint"/>
+  <xacro:wheel_terrain wheel_name="re_right_link" wheel_conector_name="base_link"
+   wheel_joint_name="re_right_joint"/>
+  <xacro:wheel_terrain wheel_name="fr_left_link" wheel_conector_name="fr_steer_left_link"
+   wheel_joint_name="fr_left_joint"/>
+  <xacro:wheel_terrain wheel_name="fr_right_link" wheel_conector_name="fr_steer_right_link"
+   wheel_joint_name="fr_right_joint"/>
+
+  <gazebo reference="fr_left_joint">
+		<sensor name="wheel_LF_force_torque" type="force_torque">
+			<always_on>true</always_on>
+			<update_rate>20.0</update_rate>
+			<visualize>false</visualize>
+			<force_torque>
+				<frame>parent</frame>
+				<measure_direction>child_to_parent</measure_direction>
+			</force_torque>
+		</sensor>
+	</gazebo>
+
+  <gazebo reference="fr_right_joint">
+		<sensor name="wheel_RF_force_torque" type="force_torque">
+			<always_on>true</always_on>
+			<update_rate>20.0</update_rate>
+			<visualize>false</visualize>
+			<force_torque>
+				<frame>parent</frame>
+				<measure_direction>child_to_parent</measure_direction>
+			</force_torque>
+		</sensor>
+	</gazebo>
+
+  <gazebo reference="re_left_joint">
+		<sensor name="wheel_LR_force_torque" type="force_torque">
+			<always_on>true</always_on>
+			<update_rate>20.0</update_rate>
+			<visualize>false</visualize>
+			<force_torque>
+				<frame>parent</frame>
+				<measure_direction>child_to_parent</measure_direction>
+			</force_torque>
+		</sensor>
+	</gazebo>
+
+  <gazebo reference="re_right_joint">
+		<sensor name="wheel_RR_force_torque" type="force_torque">
+			<always_on>true</always_on>
+			<update_rate>20.0</update_rate>
+			<visualize>false</visualize>
+			<force_torque>
+				<frame>parent</frame>
+				<measure_direction>child_to_parent</measure_direction>
+			</force_torque>
+		</sensor>
+	</gazebo>
+
+
+  <!-- ros_control plugin -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+  </gazebo>  
+
+  <gazebo reference="base_link">
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="gazebo_ros_joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+      <updateRate>50.0</updateRate>
+      <frameName>base_link</frameName>
+    </plugin>
+  </gazebo>
+
+</robot>

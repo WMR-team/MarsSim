@@ -6,6 +6,7 @@ from RockDistCalc import calculate_rock_distribution
 import numpy as np
 import os
 import cv2
+import rospkg
 
 def generate_rocks_model(DEM, param_data, terrain_class_mat, save_path='', seed=1, is_label=False, rock_dis_rate=None, return_record={}):
     '''生成岩石model文件
@@ -299,7 +300,11 @@ def generate_terrain_model(heightmap_name, length, height, save_path='', seed=1,
     lbl_viz = colormap[sem_img]
     lbl_viz = lbl_viz.astype(np.uint8)
     # lbl_viz = lbl_viz[:,:,::-1]
-    cv2.imwrite('/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/whole_tex/class.png',lbl_viz)
+
+    rospack = rospkg.RosPack()
+    pkg_path = rospack.get_path('rover_gazebo')
+    png_file = os.path.join(pkg_path, 'models/mars_terrain/whole_tex/class.png')
+    cv2.imwrite(png_file,lbl_viz)
     
     return_record['min_heights'] = min_height_list
     

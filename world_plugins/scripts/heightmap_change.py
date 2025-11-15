@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 import random
+import rospkg
 
 def noise(img,snr):
     h=img.shape[0]
@@ -42,8 +43,10 @@ def gen_heightmap(img_num):
 
     l_min = int(0.8/10*640)
 
-    file_path_16 = '/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/choose/heightmaps_int16'
-    file_path_8 = '/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/choose/heightmaps_int8'
+    rospack = rospkg.RosPack()
+    pkg_path = rospack.get_path('rover_gazebo')
+    file_path_16 = os.path.join(pkg_path, 'models/mars_terrain/choose/heightmaps_int16')
+    file_path_8 = os.path.join(pkg_path, 'models/mars_terrain/choose/heightmaps_int8')
     # img_name = 'HM8.png'
     img = cv2.imread(os.path.join(file_path_16,'HM'+str(img_num)+'.png'), -1)
     ii = random.randint(0,3)

@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import random
 from numpy.random import randint
+import os
+import rospkg
 
 def label_colormap(N=256):
 
@@ -63,9 +65,14 @@ def generate_class_mat():
     #设置图片添加高斯噪声之后的像素值的范围
     img = np.clip(noisy_img,a_min=0,a_max=255)
     
-    cv2.imwrite('/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/whole_tex/terrain_tex.png', img)
+    rospack = rospkg.RosPack()
+    pkg_path = rospack.get_path('rover_gazebo')
+
+    png_file = os.path.join(pkg_path, 'models/mars_terrain/whole_tex/terrain_tex.png')
+    cv2.imwrite(png_file, img)
     # class_mat = class_mat[::-1,:]
-    np.save('/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/whole_tex/terrain_class.npy', class_mat)
+    save_path = os.path.join(pkg_path, 'models/mars_terrain/whole_tex/terrain_class.npy')
+    np.save(save_path, class_mat)
     # cv2.imshow('img', img)
     # cv2.imshow('class_mat', class_mat)
     # cv2.waitKey()

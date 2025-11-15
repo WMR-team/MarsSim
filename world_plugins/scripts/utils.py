@@ -2,6 +2,7 @@
 import math
 import shutil
 import os
+from pathlib import Path
 
 def quaternion_from_euler(r, p, y):
     '''欧拉角转四元数'''
@@ -18,5 +19,6 @@ def quaternion_from_euler(r, p, y):
 
 def delete_paging():
     '''删除gazebo paging文件夹'''
-    if os.path.exists('/home/fwh/.gazebo/paging'):
-        shutil.rmtree('/home/fwh/.gazebo/paging')
+    paging_dir = Path.home() / ".gazebo" / "paging"
+    if paging_dir.exists():
+        shutil.rmtree(paging_dir)
