@@ -268,8 +268,8 @@ def show_comparison(original, result, title):
 # 使用示例
 if __name__ == "__main__":
     # 设置输入和输出文件夹路径
-    input_folder = "/home/li/MarsSim_v2_ws/src/MarsSim_v2-main/simulation_images/epoch_001/labels"  # 输入文件夹，包含要处理的图片
-    output_folder = "output2_images"  # 输出文件夹，处理后的图片将保存到这里
+    input_folder = "input_folder"  # 输入文件夹，包含要处理的图片
+    output_folder = "output_folder"  # 输出文件夹，处理后的图片将保存到这里
     
     # 批量处理文件夹中的所有图片
     batch_adaptive_clustering(
