@@ -33,28 +33,20 @@
 ### 3. 更改路径
 将文件中出现的绝对路径进行全部替换 
 
-### 4. 运行地形生成文件
+### 4. 运行仿真与标签生成文件以及保存
 
     $ cd src/world_plugins/
-    $ python ./scripts/world_change_pipeline.py
+    $ python ./scripts/simulation_pipeline.py
+	在新终端打开
+	$ cd src/world_plugins/
+    $ python ./scripts/image_saver.py
+	按照simulation_pipeline.py运行指令进行图片的保存
 
-### 5. 启动火星车仿真(二选一)
-高保真场景
+### 5. 保存图片的后处理
+    $ cd src/world_plugins/
+    $ python ./scripts/ppimage.py
+	将输入输出文件夹更改为自己需要
 
-    $ roslaunch rover_gazebo zhurong_main_real.launch
-
-简单场景
-
-    $ roslaunch rover_gazebo zhurong_main_simple.launch
-
-## 6. 键盘控制火星车移动
-在terminal窗口中输入如下键盘控制指令，控制火星车移动：
-- w: 前进
-- s: 后退
-- a: 左转
-- d: 右转
-- p: 停止
-- TODO： `添加停止、加速、减速以及更多模式`
 
 
 
