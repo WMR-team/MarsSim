@@ -44,7 +44,7 @@
 
 ### 5. 保存图片的后处理
     $ cd src/world_plugins/
-    $ python ./scripts/ppimage.py
+    $ python ./scripts/PPimage.py
 	将输入输出文件夹更改为自己需要
 
 
