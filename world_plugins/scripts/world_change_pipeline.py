@@ -116,3 +116,4 @@ def change_world(seed, use_user_H=False, default_height=1.5, default_rock_dis=No
 
 if __name__ == "__main__":
     change_world(55, use_user_H=True, default_height=5, default_rock_dis=0.055)
+    change_world(55, use_user_H=True, default_height=5, default_rock_dis=0.055)
