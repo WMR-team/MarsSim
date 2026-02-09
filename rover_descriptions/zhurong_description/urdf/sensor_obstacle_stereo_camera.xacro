@@ -123,6 +123,13 @@
       <origin xyz="0.012 0 0.015" rpy="0 0 0"/>
     </joint>
 
+    <link name="camera_obs_F_optical_frame"/>
+    <joint name="camera_obs_F_optical_joint" type="fixed">
+      <parent link="camera_obs_F_link"/>
+      <child link="camera_obs_F_optical_frame"/>
+      <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+    </joint>
+
     <link name="obsZEDSupport_B_Link">
       <inertial>
         <origin
@@ -216,7 +223,7 @@
     <joint name="obsZED_B_joint" type="fixed">
       <origin
         xyz="0.035358 0 -0.036993"
-        rpy="0 0.92502 0" />
+        rpy="0 0.40 0" />  <!--0.92502-->
       <parent link="obsZEDSupport_B_Link" />
       <child link="obsZED_B_Link" />
       <axis xyz="0 0 0" />
@@ -241,6 +248,13 @@
       <parent link="obsZED_B_Link"/>
       <child link="camera_obs_B_link"/>
       <origin xyz="0.012 0 0.015" rpy="0 0 0"/>
+    </joint>
+
+    <link name="camera_obs_B_optical_frame"/>
+    <joint name="camera_obs_B_optical_joint" type="fixed">
+      <parent link="camera_obs_B_link"/>
+      <child link="camera_obs_B_optical_frame"/>
+      <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
     </joint>
     
   </xacro:macro>

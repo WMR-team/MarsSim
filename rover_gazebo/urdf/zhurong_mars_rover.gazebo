@@ -19,7 +19,7 @@
 		<plugin name="ground_truth"
 						filename="libgazebo_ros_p3d.so">
 			<frameName>world</frameName>
-			<bodyName>nav_base_link</bodyName>
+			<bodyName>base_link</bodyName>
 			<topicName>odom</topicName>
 			<updateRate>100.0</updateRate>
 		</plugin>
@@ -34,7 +34,7 @@
 			<camera>
 				<horizontal_fov>1.045</horizontal_fov>
 				<image>
-					<format>R8G8B8</format>
+					<format>B8G8R8</format>
 					<width>512</width>
 					<height>512</height>
 				</image>
@@ -54,10 +54,10 @@
 				<updateRate>10</updateRate>
 				<imageTopicName>rgb/image_raw</imageTopicName>
 				<depthImageTopicName>depth/image_raw</depthImageTopicName>
-				<pointCloudTopicName>depth/points</pointCloudTopicName>
+				<pointCloudTopicName>depth/point_cloud</pointCloudTopicName>
 				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
 				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
-				<frameName>camera_frame_optical</frameName>
+				<frameName>camera_optical_frame</frameName>
 				<baseline>0.1</baseline>
 				<distortion_k1>0.0</distortion_k1>
 				<distortion_k2>0.0</distortion_k2>
@@ -76,7 +76,7 @@
 			<camera>
 				<horizontal_fov>1.91</horizontal_fov>
 				<image>
-					<format>R8G8B8</format>
+					<format>B8G8R8</format>
 					<width>640</width>
 					<height>360</height>
 				</image>
@@ -96,10 +96,10 @@
 				<updateRate>10</updateRate>
 				<imageTopicName>rgb/image_raw</imageTopicName>
 				<depthImageTopicName>depth/image_raw</depthImageTopicName>
-				<pointCloudTopicName>depth/points</pointCloudTopicName>
+				<pointCloudTopicName>depth/point_cloud</pointCloudTopicName>
 				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
 				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
-				<frameName>camera_nav_pointcloud_link</frameName>
+				<frameName>camera_nav_optical_frame</frameName>
 				<baseline>0.1</baseline>
 				<distortion_k1>0.0</distortion_k1>
 				<distortion_k2>0.0</distortion_k2>
@@ -119,7 +119,7 @@
 			<camera>
 				<horizontal_fov>1.91</horizontal_fov>
 				<image>
-					<format>R8G8B8</format>
+					<format>B8G8R8</format>
 					<width>640</width>
 					<height>360</height>
 				</image>
@@ -139,10 +139,10 @@
 				<updateRate>10</updateRate>
 				<imageTopicName>rgb/image_raw</imageTopicName>
 				<depthImageTopicName>depth/image_raw</depthImageTopicName>
-				<pointCloudTopicName>depth/points</pointCloudTopicName>
+				<pointCloudTopicName>depth/point_cloud</pointCloudTopicName>
 				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
 				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
-				<frameName>camera_frame_optical</frameName>
+				<frameName>camera_obs_F_optical_frame</frameName>
 				<baseline>0.1</baseline>
 				<distortion_k1>0.0</distortion_k1>
 				<distortion_k2>0.0</distortion_k2>
@@ -155,16 +155,16 @@
 		</sensor>
 	</gazebo>
 
-	<!-- <gazebo reference="camera_obs_B_link">
+	<gazebo reference="camera_obs_B_link">
 		<sensor type="depth" name="Camera">
 			<always_on>true</always_on>
 			<update_rate>10.0</update_rate>
 			<camera>
-				<horizontal_fov>1.045</horizontal_fov>
+				<horizontal_fov>1.91</horizontal_fov>
 				<image>
-					<format>R8G8B8</format>
-					<width>512</width>
-					<height>512</height>
+					<format>B8G8R8</format>
+					<width>640</width>
+					<height>360</height>
 				</image>
 				<clip>
 					<near>0.2</near>
@@ -182,10 +182,10 @@
 				<updateRate>10</updateRate>
 				<imageTopicName>rgb/image_raw</imageTopicName>
 				<depthImageTopicName>depth/image_raw</depthImageTopicName>
-				<pointCloudTopicName>depth/points</pointCloudTopicName>
+				<pointCloudTopicName>depth/point_cloud</pointCloudTopicName>
 				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
 				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
-				<frameName>camera_frame_optical</frameName>
+				<frameName>camera_obs_B_optical_frame</frameName>
 				<baseline>0.1</baseline>
 				<distortion_k1>0.0</distortion_k1>
 				<distortion_k2>0.0</distortion_k2>
@@ -193,9 +193,10 @@
 				<distortion_t1>0.0</distortion_t1>
 				<distortion_t2>0.0</distortion_t2>
 				<pointCloudCutoff>0.2</pointCloudCutoff>
+				<pointCloudCutoffMax>20</pointCloudCutoffMax>
 			</plugin>
 		</sensor>
-	</gazebo> -->
+	</gazebo>
 
 
 	<gazebo>
@@ -232,7 +233,7 @@
 			<always_on>1</always_on>
 			<update_rate>20</update_rate>
 			<contact>
-				<collision>chassis_collision</collision>
+				<collision>base_link_fixed_joint_lump__chassis_collision</collision>
 				<topic>/bumper_contact</topic>
 			</contact>
 			<plugin name="gazebo_ros_bumper_controller" filename="libgazebo_ros_bumper.so">   

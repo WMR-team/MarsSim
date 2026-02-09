@@ -17,8 +17,8 @@ class ZhurongMarsRoverControl(object):
         rospy.loginfo("ZhurongRoverControl Initialising...")
         self.control_msg=Float64()
 
-        self.h = 0.652
-        self.l = 0.775
+        self.h = 0.652  # 1/2 width
+        self.l = 0.775  # 1/2 length
         self.r = 0.15
   
         self.cam_pitch = 0
@@ -52,7 +52,10 @@ class ZhurongMarsRoverControl(object):
                                 ]
 
         for controller_name in self.controllers_list:
-            topic_name = "/"+self.controller_ns+"/"+controller_name+"/"+self.controller_command
+            if len(self.controller_ns) > 0:
+                topic_name = "/"+self.controller_ns+"/"+controller_name+"/"+self.controller_command
+            else:
+                topic_name = "/"+controller_name+"/"+self.controller_command
             self.zhurong_publishers[controller_name] = rospy.Publisher(
                 topic_name,
                 Float64,
@@ -78,43 +81,43 @@ class ZhurongMarsRoverControl(object):
   
         rospy.logwarn("ZhurongMarsRoverControl...READY")
 
-    def cmd_vel_callback(self, msg):
+    def cmd_vel_callback(self, msg: Twist):
         # print('received!!!')
         self.body_velocity = msg.linear.x
         self.body_omega = msg.angular.z
         self.move_with_cmd_vel()
         
-    def wheel_LF_cmd_callback(self, msg):
+    def wheel_LF_cmd_callback(self, msg: Twist):
         self.wheel_velocity_msg[0].data = msg.linear.x
         self.wheel_publisher[0].publish(self.wheel_velocity_msg[0])
         self.wheel_steer_msg[0].data = msg.angular.z
         self.steer_publisher[0].publish(self.wheel_steer_msg[0])
         
-    def wheel_RF_cmd_callback(self, msg):
+    def wheel_RF_cmd_callback(self, msg: Twist):
         self.wheel_velocity_msg[1].data = msg.linear.x
         self.wheel_publisher[1].publish(self.wheel_velocity_msg[1])
         self.wheel_steer_msg[1].data = msg.angular.z
         self.steer_publisher[1].publish(self.wheel_steer_msg[1])
         
-    def wheel_LM_cmd_callback(self, msg):
+    def wheel_LM_cmd_callback(self, msg: Twist):
         self.wheel_velocity_msg[2].data = msg.linear.x
         self.wheel_publisher[2].publish(self.wheel_velocity_msg[2])
         self.wheel_steer_msg[2].data = msg.angular.z
         self.steer_publisher[2].publish(self.wheel_steer_msg[2])
         
-    def wheel_RM_cmd_callback(self, msg):
+    def wheel_RM_cmd_callback(self, msg: Twist):
         self.wheel_velocity_msg[3].data = msg.linear.x
         self.wheel_publisher[3].publish(self.wheel_velocity_msg[3])
         self.wheel_steer_msg[3].data = msg.angular.z
         self.steer_publisher[3].publish(self.wheel_steer_msg[3])
         
-    def wheel_LB_cmd_callback(self, msg):
+    def wheel_LB_cmd_callback(self, msg: Twist):
         self.wheel_velocity_msg[4].data = msg.linear.x
         self.wheel_publisher[4].publish(self.wheel_velocity_msg[4])
         self.wheel_steer_msg[4].data = msg.angular.z
         self.steer_publisher[4].publish(self.wheel_steer_msg[4])
         
-    def wheel_RB_cmd_callback(self, msg):
+    def wheel_RB_cmd_callback(self, msg: Twist):
         self.wheel_velocity_msg[5].data = msg.linear.x
         self.wheel_publisher[5].publish(self.wheel_velocity_msg[5])
         self.wheel_steer_msg[5].data = msg.angular.z
@@ -295,7 +298,7 @@ class ZhurongMarsRoverControl(object):
             self.set_wheels_speed(vel_arr)
         else:
             turning_radius = self.body_velocity/self.body_omega
-            r_arr = np.zeros(6)
+            r_arr = np.zeros(6) 
             r_arr[0] = np.sqrt((turning_radius-self.h)**2+self.l**2)
             r_arr[1] = np.sqrt((turning_radius+self.h)**2+self.l**2)
             r_arr[2] = abs(turning_radius-self.h)
@@ -303,6 +306,10 @@ class ZhurongMarsRoverControl(object):
             r_arr[4] = r_arr[0]
             r_arr[5] = r_arr[1]
             vel_arr = abs(self.body_omega) * r_arr / self.r
+            if self.body_velocity < 0:
+                vel_arr = -vel_arr
+            elif self.body_velocity == 0 and self.body_omega < 0:
+                vel_arr = -vel_arr
             # print(vel_arr)
 
             theta = np.zeros(6)
@@ -313,12 +320,12 @@ class ZhurongMarsRoverControl(object):
             theta[4] = -theta[0]
             theta[5] = -theta[1]
             
-            if turning_radius>=0 and turning_radius<self.h:
+            if turning_radius>=0 and abs(turning_radius)<self.h:
                 vel_arr[0] = -vel_arr[0]
                 vel_arr[2] = -vel_arr[2]
                 vel_arr[4] = -vel_arr[4]
 
-            elif turning_radius<0 and turning_radius>-self.h:
+            elif turning_radius<0 and abs(turning_radius)<self.h:
                 vel_arr[1] = -vel_arr[1]
                 vel_arr[3] = -vel_arr[3]
                 vel_arr[5] = -vel_arr[5]
@@ -374,7 +381,7 @@ class ZhurongMarsRoverControl(object):
 
 if __name__ == "__main__":
     
-    zhurong_mars_rover_control = ZhurongMarsRoverControl("zhurong_mars_rover")
+    zhurong_mars_rover_control = ZhurongMarsRoverControl()
     # rover2_control = ZhurongMarsRoverControl("rover_2")
     rate = rospy.Rate(100.0)
     while not rospy.is_shutdown():
@@ -382,9 +389,3 @@ if __name__ == "__main__":
         zhurong_mars_rover_control.wait_for_keyboard_ctl(x)
         # rover2_control.wait_for_keyboard_ctl(x)
         rate.sleep()
-        
-
-    
-    
-
-
