@@ -62,13 +62,13 @@ def generate_class_mat():
     noisy_img = img + gauss
     #设置图片添加高斯噪声之后的像素值的范围
     img = np.clip(noisy_img,a_min=0,a_max=255)
-    
-    cv2.imwrite('/home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_terrain/whole_tex/terrain_tex.png', img)
+
+    cv2.imwrite('/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/rover_gazebo/models/mars_terrain/whole_tex/terrain_tex.png', img)
     # class_mat = class_mat[::-1,:]
-    np.save('/home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_terrain/whole_tex/terrain_class.npy', class_mat)
+    np.save('/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/rover_gazebo/models/mars_terrain/whole_tex/terrain_class.npy', class_mat)
     # cv2.imshow('img', img)
     # cv2.imshow('class_mat', class_mat)
     # cv2.waitKey()
-    
+
 if __name__ == "__main__":
     generate_class_mat()

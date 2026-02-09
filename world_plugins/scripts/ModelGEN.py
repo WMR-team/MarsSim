@@ -9,8 +9,8 @@ import cv2
 
 def generate_rocks_model(DEM, param_data, terrain_class_mat, save_path='', seed=1, is_label=False, rock_dis_rate=None, return_record={}):
     '''生成岩石model文件
-    
-    param:  
+
+    param:
         DEM: 地形DEM
         param_data: 参数字典
         terrain_class_mat: 地形类别矩阵
@@ -18,7 +18,7 @@ def generate_rocks_model(DEM, param_data, terrain_class_mat, save_path='', seed=
         seed: 随机种子
         is_label: 是否生成标签model
     '''
-    
+
     random.seed(seed)
     np.random.seed(int(seed))
     generate_config('mars_rocks_lbl', save_path=save_path)
@@ -86,8 +86,8 @@ def generate_rocks_model(DEM, param_data, terrain_class_mat, save_path='', seed=
 
 def generate_rocks_model_cylinder(DEM, param_data, terrain_class_mat, save_path='', seed=1, is_label=False, rock_dis_rate=None, return_record={}):
     '''生成岩石model文件
-    
-    param:  
+
+    param:
         DEM: 地形DEM
         param_data: 参数字典
         terrain_class_mat: 地形类别矩阵
@@ -95,7 +95,7 @@ def generate_rocks_model_cylinder(DEM, param_data, terrain_class_mat, save_path=
         seed: 随机种子
         is_label: 是否生成标签model
     '''
-    
+
     random.seed(seed)
     np.random.seed(int(seed))
     generate_config('mars_rocks_lbl', save_path=save_path)
@@ -137,7 +137,7 @@ def generate_rocks_model_cylinder(DEM, param_data, terrain_class_mat, save_path=
         scale = 1.5*(D+np.random.rand()*D/2)
         scale_list = str(scale)+' '+str(scale)+' '+str(scale)
         radius.text = str(1.1*D)
-        
+
         length = ET.SubElement(cylinder_geometry, "length")
         rock_choose = random.randint(1,param_data['rock_count'])
         if is_label:
@@ -164,8 +164,8 @@ def generate_rocks_model_cylinder(DEM, param_data, terrain_class_mat, save_path=
 
 def generate_rocks_model_no_collision(DEM, param_data, terrain_class_mat, save_path='', seed=1, is_label=False, rock_dis_rate=None, return_record={}):
     '''生成岩石model文件
-    
-    param:  
+
+    param:
         DEM: 地形DEM
         param_data: 参数字典
         terrain_class_mat: 地形类别矩阵
@@ -173,7 +173,7 @@ def generate_rocks_model_no_collision(DEM, param_data, terrain_class_mat, save_p
         seed: 随机种子
         is_label: 是否生成标签model
     '''
-    
+
     random.seed(seed)
     np.random.seed(int(seed))
     generate_config('mars_rocks_lbl', save_path=save_path)
@@ -209,7 +209,7 @@ def generate_rocks_model_no_collision(DEM, param_data, terrain_class_mat, save_p
 
         scale = 1.5*(D+np.random.rand()*D/2)
         scale_list = str(scale)+' '+str(scale)+' '+str(scale)
- 
+
         rock_choose = random.randint(1,param_data['rock_count'])
         if is_label:
             rock_name = 'model://mars_rocks_lbl/mars_rock_' + \
@@ -236,30 +236,30 @@ def generate_rocks_model_no_collision(DEM, param_data, terrain_class_mat, save_p
 # 生成地形model文件
 def generate_terrain_model(heightmap_name, length, height, save_path='', seed=1, is_label=False, texture_count=26, return_record={}, use_whole_tex=False, param_data={}):
     '''生成地形model文件
-    
-    param:  
+
+    param:
         heightmap_name: 地形高度图文件名
         save_path: model保存路径
         seed: 随机种子
         is_label: 是否生成标签model
         texture_count: 地形纹理数量
-    return: 
+    return:
         min_height_list: 多地形过渡高度列表
     '''
-    
+
     random.seed(seed)
     # texture_num1 = random.randint(1, texture_count)
     # texture_num2 = random.randint(1, texture_count)
     # texture_num3 = random.randint(1, texture_count)
     # texture_num4 = random.randint(1, texture_count)
-    
+
     ii = [i+1 for i in range(texture_count)]
     random.shuffle(ii)
     texture_num1 = ii[0]
     texture_num2 = ii[1]
     texture_num3 = ii[2]
     texture_num4 = ii[3]
-    
+
     min_height_list = [height/5, height/2, height/5*4]
     if texture_count == 4:
         ii = [i+1 for i in range(3)]
@@ -282,27 +282,27 @@ def generate_terrain_model(heightmap_name, length, height, save_path='', seed=1,
                 hs += 1
     min_height_list[0] = min_height_list[0]*0.75
     print(min_height_list)
-    
+
     heightmap = cv2.imread(os.path.join(heightmap_path, heightmap_name), -1)
     heightmap = heightmap//256
     heightmap = heightmap/255.0*height
-    
+
     sem_img = np.ones_like(heightmap)*texture_num4
     sem_img[heightmap<min_height_list[2]]=texture_num3
     sem_img[heightmap<min_height_list[1]]=texture_num2
     sem_img[heightmap<min_height_list[0]]=texture_num1
     sem_img = sem_img.astype('uint8')
-    
+
     # colormap = label_colormap(76)
     colormap = np.array([[0,0,0],[150,0,0],[197,255,49],[0,180,255],[0,0,150]])
     colormap = (colormap).astype(np.uint8)
     lbl_viz = colormap[sem_img]
     lbl_viz = lbl_viz.astype(np.uint8)
     # lbl_viz = lbl_viz[:,:,::-1]
-    cv2.imwrite('/home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_terrain/whole_tex/class.png',lbl_viz)
-    
+    cv2.imwrite('/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/rover_gazebo/models/mars_terrain/whole_tex/class.png',lbl_viz)
+
     return_record['min_heights'] = min_height_list
-    
+
     texture_num_list = [texture_num1, texture_num2, texture_num3, texture_num4]
     return_record['texture_nums'] = texture_num_list
     # 生成config文件
@@ -330,7 +330,7 @@ def generate_terrain_model(heightmap_name, length, height, save_path='', seed=1,
         normal.text = 'model://mars_terrain/simulation_label/'+'NRM.png'
         size = ET.SubElement(texture, 'size')
         size.text = str(length)
-        
+
     else:
         for i in range(4):
             texture = ET.SubElement(heightmap, 'texture')
@@ -341,7 +341,7 @@ def generate_terrain_model(heightmap_name, length, height, save_path='', seed=1,
                 diffuse.text = 'model://mars_terrain/simulation_label/' + \
                     str((texture_num_list[i]-1)//3+1)+'_color.jpg'
                     # '8_color.jpg'
-                    
+
                 # diffuse.text = 'model://mars_terrain/simulation_label/'+'2_color.jpg'
                 normal.text = 'model://mars_terrain/simulation_label/'+'NRM.png'
             else:
@@ -375,7 +375,7 @@ def generate_terrain_model(heightmap_name, length, height, save_path='', seed=1,
     tree = ET.ElementTree(sdf)
     save_file = os.path.join(save_path, 'model.sdf')
     tree.write(save_file, pretty_print=True, xml_declaration=True)
-    
+
     return min_height_list, texture_num_list
 def generate_terrain_model_exp(heightmap_name, length, height, save_path='', seed=1, texture_count=26, return_record={}, param_data={}):
     random.seed(seed)
@@ -383,14 +383,14 @@ def generate_terrain_model_exp(heightmap_name, length, height, save_path='', see
     # texture_num2 = random.randint(1, texture_count)
     # texture_num3 = random.randint(1, texture_count)
     # texture_num4 = random.randint(1, texture_count)
-    
+
     ii = [i+1 for i in range(texture_count)]
     random.shuffle(ii)
     texture_num1 = 1
     texture_num2 = 1
     texture_num3 = 1
     texture_num4 = 1
-    
+
     min_height_list = [height/5, height/2, height/5*4]
     if param_data['terrain_classes'] == 4:
         ii = [i+1 for i in range(3)]
@@ -413,9 +413,9 @@ def generate_terrain_model_exp(heightmap_name, length, height, save_path='', see
                 hs += 1
     min_height_list[-1] = height*0.91
     print(min_height_list)
-    
+
     return_record['min_heights'] = min_height_list
-    
+
     texture_num_list = [texture_num1, texture_num2, texture_num3, texture_num4]
     return_record['texture_nums'] = texture_num_list
     # 生成config文件
@@ -466,11 +466,11 @@ def generate_terrain_model_exp(heightmap_name, length, height, save_path='', see
     tree = ET.ElementTree(sdf)
     save_file = os.path.join(save_path, 'model.sdf')
     tree.write(save_file, pretty_print=True, xml_declaration=True)
-    
+
     return min_height_list, texture_num_list
 
 def generate_flat_terrain_model(heightmap_name, length, height, save_path='', seed=1, texture_count=26, param_data={}):
-    
+
     # 生成config文件
     generate_config('mars_terrain', save_path=save_path)
 
@@ -512,25 +512,25 @@ def generate_flat_terrain_model(heightmap_name, length, height, save_path='', se
 
 # def generate_terrain_model_exp(heightmap_name, length, height, save_path='', seed=1, is_label=False, texture_count=26, return_record={}, use_whole_tex=False, param_data={}):
 #     '''生成地形model文件
-    
-#     param:  
+
+#     param:
 #         heightmap_name: 地形高度图文件名
 #         save_path: model保存路径
 #         seed: 随机种子
 #         is_label: 是否生成标签model
 #         texture_count: 地形纹理数量
-#     return: 
+#     return:
 #         min_height_list: 多地形过渡高度列表
 #     '''
 
 #     texture_num1 = 1
 #     texture_num2 = 2
-    
+
 #     min_height_list = [height/10]
-    
-    
+
+
 #     return_record['min_heights'] = min_height_list
-    
+
 #     texture_num_list = [texture_num1, texture_num2]
 #     return_record['texture_nums'] = texture_num_list
 #     # 生成config文件
@@ -581,10 +581,10 @@ def generate_flat_terrain_model(heightmap_name, length, height, save_path='', se
 #     tree = ET.ElementTree(sdf)
 #     save_file = os.path.join(save_path, 'model.sdf')
 #     tree.write(save_file, pretty_print=True, xml_declaration=True)
-    
+
 #     return min_height_list, texture_num_list
-    
-    
+
+
 def label_colormap(N=256):
 
     def bitget(byteval, idx):

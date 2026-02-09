@@ -42,20 +42,20 @@ def gen_heightmap(img_num):
 
     l_min = int(0.8/10*640)
 
-    file_path_16 = '/home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_terrain/choose/heightmaps_int16'
-    file_path_8 = '/home/fwh/FWH/MarsSim_ws/src/rover_gazebo/models/mars_terrain/choose/heightmaps_int8'
+    file_path_16 = '/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/rover_gazebo/models/mars_terrain/choose/heightmaps_int16'
+    file_path_8 = '/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/rover_gazebo/models/mars_terrain/choose/heightmaps_int8'
     # img_name = 'HM8.png'
     img = cv2.imread(os.path.join(file_path_16,'HM'+str(img_num)+'.png'), -1)
     ii = random.randint(0,3)
     for i in range(ii):
         img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
-    
+
     img_cp = (img.copy()*0.85).astype('uint16')
     cv2.imwrite(os.path.join(file_path_16, 'HM9_o.png'), img_cp)
     img_cp_o = cv2.resize(img_cp.copy(), (513, 513))
     img_cp_o = (img_cp_o//256).astype('uint8')
     cv2.imwrite(os.path.join(file_path_8, 'HM9_o.png'), img_cp_o)
-    
+
     label = np.zeros((640,640),dtype=np.uint8)
     num = random.randint(1,3)
     for i in range(num):
@@ -88,13 +88,13 @@ def gen_heightmap(img_num):
 
     img_cp_ = img_cp.copy()
     img_cp_ = cv2.GaussianBlur(img_cp_, (37, 37), 23)
-    
+
     img_cp_ = ((img_cp_-np.min(img_cp_))*((2**16-1)/(np.max(img_cp_)-np.min(img_cp_)))).astype('uint16')
     # img_end = noise_label(img_cp_, label, 0.8)
     # img_end = cv2.GaussianBlur(img_end, (5, 5), 2)
     img_end = img_cp_
     cv2.imwrite(os.path.join(file_path_16, 'HM9.png'), img_end)
-    
+
     img_end = cv2.resize(img_end, (513, 513))
     img_end = (img_end//256).astype('uint8')
     cv2.imwrite(os.path.join(file_path_8, 'HM9.png'), img_end)
