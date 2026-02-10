@@ -34,9 +34,24 @@ pip install hydra-core omegaconf
 # 方式1：用 Google Drive file id（推荐）
 python -m world_plugins.scripts.download_models --gdrive-file-id 1WT5JkZ87SlinNSlQP95LfcPy7OwLVmif
 
-# 方式2：用 Google Drive 分享链接，下载后请手动将模型解压至`Marsim/rover_gazebo`路径下
+# 方式2：用 Google Drive 分享链接，下载后请手动将model解压至`Marsim/rover_gazebo`路径下，期望解压后的路径形式为:
+Marsim
+├── ...
+├── rover_control
+│   ├── ...
+├── rover_descriptions
+│   ├── ...
+├── rover_gazebo
+│   ├── ...
+│   ├── models                     <-- Your extracted Folder
+│   ├── ...
+├── rover_gazebo_plugins
+│   ├── ...
+└── world_plugins
+    ├── ...
 ```
 [Google Drive 分享链接](https://drive.google.com/file/d/1WT5JkZ87SlinNSlQP95LfcPy7OwLVmif/view?usp=drive_link)
+[百度网盘 分享链接](https://pan.baidu.com/s/1wRg5N2Vxj_nuMMZaTU_9PA?pwd=1234)
 
 ### 3. 运行地形生成文件
 ```shell
