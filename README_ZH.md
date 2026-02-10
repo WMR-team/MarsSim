@@ -2,7 +2,14 @@
 # MarsSim_v2
 
 ## 概述
-
+<div align="center" style="margin: 20px 0;">
+  <img src="assets/intro.png"
+    alt="intro"
+    title="intro"
+    width="800"
+    style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
+    loading="lazy"/>
+</div>
 ## 安装依赖
 
 - Ubuntu 20.04
@@ -16,7 +23,6 @@
 - hydra-core
 - omegaconf
 
-## 教程
 
 ## 安装
 ### 1. 项目初始化
@@ -75,17 +81,20 @@ roslaunch rover_gazebo zhurong_main_simple.launch
 - TODO： `添加停止、加速、减速以及更多模式`
 
 ## 6. Contributes and Push Code
-我们使用black格式化Python文件
-使用clang-format格式化Cpp文件
-使用pre-commit进行提交前代码检查，
+我们使用 `black` 格式化 `Python` 文件
+使用 `clang-format` 格式化`Cpp`文件
+使用 `pre-commit` 进行提交前代码检查，在您每次 `git commit` 时，会自动：
+
+对本次提交中改动的 `.cpp/.h` 等文件执行 `clang-format`
+对改动的 `.py` 执行 `black`
+执行你配置的其他 `hooks`
+如果格式化修改了文件，第一次 `git commit` 会被阻止; 你需要:
+
+
 ```shell
 pip install pre-commit
 ```
-- `w`: 前进
-- `s`: 后退
-- `a`: 左转
-- `d`: 右转
-- TODO： `添加停止、加速、减速以及更多模式`
+
 
 ## 工程文件架构
 ```txt
