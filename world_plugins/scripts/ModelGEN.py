@@ -1,3 +1,5 @@
+"""Model and terrain SDF generators for Gazebo simulation assets."""
+
 # -*- coding: UTF-8 -*-
 from lxml import etree as ET
 import random
@@ -18,7 +20,8 @@ def generate_rocks_model(
     rock_dis_rate=None,
     return_record={},
 ):
-    '''生成岩石model文件
+    """生成岩石model文件
+    Generate a rock model SDF using mesh assets.
 
     param:
         DEM: 地形DEM
@@ -27,7 +30,9 @@ def generate_rocks_model(
         save_path: model保存路径
         seed: 随机种子
         is_label: 是否生成标签model
-    '''
+    Returns:
+        list[dict]: Rock placement list used for SDF generation.
+    """
 
     random.seed(seed)
     np.random.seed(int(seed))
@@ -132,8 +137,8 @@ def generate_rocks_model_cylinder(
     rock_dis_rate=None,
     return_record={},
 ):
-    '''生成岩石model文件
-
+    """生成岩石model文件
+    Generate a rock model SDF using cylinders for collision.
     param:
         DEM: 地形DEM
         param_data: 参数字典
@@ -141,7 +146,7 @@ def generate_rocks_model_cylinder(
         save_path: model保存路径
         seed: 随机种子
         is_label: 是否生成标签model
-    '''
+    """
 
     random.seed(seed)
     np.random.seed(int(seed))
@@ -250,7 +255,7 @@ def generate_rocks_model_no_collision(
     return_record={},
 ):
     '''生成岩石model文件
-
+    Generate a rock model SDF without collision geometry.
     param:
         DEM: 地形DEM
         param_data: 参数字典
@@ -360,7 +365,7 @@ def generate_terrain_model(
     param_data={},
 ):
     '''生成地形model文件
-
+    Generate a Gazebo heightmap model with texture blending.
     param:
         heightmap_name: 地形高度图文件名
         save_path: model保存路径
@@ -532,6 +537,7 @@ def generate_terrain_model_exp(
     return_record={},
     param_data={},
 ):
+    """Generate an experimental terrain model with constrained textures."""
     random.seed(seed)
     # texture_num1 = random.randint(1, texture_count)
     # texture_num2 = random.randint(1, texture_count)
@@ -671,7 +677,7 @@ def generate_flat_terrain_model(
     uri.text = 'model://mars_terrain/' + heightmap_int8_path + heightmap_name
     # uri.text = 'model://mars_terrain/heightmaps_int8/'+heightmap_name
     size = ET.SubElement(heightmap, 'size')
-    terrain_size = str(length) + ' ' + str(length) + ' ' + str(height)
+    terrain_size = str(length)+' '+str(length)+' '+str(height)
     size.text = terrain_size
     pos = ET.SubElement(heightmap, 'pos')
     pos.text = '0 0 0'
@@ -685,13 +691,16 @@ def generate_flat_terrain_model(
 #     '''生成地形model文件
 
 #     param:
-#         heightmap_name: 地形高度图文件名
-#         save_path: model保存路径
-#         seed: 随机种子
-#         is_label: 是否生成标签model
-#         texture_count: 地形纹理数量
+#         heightmap_name: Name of the heightmap file. 地形高度名文件
+#         length: Length of the terrain.
+#         height: Height of the terrain.
+#         save_path: Path to save the model. model保存路径
+#         seed: Random seed. 随机种子
+#         is_label: Whether to generate labeled model. 是否生成标签model
+#         texture_count: Number of textures. 地形纹理数量
 #     return:
-#         min_height_list: 多地形过渡高度列表
+#         min_height_list: List of minimum heights for terrain transitions.
+#                          多地形过度高度列表
 #     '''
 
 #     texture_num1 = 1

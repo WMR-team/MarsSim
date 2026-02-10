@@ -1,3 +1,5 @@
+"""Procedural geometry generator for terrain class maps and textures."""
+""""""
 import cv2
 import numpy as np
 import random
@@ -5,6 +7,13 @@ from numpy.random import randint
 
 
 def label_colormap(N=256):
+    """Generate a Pascal VOC-style label colormap.
+
+    Args:
+        N (int): Number of labels/colors.
+    Returns:
+        np.ndarray: Colormap of shape (N, 3) in uint8.
+    """
 
     def bitget(byteval, idx):
         return (byteval & (1 << idx)) != 0
@@ -26,6 +35,13 @@ def label_colormap(N=256):
 
 
 def generate_class_mat():
+    """Create a random semantic class map and matching texture image.
+
+    Writes:
+        - terrain_tex.png: synthetic texture
+        - terrain_class.npy: class matrix (labels)
+    """
+
     color_list = label_colormap(10)[1:]
     print(color_list)
     h = 1024

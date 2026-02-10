@@ -1,3 +1,5 @@
+"""Heightmap augmentation utilities: noise injection and synthetic edits."""
+
 import cv2
 import numpy as np
 import os
@@ -5,6 +7,14 @@ import random
 
 
 def noise(img, snr):
+    """Apply salt-and-pepper noise to a grayscale image.
+
+    Args:
+        img (np.ndarray): Input uint16 heightmap.
+        snr (float): Signal-to-noise ratio (0..1).
+    Returns:
+        np.ndarray: Noisy image.
+    """
     h = img.shape[0]
     w = img.shape[1]
     img1 = img.copy()
@@ -23,6 +33,7 @@ def noise(img, snr):
 
 
 def noise_label(img, label, snr):
+    """Apply salt-and-pepper noise to labeled regions only."""
     h = img.shape[0]
     w = img.shape[1]
     img1 = img.copy()
@@ -42,6 +53,11 @@ def noise_label(img, label, snr):
 
 
 def gen_heightmap(img_num):
+    """Generate a new heightmap variant from an existing source.
+
+    Args:
+        img_num (int): Source heightmap index (HM{img_num}.png).
+    """
     x_min = int((-4.2 + 5) * 640 / 10)
     x_max = int((4.2 + 5) * 640 / 10)
     y_min = int((-2.2 + 5) * 640 / 10)

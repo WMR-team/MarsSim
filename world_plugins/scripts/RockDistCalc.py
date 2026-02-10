@@ -1,3 +1,9 @@
+"""Rock distribution utilities for terrain generation and visualization.
+
+Defines the rock size distribution model, collision checks, and a generator
+that places rocks across terrain classes with optional visualization.
+"""
+
 # -*- coding: UTF-8 -*-
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,24 +12,52 @@ from matplotlib.patches import Circle
 
 
 def rock_distribution_function(k, D):
-    '''岩石分布模型'''
+    """Compute rock size distribution value.
+    计算岩石分布模型
+
+    Args:
+        k (float): Density coefficient.
+        D (float): Rock diameter (meters).
+    Returns:
+        float: Distribution value F for diameter D.
+    """
     q = 1.79 + 0.152 / k
     F = k * np.exp(-q * D)
     return F
 
 
 def calculate_N(F, s):
-    '''计算岩石数量'''
+    """Compute rock count from distribution and area.
+    计算岩石数量
+
+    Args:
+        F (float): Distribution value.
+        s (float): Area (m^2) for the terrain class.
+    Returns:
+        int: Number of rocks to generate.
+    """
     return int(F * s)
 
 
 def get_distance(x1, y1, x2, y2):
-    '''计算两点之间的距离'''
+    """Euclidean distance between two 2D points.
+    计算两点之间的距离
+    """
     return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
 
 def check_collision(rock_list, x, y, D):
-    '''检查新生成的岩石与原来生成的岩石是否存在冲突'''
+    """Check whether a candidate rock overlaps any existing rock.
+    检查新生成的岩石与原来生成的岩石是否存在冲突
+
+    Args:
+        rock_list (list[dict]): Existing rocks with keys x, y, D.
+        x (float): Candidate x position.
+        y (float): Candidate y position.
+        D (float): Candidate diameter.
+    Returns:
+        bool: True if collision detected, else False.
+    """
     if len(rock_list) > 0:
         for i in range(len(rock_list)):
             x1 = rock_list[i]['x']
@@ -47,16 +81,18 @@ def calculate_rock_distribution(
     return_record={},
     is_show=False,
 ):
-    '''计算岩石分布
-
-    params:
-        DEM: 地形DEM
-        param_data: 预设参数字典
-        terrain_class_mat: 地形类别矩阵
-        is_show: 是否可视化展示岩石分布
-    return:
-        rock_list: 岩石分布列表，[{'x': , 'y': , 'D': },{}]
-    '''
+    """Generate a list of rock positions and sizes.
+    计算岩石分布
+    Args:
+        DEM (np.ndarray): Terrain DEM [3, H, H]. 地形DEM
+        param_data (dict): Configuration parameters (terrain classes, etc.). 预设参数字典
+        terrain_class_mat (np.ndarray): Terrain class matrix [H, H]. 地形类别矩阵
+        rock_dis_rate (float|None): Override density coefficient.
+        return_record (dict): Output metadata holder.
+        is_show (bool): Visualize rock placement if True. 是否可视化展示岩石分布
+    Returns:
+        list[dict]: Rocks [{'x':..., 'y':..., 'D':...}, ...]. 岩石分布列表
+    """
     # rock_size_list = [0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12, 10.24]
     rock_size_list = [0.4, 0.8, 1.6, 3.2, 6.4]
     # rock_size_list = [0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1]

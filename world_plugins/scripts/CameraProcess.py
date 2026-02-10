@@ -1,18 +1,20 @@
+"""Camera path generation and image labeling utilities."""
+
 # -*- coding: UTF-8 -*-
 import random
 import numpy as np
 
 
 def generate_camera_path(DEM, points, is_debug=False):
-    '''生成相机路径
-
-    params:
-        DEM: 地形DEM
-        points: 路径点数量
-        is_debug: 是否生成路径点txt文件
-    returns:
-        camera_pose_list: 相机路径点列表
-    '''
+    """Sample random camera poses over the DEM.
+    生成相机路径
+    Args:
+        DEM (np.ndarray): Terrain DEM [3, H, H]. 地形DEM
+        points (int): Number of camera poses. 路径点数量
+        is_debug (bool): Write poses to camera_path.txt if True. 是否生成路径点txt文件
+    Returns:
+        list[list[float]]: [x, y, z, pitch, yaw] per pose. 相机路径点列表
+    """
     H = DEM.shape[1]
     min_l = DEM[0, 0, 0]
     max_l = DEM[0, 0, -1]
@@ -62,9 +64,11 @@ def generate_camera_path(DEM, points, is_debug=False):
 
 # 标注图像处理
 def label_img_process():
+    """Placeholder for label-image post-processing pipeline."""
     pass
 
 
 # 可视化原始图像与标注图像
 def visuallize_image():
+    """Placeholder for visualization of raw vs labeled images."""
     pass

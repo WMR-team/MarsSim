@@ -1,3 +1,5 @@
+"""Model.config generator for Gazebo model assets."""
+
 # -*- coding: UTF-8 -*-
 from lxml import etree as ET
 import os
@@ -7,13 +9,13 @@ import os
 def generate_config(
     model_name, save_path='', description_text='My Generate Model for Gazebo'
 ):
-    '''生成model的config文件并保存
-
-    params:
-        model_name: model名称
-        save_path: 文件保存路径
-        description_text: model描述
-    '''
+    """Create a Gazebo model.config file on disk.
+    生成model的config文件并保存
+    Args:
+        model_name (str): Gazebo model name.
+        save_path (str): Directory to write model.config into.
+        description_text (str): Human-readable description.
+    """
 
     model = ET.Element("model")
 

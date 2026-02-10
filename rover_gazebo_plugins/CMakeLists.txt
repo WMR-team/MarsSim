@@ -1,3 +1,5 @@
+# CMake configuration for rover_gazebo_plugins (Gazebo/ROS plugins).
+
 cmake_minimum_required(VERSION 3.0.2)
 project(rover_gazebo_plugins)
 

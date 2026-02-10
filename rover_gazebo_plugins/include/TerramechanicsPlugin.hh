@@ -13,7 +13,7 @@
 #include <gazebo/common/common.hh>
 #include <ignition/math.hh>
 #include <ignition/math/Matrix4.hh>
-// Eigen 
+// Eigen
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -33,106 +33,129 @@
 
 namespace gazebo
 {
-	class TerramachanicsPlugin : public ModelPlugin
-	{
+    /// \brief Gazebo ModelPlugin implementing terramechanics wheel-terrain interaction.
+    class TerramachanicsPlugin : public ModelPlugin
+    {
         public: virtual ~TerramachanicsPlugin();
         public: TerramachanicsPlugin();
-        //加载SDF文件，仿真时的主函数
+        /// \brief Load plugin and parse SDF parameters.
         public: void virtual Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+        /// \brief Extract SDF configuration values.
         public: void GetSDFParam(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+        /// \brief Initialize terrain-related data structures.
         public: void InitTerrain();
+        /// \brief Initialize ROS publishers/subscribers.
         public: void virtual InitSubPub();
-        //接收速度控制指令
+        /// \brief ROS command callback for wheel control.
         public: void OnRosMsg(const std_msgs::Float64ConstPtr &msg);
-        //仿真迭代求解函数
+        /// \brief Per-iteration update step for physics and forces.
         public: void OnUpdate();
-        //结构体：定义车轮所受六维力
+        /// \brief Container for 3D force and torque values.
         public: struct FT
             {
                 double Force[3];
                 double Torque[3];
             };
-        
+
         public: FT force_torque;
         public: ignition::math::Vector3d wheel_force;
         public: ignition::math::Vector3d wheel_torque;
         public: physics::JointWrench wrech;
         public: ignition::math::Vector3d force;
         public: ignition::math::Vector3d torque;
-        
-        //车轮六维力解算
+
+        /// \brief Compute wheel force/torque based on terrain data.
         public: FT CalculationWheelForce(double Terrain_Data[], int iter);
+        /// \brief Main wheel-terrain interaction routine.
         public: void virtual WheelTerrainInteraction(double theta11);
+        /// \brief Apply static model constraints to pose.
         public: void StaticModel(ignition::math::Matrix3d Rot_0_2);
 
-        //结构体：定义轮地接触点处的地形高度值和地面力学参数值
+        /// \brief Terrain node height and parameters at contact point.
         public: struct NodeZandTerrainParams
             {
                 double NodeZ;
                 double *TerrainParams;
             };
-        //获取轮地接触点处的地形高度值和地面力学参数值
+        /// \brief Query terrain height/params at wheel contact point.
+        // 获取轮地接触点处的地形高度值和地面力学参数值
         public: NodeZandTerrainParams GetTouchNodes(double px, double py, double Terrain_Data[]);
-        //结构体：轮地接触面法向量和平面上的一个点
+        /// \brief Contact surface normal and a point on the plane.
+        // 轮地接触面法向量和平面上的一个点
         public: struct NormalandNode
             {
                 ignition::math::Vector3d NormalVector;
                 ignition::math::Vector3d NodePosition;
             };
-        //计算轮地接触面法向量，同时返回平面上的一个点
+        /// \brief Compute contact area normal from wheel pose and terrain.
+        // 计算轮地接触面法向量，同时返回平面上的一个点
         public: NormalandNode CalculateTouchArea(double WheelPos[3], double Terrain_Data[], double theta1_in, double phi_yaw);
+        /// \brief Compute contact area normal from transform matrix.
         public: NormalandNode CalculateTouchArea(ignition::math::Matrix4d TransMat, double Terrain_Data[], double theta1_in);
-        //计算车轮滑转率
+        /// \brief Compute slip ratio based on angular and linear velocity.
+        // 计算车轮滑转率
         public: double CalculateSlip(double Angv, double Local_Lin_Velocity[3]);
-        //计算车轮滑转率正负
+        /// \brief Determine slip sign.
+        // 计算车轮滑转率正负
         public: double CalculateS_flag(double s);
-        //计算车轮侧偏角
+        /// \brief Compute lateral slip (beta) angle.
+        // 计算车轮侧偏角
         public: double CalculateBeta(double Local_Lin_Velocity[3]);
-        //计算车轮侧偏角正负
+        /// \brief Determine beta sign.
+        // 计算车轮侧偏角正负
         public: double CalculateBeta_flag(double beta);
-        //计算车轮沉陷量
+        /// \brief Compute wheel sinkage depth.
+        // 计算车轮沉陷量
         public: double CalculationSinkage(ignition::math::Vector3d WheelPos, ignition::math::Vector3d P1, ignition::math::Vector3d Area, double sinkage_last);
-        //计算车轮进入角
+        /// \brief Compute wheel entry angle.
+        // 计算车轮进入角
         public: double CalculationTheta1(double z_sinkage0, double theta1_last);
-        //计算车轮等效半径
+        /// \brief Compute equivalent wheel radius from slip.
+        // 计算车轮等效半径
         public: double CalculationEqualRadius(double slip);
-        //轮地接触时的阻尼(不太清楚)
+        /// \brief Limit damping coefficient based on linear velocity.
+        // 轮地接触时的阻尼(不太清楚)
         public: double LimitDampingCoef(double Linv[3]);
-        //限制最大法向力
+        /// \brief Cap normal force to a maximum.
+        // 限制最大法向力
         public: double LimitSustainForce(double Fn_in);
-        //计算考虑滑转时的车轮等效半径
+        /// \brief Compute equivalent radius under slip.
+        // 计算考虑滑转时的车轮等效半径
         public: double CalculateRj(double s);
-        //计算车体静止时车轮的摩擦力方向
+        /// \brief Compute friction direction under static conditions.
+        // 计算车体静止时的车轮的摩擦力方向
         public: ignition::math::Vector3d CalculateFrictionDirectionNew(ignition::math::Vector3d normalVector, ignition::math::Vector3d WheelPos0, ignition::math::Vector3d WheelPos1);
-        //
+        /// \brief ROS queue processing thread.
         public: void QueueThread();
+        /// \brief Secondary ROS queue processing thread.
         public: void QueueThread2();
 
+        /// \brief Load simulation parameters from configuration.
         public: void GetSimulationParam();
 
         // void dynamic_callback(rover_gazebo_plugins::DynamicTerrainConfig &config);
         // void OnCallback(const dynamic_params::terrain_paramsConstPtr &msg);
 
-        // public: void 
+        // public: void
         //定义仿真所需的参数
         public:
-            /// \brief 
+            /// \brief
             physics::ModelPtr model;
 
-            /// \brief 
+            /// \brief
             event::ConnectionPtr updateConnection;
 
-            /// \brief 
+            /// \brief
             physics::JointPtr WheelJoint;
 
-            /// \brief 
+            /// \brief
             physics::LinkPtr WheelLink, BaseLink;
 
-            /// \brief 
+            /// \brief
             std::vector<double> terrain_data;
             std::string robot_namespace_;
 
-            /// \brief 
+            /// \brief
             bool enable_plugin = true;
 
             double c1 = 0.5;
@@ -177,13 +200,13 @@ namespace gazebo
             double control_v=0;
             std::string TerrainMapFileName;
             std::ifstream TerrainMapFile;
-            /// \brief 
+            /// \brief
             /// \param[in]
             ///
             std::vector<double> TerrainDataVec;
 
             int SimulateCount=0;
-            
+
             double SteerAngle=0;
             ignition::math::Vector3d WheelPos;
             ignition::math::Vector3d NormalVector;
@@ -206,7 +229,7 @@ namespace gazebo
             double Velocity_Local_Real[3];
             double x_step;
             double y_step;
-            
+
             double x_0, y_0;
             int Node_Coef;
             int PublishRate;
@@ -222,7 +245,7 @@ namespace gazebo
             geometry_msgs::Wrench Wheel_FT_msg;
 
             // default paramters
-            double FN_AVE=220;                       
+            double FN_AVE=220;
             double cmd_vel=0;
 
             double r = 0.14;

@@ -1,3 +1,5 @@
+# CMake configuration for the world_plugins package (Gazebo world generation).
+
 cmake_minimum_required(VERSION 3.0.2)
 project(world_plugins)
 

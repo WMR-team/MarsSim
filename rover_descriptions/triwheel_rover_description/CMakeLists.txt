@@ -1,3 +1,5 @@
+# CMake configuration for triwheel_rover_description (URDF description package).
+
 cmake_minimum_required(VERSION 3.0.2)
 project(triwheel_rover_description)
 
