@@ -18,27 +18,21 @@
 
 ## 安装
 ### 1. 项目初始化
-    $ mkdir MarsSim_v2_ws
-    $ cd MarsSim_v2_ws
-    $ mkdir src
-    $ cd src
-    $ git clone https://github.com/fengwh123/MarsSim_v2
-    $ cd ..
-    $ catkin build
-    $ source ./devel/setup.bash
-
+```shell
+mkdir -p MarsSim_ws/src && cd MarsSim_ws
+git clone --branch remove_abs_path git@github.com:WMR-team/MarsSim.git ./src/MarsSim
+catkin build
+source ./devel/setup.bash
+```
 ### 2. 找我拷贝模型文件
 
 将文件解压后，放置于`~/MarsSim_v2/src/rover_gazebo/models`文件夹中
 
-### 3. 更改路径
-将文件中出现的绝对路径进行全部替换
-
-### 4. 运行地形生成文件
-
-    $ cd src/world_plugins/
-    $ python ./scripts/world_change_pipeline.py
-
+### 3. 运行地形生成文件
+```shell
+cd ./src/MarsSim
+python -m world_plugins.scripts.world_change_pipeline
+```
 ### 5. 启动火星车仿真(二选一)
 高保真场景
 
