@@ -94,8 +94,8 @@ def get_terrain_class_mat(param_data, DEM, mode=""):
     params:
         param_data: 预设参数字典
         DEM: 地形DEM
-        mode: 计算模式（如果地形类别为1，则不需要；
-                    大于1时，'height'为根据地形高度生成矩阵；'semantic'为根据手工设置的语义图计算）
+        mode: 计算模式(如果地形类别为1，则不需要；
+                    大于1时，'height'为根据地形高度生成矩阵；'semantic'为根据手工设置的语义图计算)
     return:
         terrain_class_mat:
     """
@@ -143,9 +143,9 @@ def save_DTM(DTM, save_path, save_name, plugin_config_modify_path):
 
     params:
         DTM: 地形DTM
-        save_path: 文件保存路径（可相对 MarsSim 根目录）
+        save_path: 文件保存路径(可相对 MarsSim 根目录)
         save_name: 文件保存名称
-        plugin_config_modify_path: 插件 yaml 路径（可相对 MarsSim 根目录）
+        plugin_config_modify_path: 插件 yaml 路径(可相对 MarsSim 根目录)
     """
     repo_root = Path(__file__).resolve().parents[2]  # .../MarsSim
 

@@ -84,7 +84,7 @@ def change_world(
     DEM = generate_DEM(heightmap, param_data)
     DEM_c = generate_DEM(heightmap_c, param_data)
 
-    # 生成地形model文件（use repo-relative path, resolved to abs at runtime）
+    # 生成地形model文件(use repo-relative path, resolved to abs at runtime)
     save_path = str(
         (repo_root / "rover_gazebo" / "models" / "experiment_terrain").resolve()
     )

@@ -1,0 +1,66 @@
+name: CI (MarsSim / ROS Noetic)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-20.04
+
+    env:
+      ROS_DISTRO: noetic
+      CATKIN_WS: ${{ github.workspace }}/ws # 临时工作区目录
+
+    steps:
+      - name: Checkout MarsSim repository
+        uses: actions/checkout@v4
+
+      - name: Setup ROS Noetic
+        run: |
+          sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros1-latest.list'
+          sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+          sudo apt-get update
+          sudo apt-get install -y \
+            ros-noetic-desktop-full \
+            python3-rosdep python3-rosinstall python3-vcstools \
+            python3-catkin-tools \
+            build-essential
+
+          sudo rosdep init || true
+          rosdep update
+
+      - name: Create catkin workspace and place MarsSim in src
+        run: |
+          mkdir -p $CATKIN_WS/src
+          # 把当前仓库(MarsSim 包)拷到 workspace 的 src 里
+          rsync -a . $CATKIN_WS/src/MarsSim --exclude '.git' --exclude 'ws'
+
+      - name: Install dependencies via rosdep
+        run: |
+          source /opt/ros/${ROS_DISTRO}/setup.bash
+          cd $CATKIN_WS
+          rosdep install --from-paths src --ignore-src -r -y
+
+      - name: Configure workspace (catkin_tools)
+        run: |
+          source /opt/ros/${ROS_DISTRO}/setup.bash
+          cd $CATKIN_WS
+          catkin config --extend /opt/ros/${ROS_DISTRO} --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build MarsSim
+        run: |
+          source /opt/ros/${ROS_DISTRO}/setup.bash
+          cd $CATKIN_WS
+          # 只构建 MarsSim 包(以及其依赖)
+          catkin build MarsSim --no-status --summarize
+
+      - name: Run tests (MarsSim)
+        run: |
+          source /opt/ros/${ROS_DISTRO}/setup.bash
+          cd $CATKIN_WS
+          # 若已有 gtest/rostest 配置，这里会执行
+          catkin build MarsSim --no-status --summarize --make-args run_tests
+          catkin_test_results build || true
