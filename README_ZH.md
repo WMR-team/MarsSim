@@ -5,14 +5,16 @@
 
 ## 安装依赖
 
-- Ubuntu 18.04
-- [ROS Melodic](http://wiki.ros.org/melodic/Installation/Ubuntu)
+- Ubuntu 20.04
+- [ROS Noetic](http://wiki.ros.org/noetic/Installation/Ubuntu)
 - catkin_tools
 - pyyaml
 - cv2
 - numpy
 - matplotlib
 - pandas
+- hydra-core
+- omegaconf
 
 ## 教程
 
@@ -31,6 +33,7 @@ source ./devel/setup.bash
 ### 3. 运行地形生成文件
 ```shell
 cd ./src/MarsSim
+pip install hydra-core omegaconf
 python -m world_plugins.scripts.world_change_pipeline
 ```
 ### 4. 启动火星车仿真(二选一)
