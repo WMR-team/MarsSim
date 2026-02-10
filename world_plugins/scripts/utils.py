@@ -23,7 +23,7 @@ def quaternion_from_euler(r, p, y):
     return q
 
 
-def delete_paging(paging_dir: Union[str, os.PathLike, None]):
+def delete_paging(paging_dir: Union[str, os.PathLike, None]=None):
     '''删除gazebo paging文件夹
 
     Args:
