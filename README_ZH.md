@@ -74,7 +74,18 @@ roslaunch rover_gazebo zhurong_main_simple.launch
 - `d`: 右转
 - TODO： `添加停止、加速、减速以及更多模式`
 
-
+## 6. Contributes and Push Code
+我们使用black格式化Python文件
+使用clang-format格式化Cpp文件
+使用pre-commit进行提交前代码检查，
+```shell
+pip install pre-commit
+```
+- `w`: 前进
+- `s`: 后退
+- `a`: 左转
+- `d`: 右转
+- TODO： `添加停止、加速、减速以及更多模式`
 
 ## 工程文件架构
 ```txt
@@ -122,7 +133,7 @@ roslaunch rover_gazebo zhurong_main_simple.launch
 - 绝对路径
 - world文件云下载，脚本
 - 配置文件()
-- 代码规范
+- 代码规范(py and cpp)
 
 - log(hydra)
 

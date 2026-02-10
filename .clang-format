@@ -1,0 +1,8 @@
+BasedOnStyle: Google        # 或 Google / Mozilla / Microsoft / WebKit 等
+IndentWidth: 4
+ColumnLimit: 80
+UseTab: Never
+DerivePointerAlignment: false
+PointerAlignment: Left
+SortIncludes: true
+ReflowComments: true
