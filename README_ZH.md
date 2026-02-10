@@ -32,7 +32,7 @@ cd ./src/MarsSim
 pip install hydra-core omegaconf
 
 # 方式1：用 Google Drive file id（推荐）
-python -m world_plugins.scripts.download_models --gdrive-file-id <YOUR_FILE_ID>
+python -m world_plugins.scripts.download_models --gdrive-file-id 1WT5JkZ87SlinNSlQP95LfcPy7OwLVmif
 
 # 方式2：用 Google Drive 分享链接
 # python -m world_plugins.scripts.download_models --gdrive-url "https://drive.google.com/file/d/1WT5JkZ87SlinNSlQP95LfcPy7OwLVmif/view?usp=sharing"

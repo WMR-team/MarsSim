@@ -79,21 +79,26 @@ def _download_gdrive_file(file_id: str, dst_path: Path) -> None:
         ct = resp.headers.get("Content-Type", "")
         if "text/html" in ct or b"confirm=" in data:
             html = data.decode("utf-8", errors="ignore")
-            m = re.search(r"confirm=([0-9A-Za-z_]+)", html)
+
+            # 1) 先尝试匹配隐藏 input： name="confirm" value="XXX"
+            m = re.search(r'name="confirm"\s+value="([0-9A-Za-z_-]+)"', html)
+
+            # 2) 如果没匹配到，再退回旧的 URL 形式 confirm=XXX
+            if not m:
+                m = re.search(r"confirm=([0-9A-Za-z_]+)", html)
+
             if not m:
                 raise RuntimeError(
                     "Google Drive download requires confirmation token, but token not found. "
                     "Try a smaller file, change sharing settings to 'Anyone with the link', "
                     "or use a direct non-Drive URL."
                 )
+
             confirm = m.group(1)
             url2 = f"{base}&confirm={confirm}&id={urllib.parse.quote(file_id)}"
             req2 = urllib.request.Request(url2, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req2) as resp2, open(dst_path, "wb") as f:
                 shutil.copyfileobj(resp2, f)
-        else:
-            with open(dst_path, "wb") as f:
-                f.write(data)
 
 
 def _is_within_directory(base: Path, target: Path) -> bool:
