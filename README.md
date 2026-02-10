@@ -28,9 +28,10 @@
     $ catkin build -DPYTHON_EXECUTABLE=/usr/bin/python3
     $ source ./devel/setup.bash
 
-### 2. 找我拷贝模型文件
-
-将文件解压后，放置于`~/MarsSim_v2/src/rover_gazebo/`文件夹中
+### 2. Download & install model assets (auto)
+    $ cd ./src/MarsSim
+    $ pip install hydra-core omegaconf
+    $ python -m world_plugins.scripts.download_models --gdrive-file-id <YOUR_FILE_ID>
 
 ### 3. 更改路径
 将文件中出现的绝对路径进行全部替换 

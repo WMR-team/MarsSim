@@ -26,10 +26,17 @@ git clone --branch remove_abs_path git@github.com:WMR-team/MarsSim.git ./src/Mar
 catkin build
 source ./devel/setup.bash
 ```
-### 2. 找我拷贝模型文件
+### 2. 下载并安装模型资源（自动）
+```shell
+cd ./src/MarsSim
+pip install hydra-core omegaconf
 
-将文件解压后，放置于`~/MarsSim_v2/src/rover_gazebo/models`文件夹中
+# 方式1：用 Google Drive file id（推荐）
+python -m world_plugins.scripts.download_models --gdrive-file-id <YOUR_FILE_ID>
 
+# 方式2：用 Google Drive 分享链接
+# python -m world_plugins.scripts.download_models --gdrive-url "https://drive.google.com/file/d/1WT5JkZ87SlinNSlQP95LfcPy7OwLVmif/view?usp=sharing"
+```
 ### 3. 运行地形生成文件
 ```shell
 cd ./src/MarsSim
@@ -108,12 +115,3 @@ roslaunch rover_gazebo zhurong_main_simple.launch
 - 需要有一个可视化的界面，把joystick啥的都，
 - 最基本的utilize的脚本，rosbag 的记录和显示的脚本，想
 -
-
-
-```
-
-pip install hydra-core
-
-
-python -m world_plugins.scripts.world_change_pipeline
-```
