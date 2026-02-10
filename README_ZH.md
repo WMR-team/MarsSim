@@ -116,5 +116,9 @@
 
 
 ```
+
+pip install hydra-core
+
+
 python -m world_plugins.scripts.world_change_pipeline
 ```

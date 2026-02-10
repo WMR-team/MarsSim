@@ -3,20 +3,22 @@
 import random
 import time
 import os
-import numpy as np
-from numpy.random import default_rng
 import yaml
 import cv2
 from .TerrainGEN import *
 from .ModelGEN import *
+import hydra
 
 # from CameraProcess import *
 from .WorldGEN import *
 from .utils import delete_paging
-import pandas as pd
+from .utils import omegaconf_to_dict, print_dict
+from omegaconf import DictConfig, OmegaConf
+from hydra.utils import to_absolute_path
 
 
-def change_world(
+def change_world_core(
+    param_data,
     seed,
     use_user_H=False,
     default_height=1.5,
@@ -27,12 +29,8 @@ def change_world(
     collide_mode='origin',
     terrain_len=80,
 ):
-    random.seed(seed)
-    yaml_file_name = '/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/world_plugins/config/mars_terrain_params.yaml'
 
-    # 读取配置yaml文件
-    param_file = open(yaml_file_name)
-    param_data = yaml.load(param_file, Loader=yaml.FullLoader)
+    random.seed(seed)
 
     # 随机获取地形高度图
     # heightmap_num = random.randint(1,param_data['heightmap_count'])
@@ -135,5 +133,54 @@ def change_world(
     return DEM, rock_list, return_record
 
 
+@hydra.main(
+    version_base="1.1",
+    config_name="mars_terrain_params",
+    config_path="../config",
+)
+def hydra_entry(cfg: DictConfig):
+    # 从 cfg 中取参数，然后调用核心函数
+    seed = cfg.get("seed", 55)
+    use_user_H = cfg.get("use_user_H", False)
+    default_height = cfg.get("default_height", 1.5)
+    default_rock_dis = cfg.get("default_rock_dis", None)
+    use_label = cfg.get("use_label", False)
+    mode = cfg.get("mode", "height")
+    heightmap_num = cfg.get("heightmap_num", 5)
+    collide_mode = cfg.get("collide_mode", "origin")
+    terrain_len = cfg.get("terrain_len", 80)
+
+    # 先把 cfg 转 dict
+    cfg_dict = omegaconf_to_dict(cfg)
+
+    # 把和磁盘相关的字段统一转为绝对路径（如果你在 yaml 里用的是相对路径）
+    path_keys = [
+        "heightmap_path",
+        "terrain_model_save_path",
+        "DTM_save_path",
+        "rock_model_save_path",
+        "world_save_path",
+        "plugin_config_file",
+    ]
+    for k in path_keys:
+        if k in cfg_dict and cfg_dict[k] is not None:
+            cfg_dict[k] = to_absolute_path(cfg_dict[k])
+
+    print_dict(cfg_dict)
+
+    return change_world_core(
+        cfg_dict,
+        seed,
+        use_user_H=use_user_H,
+        default_height=default_height,
+        default_rock_dis=default_rock_dis,
+        use_label=use_label,
+        mode=mode,
+        heightmap_num=heightmap_num,
+        collide_mode=collide_mode,
+        terrain_len=terrain_len,
+    )
+
+
 if __name__ == "__main__":
-    change_world(55, use_user_H=True, default_height=1, default_rock_dis=0.055)
+    hydra_entry()

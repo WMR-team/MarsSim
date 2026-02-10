@@ -430,8 +430,9 @@ def generate_terrain_model(
     lbl_viz = colormap[sem_img]
     lbl_viz = lbl_viz.astype(np.uint8)
     # lbl_viz = lbl_viz[:,:,::-1]
+    _class_png_save_path = os.path.join(save_path, "whole_tex/class.png")
     cv2.imwrite(
-        '/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/rover_gazebo/models/mars_terrain/whole_tex/class.png',
+        _class_png_save_path,
         lbl_viz,
     )
 
@@ -456,7 +457,7 @@ def generate_terrain_model(
     if use_whole_tex:
         import plot_geometry
 
-        plot_geometry.generate_class_mat()
+        plot_geometry.generate_class_mat(save_base_path=save_path)
         texture = ET.SubElement(heightmap, 'texture')
         diffuse = ET.SubElement(texture, 'diffuse')
         normal = ET.SubElement(texture, 'normal')
@@ -677,7 +678,7 @@ def generate_flat_terrain_model(
     uri.text = 'model://mars_terrain/' + heightmap_int8_path + heightmap_name
     # uri.text = 'model://mars_terrain/heightmaps_int8/'+heightmap_name
     size = ET.SubElement(heightmap, 'size')
-    terrain_size = str(length)+' '+str(length)+' '+str(height)
+    terrain_size = str(length) + ' ' + str(length) + ' ' + str(height)
     size.text = terrain_size
     pos = ET.SubElement(heightmap, 'pos')
     pos.text = '0 0 0'

@@ -8,3 +8,4 @@ rover_gazebo_plugins/.vscode/
 world_plugins/.vscode/
 rover_gazebo/data/simulated_terrain_data.txt
 rover_gazebo/models/
+outputs/
