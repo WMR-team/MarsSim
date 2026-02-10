@@ -3,9 +3,11 @@
 import numpy as np
 import cv2
 import os
+
 # from ruamel import yaml
 import yaml
 import pandas as pd
+
 
 def generate_param_tensor(terrain_class_mat, param_data):
     '''根据地形类别矩阵生成地面力学参数张量
@@ -19,30 +21,35 @@ def generate_param_tensor(terrain_class_mat, param_data):
     params_num = param_data['parameters_num']
 
     terrain_params = np.zeros((params_num, terrain_classes))
-    if terrain_classes==1:
+    if terrain_classes == 1:
         for t in range(params_num):
-            param = (param_data['param_'+str(t)])
+            param = param_data['param_' + str(t)]
             if type(param) == 'str':
                 param = param.split(' ')
                 terrain_params[t, :] = [float(i) for i in param]
             else:
-                terrain_params[t,:]=param
+                terrain_params[t, :] = param
     else:
-        csv_data = pd.read_csv(param_data['terrain_data_file'], delimiter=',')  # 读取训练数据
-        terrain_params[0,:]=list(csv_data.kc[:terrain_classes])
-        terrain_params[1,:]=list(csv_data.kphi[:terrain_classes])
-        terrain_params[2,:]=list(csv_data.n0[:terrain_classes])
-        terrain_params[3,:]=list(csv_data.n1[:terrain_classes])
-        terrain_params[4,:]=list(csv_data.c[:terrain_classes])
-        terrain_params[5,:]=list(csv_data.phi[:terrain_classes])
-        terrain_params[6,:]=list(csv_data.K[:terrain_classes])
+        csv_data = pd.read_csv(
+            param_data['terrain_data_file'], delimiter=','
+        )  # 读取训练数据
+        terrain_params[0, :] = list(csv_data.kc[:terrain_classes])
+        terrain_params[1, :] = list(csv_data.kphi[:terrain_classes])
+        terrain_params[2, :] = list(csv_data.n0[:terrain_classes])
+        terrain_params[3, :] = list(csv_data.n1[:terrain_classes])
+        terrain_params[4, :] = list(csv_data.c[:terrain_classes])
+        terrain_params[5, :] = list(csv_data.phi[:terrain_classes])
+        terrain_params[6, :] = list(csv_data.K[:terrain_classes])
 
     params_map = np.zeros((params_num, H, H))
     for i in range(H):
         for j in range(H):
-            params_map[:, i, j] = terrain_params[:, int(terrain_class_mat[i, j])]
+            params_map[:, i, j] = terrain_params[
+                :, int(terrain_class_mat[i, j])
+            ]
 
     return params_map
+
 
 def generate_DEM(height_map, param_data):
     '''生成地形DEM
@@ -56,7 +63,7 @@ def generate_DEM(height_map, param_data):
     terrain_length = param_data['terrain_length']
     H, W = height_map.shape
 
-    height_map_new = np.zeros((H+1, W+1))
+    height_map_new = np.zeros((H + 1, W + 1))
     height_map_new[0:-1, 0:-1] = height_map
     height_map_new[0:-1, -1] = height_map[:, -1]
     height_map_new[-1, 0:-1] = height_map[-1, :]
@@ -65,10 +72,10 @@ def generate_DEM(height_map, param_data):
     height_map = height_map_new
 
     height_map = (height_map).astype('float')
-    height_map = height_map*terrain_height/(2**16-1)
+    height_map = height_map * terrain_height / (2**16 - 1)
     height_map = height_map[::-1, :]
-    start_point = -terrain_length/2
-    end_point = terrain_length/2
+    start_point = -terrain_length / 2
+    end_point = terrain_length / 2
 
     x = np.linspace(start_point, end_point, H)
     x_grid, y_grid = np.meshgrid(x, x)
@@ -76,8 +83,9 @@ def generate_DEM(height_map, param_data):
 
     terrain_map[0, :, :] = x_grid
     terrain_map[1, :, :] = y_grid
-    terrain_map[2, :, :] = height_map#+0.15
+    terrain_map[2, :, :] = height_map  # +0.15
     return terrain_map
+
 
 def get_terrain_class_mat(param_data, DEM, mode=''):
     '''计算地形类别矩阵
@@ -91,32 +99,43 @@ def get_terrain_class_mat(param_data, DEM, mode=''):
         terrain_class_mat:
     '''
     l = DEM.shape[1]
-    heightmap = DEM[2,:,:]
+    heightmap = DEM[2, :, :]
     terrain_classes = param_data['terrain_classes']
     if terrain_classes == 1:
         terrain_class_mat = np.zeros((l, l))
-    elif terrain_classes>1:
-        if mode=='height':
+    elif terrain_classes > 1:
+        if mode == 'height':
             min_height_list = param_data['min_height_list']
             texture_nums = param_data['texture_nums']
-            terrain_class_mat = np.ones((l, l))*((texture_nums[0]-1))
-            if terrain_classes<4:
-                for tt in range(terrain_classes-1):
-                    terrain_class_mat[heightmap>min_height_list[tt]]=(texture_nums[tt+1]-1)
+            terrain_class_mat = np.ones((l, l)) * ((texture_nums[0] - 1))
+            if terrain_classes < 4:
+                for tt in range(terrain_classes - 1):
+                    terrain_class_mat[heightmap > min_height_list[tt]] = (
+                        texture_nums[tt + 1] - 1
+                    )
             else:
-                terrain_class_mat[heightmap>min_height_list[0]]=(texture_nums[1]-1)
-                terrain_class_mat[heightmap>min_height_list[1]]=(texture_nums[2]-1)
-                terrain_class_mat[heightmap>min_height_list[2]]=(texture_nums[3]-1)
+                terrain_class_mat[heightmap > min_height_list[0]] = (
+                    texture_nums[1] - 1
+                )
+                terrain_class_mat[heightmap > min_height_list[1]] = (
+                    texture_nums[2] - 1
+                )
+                terrain_class_mat[heightmap > min_height_list[2]] = (
+                    texture_nums[3] - 1
+                )
 
-        if mode=='semantic':
+        if mode == 'semantic':
             terrain_class_file = param_data['terrain_class_file']
             if terrain_class_file.endswith('.npy'):
                 terrain_class_mat = np.load(terrain_class_file)
-            elif terrain_class_file.endswith('.png') or terrain_class_file.endswith('.jpg'):
+            elif terrain_class_file.endswith(
+                '.png'
+            ) or terrain_class_file.endswith('.jpg'):
                 terrain_class_mat = cv2.imread(terrain_class_file, -1)
             terrain_class_mat = terrain_class_mat[::-1, :]
 
     return terrain_class_mat
+
 
 def save_DTM(DTM, save_path, save_name, plugin_config_modify_path):
     '''保存地形DTM
@@ -126,10 +145,10 @@ def save_DTM(DTM, save_path, save_name, plugin_config_modify_path):
         save_path: 文件保存路径
         save_name: 文件保存名称
     '''
-    with open(os.path.join(save_path, save_name),'w') as f:
-        f.write(str(DTM[0,0,0]))
+    with open(os.path.join(save_path, save_name), 'w') as f:
+        f.write(str(DTM[0, 0, 0]))
         f.write('\n')
-        f.write(str(DTM[0,0,1]-DTM[0,0,0]))
+        f.write(str(DTM[0, 0, 1] - DTM[0, 0, 0]))
         f.write('\n')
         f.write(str(DTM.shape[1]))
         l = DTM.shape[1]
@@ -137,23 +156,25 @@ def save_DTM(DTM, save_path, save_name, plugin_config_modify_path):
         for i in range(l):
             for j in range(l):
                 for k in range(10):
-                    f.write(str(DTM[k,j,i]))
+                    f.write(str(DTM[k, j, i]))
                     f.write('\n')
     with open(plugin_config_modify_path, 'r') as f_y:
         content = yaml.load(f_y, Loader=yaml.FullLoader)
-        content['x_min'] = float(DTM[0,0,0])
-        content['x_max'] = float(DTM[0,0,-1])
-        content['y_min'] = float(DTM[0,0,0])
-        content['y_max'] = float(DTM[0,0,-1])
+        content['x_min'] = float(DTM[0, 0, 0])
+        content['x_max'] = float(DTM[0, 0, -1])
+        content['y_min'] = float(DTM[0, 0, 0])
+        content['y_max'] = float(DTM[0, 0, -1])
         content['x_grids'] = DTM.shape[1]
         content['y_grids'] = DTM.shape[1]
         content['TerrainMapFileName'] = os.path.join(save_path, save_name)
 
     with open(plugin_config_modify_path, 'w') as f_n:
         yaml.dump(content, f_n, default_flow_style=False)
+
+
 # 生成地形参数文件
 def generate_DTM(param_data, DEM, terrain_class_mat):
-    ''' 生成用于轮地力学仿真的参数txt文件
+    '''生成用于轮地力学仿真的参数txt文件
 
     params:
         param_data: 预设参数文件
@@ -163,7 +184,6 @@ def generate_DTM(param_data, DEM, terrain_class_mat):
         DTM: 地形DTM
     '''
     terrain_param_tensor = generate_param_tensor(terrain_class_mat, param_data)
-    DTM = np.concatenate((DEM, terrain_param_tensor),axis=0)
+    DTM = np.concatenate((DEM, terrain_param_tensor), axis=0)
 
     return DTM
-

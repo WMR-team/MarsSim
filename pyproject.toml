@@ -1,0 +1,130 @@
+########################################
+# 项目基础信息（可选，给 Poetry / build 等用）
+########################################
+
+[project]
+# 项目名称
+name = "Marsim"
+
+# 项目版本
+version = "0.1.0"
+
+# 项目描述
+description = "hello, this is a simple description provided by tipriest"
+
+# 作者信息
+authors = [
+  { name = "Tipriest", email = "a1503741059@163.com" },
+]
+
+# 使用的 Python 版本范围
+requires-python = ">=3.10"
+
+# 项目依赖（示例）
+dependencies = [
+  "black>=24.0.0",
+]
+
+########################################
+# Black 配置部分（核心）
+# Black 只会读取 [tool.black] 这一节
+########################################
+
+[tool.black]
+# 1. 行宽（非常重要）
+# Black 默认行宽为 88，如果你习惯 100 或 120，可以改这里
+# 影响：
+#   - 太小：换行很多，代码拉得很长
+#   - 太大：一行内容太多，可读性变差
+line-length = 80
+
+# 2. 目标 Python 版本（非常推荐配置）
+# Black 会根据这个决定一些语法特性如何格式化，比如：
+# - 是否使用新的语法（如 match/case）
+# - 是否允许类型提示的一些语法糖
+# 写法为一个字符串数组，可支持多个版本
+# 常见写法：
+#   ["py38"] / ["py39"] / ["py310"] / ["py311"] / ["py312"]
+target-version = ["py310"]
+
+# 3. 是否跳过字符串规范化（引号转换）
+# 默认：false
+# 默认情况下，Black 会统一把字符串改为双引号：
+#   'hello' -> "hello"
+# 如果你想保留自己写的单引号/双引号风格，则设为 true
+skip-string-normalization = true
+
+# 4. 是否跳过魔法尾逗号（magic trailing comma）
+# 默认：false（开启 magic trailing comma）
+# 说明：
+#   Black 的一个特点是：在多行参数/列表/字典的最后一项后面会自动加逗号，
+#   这样以后再添加新项时 diff 更干净，且有利于自动换行。
+# 若你不喜欢这种风格，可以设为 true 关闭。
+skip-magic-trailing-comma = false
+
+# 5. 包含 / 排除 哪些路径（通过正则表达式）
+# 注意：这些是正则表达式（Python re），匹配的是文件路径的字符串形式。
+
+# include：默认匹配所有 .py / .pyi / .pyx 等文件
+# 一般不需要改动，除非你有非常特别的文件后缀。
+# 下面是 Black 默认的 include（仅作参考，不改也可以）：
+# include = '\.pyi?$'
+include = '\.pyi?$'
+
+# exclude：排除不需要格式化的路径
+# 常见要排除的目录：.git、.venv、build、dist、migrations、cache 等
+# 这里是一个多行正则字符串，建议直接在 Black 文档或下面这个示例基础上改
+exclude = '''
+(
+  /(
+      \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | \.pytest_cache
+    | \.ruff_cache
+    | build
+    | dist
+    | migrations
+  )/
+)
+'''
+
+# 6. 忽略特定路径（可选，优先级高于 include/exclude）
+# 如果你只想忽略少量文件/目录，也可以使用 extend-exclude
+# 使用场景：
+#   - 自动生成的代码，如 proto 生成的 *_pb2.py
+#   - 不希望改变格式的第三方拷贝代码
+extend-exclude = '''
+(
+  .*_pb2\.py
+  | third_party/
+)
+'''
+
+# 7. 只对特定路径追加 include（可选）
+# extend-include 用得比较少，一般不需要配置
+# extend-include = '\.pyx$'
+
+# 8. 实验性特性（慎用）
+# Black 有时会在发布时标记一些“preview features”，
+# 需要显式开启才能使用。通常不建议在生产项目中随意打开。
+# force-exclude / preview 这些选项请查阅对应版本文档。
+#   preview = true  # 示例，强制打开预览特性（示例，通常不建议）
+
+########################################
+# 其他工具配置示例（可选）
+# 通常大家会在同一个 pyproject.toml 里配置多个工具
+########################################
+
+[tool.isort]
+# isort 的配置（示例，可以和 Black 配合使用）
+profile = "black"
+line_length = 80
+
+[tool.ruff]
+# Ruff 的配置（如果你用 Ruff 作为 linter / formatter）
+line-length = 80
+target-version = "py310"
+select = ["E", "F", "W"]

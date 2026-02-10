@@ -4,19 +4,23 @@ import matplotlib.pyplot as plt
 import random
 from matplotlib.patches import Circle
 
+
 def rock_distribution_function(k, D):
     '''岩石分布模型'''
-    q = 1.79+0.152/k
-    F = k*np.exp(-q*D)
+    q = 1.79 + 0.152 / k
+    F = k * np.exp(-q * D)
     return F
+
 
 def calculate_N(F, s):
     '''计算岩石数量'''
-    return int(F*s)
+    return int(F * s)
+
 
 def get_distance(x1, y1, x2, y2):
     '''计算两点之间的距离'''
-    return np.sqrt((x1-x2)**2+(y1-y2)**2)
+    return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
 
 def check_collision(rock_list, x, y, D):
     '''检查新生成的岩石与原来生成的岩石是否存在冲突'''
@@ -26,17 +30,25 @@ def check_collision(rock_list, x, y, D):
             y1 = rock_list[i]['y']
             D1 = rock_list[i]['D']
             dis = get_distance(x1, y1, x, y)
-            if dis > D1+D:
+            if dis > D1 + D:
                 return False
             else:
                 return True
     else:
         return False
-    
+
+
 # 计算岩石分布
-def calculate_rock_distribution(DEM, param_data, terrain_class_mat, rock_dis_rate=None, return_record={}, is_show=False):
+def calculate_rock_distribution(
+    DEM,
+    param_data,
+    terrain_class_mat,
+    rock_dis_rate=None,
+    return_record={},
+    is_show=False,
+):
     '''计算岩石分布
-    
+
     params:
         DEM: 地形DEM
         param_data: 预设参数字典
@@ -66,53 +78,56 @@ def calculate_rock_distribution(DEM, param_data, terrain_class_mat, rock_dis_rat
     H = DEM.shape[1]
     min_l = DEM[0, 0, 0]
     max_l = DEM[0, 0, -1]
-    l = max_l-min_l
+    l = max_l - min_l
     step = DEM[0, 0, 1] - DEM[0, 0, 0]
 
     area_list = []
     for i in range(terrain_classes):
-        area_list.append(np.sum(terrain_class_mat == i)/(H*H)*l*l)
+        area_list.append(np.sum(terrain_class_mat == i) / (H * H) * l * l)
     for c in range(terrain_classes):
         for i in range(len(rock_size_list)):
             D = rock_size_list[i]
             # 计算该直径岩石的分布函数
             F = rock_distribution_function(k_list[c], D)
-            F = F-F_last
+            F = F - F_last
             # 计算该直径岩石在该地形的个数
             N = calculate_N(F, area_list[c])
             # if D==0.6:
             #     N = N*2
             # elif D==0.2:
-            #     N = N/2 
-            
+            #     N = N/2
+
             j = 0
-            while(j < N):
-                x = random.random()*(l-4)+2
-                y = random.random()*(l-4)+2
+            while j < N:
+                x = random.random() * (l - 4) + 2
+                y = random.random() * (l - 4) + 2
                 # x = random.random()*l
                 # y = random.random()*l
-                flag_2 = (np.sqrt((x-l/2)**2+(y-l/2)**2)<4) or (np.sqrt((x-l/2)**2+(y-l/2)**2)>68 and np.sqrt((x-l/2)**2+(y-l/2)**2)<72)
+                flag_2 = (np.sqrt((x - l / 2) ** 2 + (y - l / 2) ** 2) < 4) or (
+                    np.sqrt((x - l / 2) ** 2 + (y - l / 2) ** 2) > 68
+                    and np.sqrt((x - l / 2) ** 2 + (y - l / 2) ** 2) < 72
+                )
                 flag = check_collision(rock_list, x, y, D)
                 # 如果有冲突，继续循环
                 if flag:
                     pass
                 if flag_2:
-                    j +=1
+                    j += 1
                 # 如果没有冲突，就将该点添加进列表，同时j+1
                 else:
-                    if terrain_class_mat[int(x/step), int(y/step)] == c:
+                    if terrain_class_mat[int(x / step), int(y / step)] == c:
                         rock = {}
                         rock['x'] = x
                         rock['y'] = y
                         rock['D'] = D
                         rock_list.append(rock)
-                        j = j+1
-                        cir = Circle(xy=(x, y), radius=D*2, alpha=0.5)
+                        j = j + 1
+                        cir = Circle(xy=(x, y), radius=D * 2, alpha=0.5)
                         if is_show:
                             ax.add_patch(cir)
                     else:
                         pass
-            F_last = F+F_last
+            F_last = F + F_last
     if is_show:
         plt.axis('scaled')
         # changes limits of x or y axis so that equal increments of x and y have the same length

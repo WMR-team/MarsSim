@@ -3,6 +3,7 @@ import random
 from lxml import etree as ET
 import os
 
+
 def get_random_world_param():
     '''生成world文件中的随机参数'''
     background_color_list = [[217, 153, 105], [211, 153, 115], [192, 157, 127]]
@@ -14,35 +15,52 @@ def get_random_world_param():
     # background_color = background_color_list[0]
     background_color = background_color_list[2]
     print(background_color)
-    background_color_text = [str(round(i/255,2)) for i in background_color]
+    background_color_text = [str(round(i / 255, 2)) for i in background_color]
     background_color_text = ' '.join(background_color_text)
     background_color_text += ' 1'
     # light_brightness = light_brightness_list[random.randint(0, 2)]
-    light_brightness = random.random()*0.5+0.2
+    light_brightness = random.random() * 0.5 + 0.2
     # light_brightness = 0.15
     light_brightness = 0.4281432790159745
-    light_brightness_text = (str(light_brightness)+' ')*3 + '1'
+    light_brightness_text = (str(light_brightness) + ' ') * 3 + '1'
     ambient = ambient_list[random.randint(0, 2)]
     # ambient = ambient_list[2]
     ambient = ambient_list[0]
     print(ambient)
-    ambient_text = [str(round(i/255, 2)) for i in ambient]
+    ambient_text = [str(round(i / 255, 2)) for i in ambient]
     ambient_text = ' '.join(ambient_text)
     ambient_text += ' 1'
-    light_pose_x = (light_pose[1]-light_pose[0])*random.random()+light_pose[0]
-    light_pose_y = (light_pose[1]-light_pose[0])*random.random()+light_pose[0]
-    light_pose_text = '0 0 1000 '+str(light_pose_x)+' '+str(light_pose_y)+' 0'
+    light_pose_x = (
+        light_pose[1] - light_pose[0]
+    ) * random.random() + light_pose[0]
+    light_pose_y = (
+        light_pose[1] - light_pose[0]
+    ) * random.random() + light_pose[0]
+    light_pose_text = (
+        '0 0 1000 ' + str(light_pose_x) + ' ' + str(light_pose_y) + ' 0'
+    )
     light_pose_text = '0 0 1000 0 0 0'
 
-    return background_color_text, light_brightness_text, ambient_text, light_pose_text
+    return (
+        background_color_text,
+        light_brightness_text,
+        ambient_text,
+        light_pose_text,
+    )
+
 
 def generate_Mars_wolrd(save_path='', return_record={}):
     '''生成仿真world文件
-    
-    params: 
+
+    params:
         save_path: 保存路径
     '''
-    background_color_text, light_brightness_text, ambient_text, light_pose_text = get_random_world_param()
+    (
+        background_color_text,
+        light_brightness_text,
+        ambient_text,
+        light_pose_text,
+    ) = get_random_world_param()
     return_record['background_color'] = background_color_text
     return_record['light_brightness'] = light_brightness_text
     return_record['ambient'] = ambient_text
@@ -52,7 +70,8 @@ def generate_Mars_wolrd(save_path='', return_record={}):
     gravity = ET.SubElement(world, "gravity")
     gravity.text = '0 0 -3.711'
     physics = ET.SubElement(
-        world, "physics", name="default_physcis", default="0", type="ode")
+        world, "physics", name="default_physcis", default="0", type="ode"
+    )
     max_step_size = ET.SubElement(physics, "max_step_size")
     max_step_size.text = '0.001'
     real_time_factor = ET.SubElement(physics, "real_time_factor")
@@ -70,7 +89,8 @@ def generate_Mars_wolrd(save_path='', return_record={}):
     sor = ET.SubElement(solver, 'sor')
     sor.text = '1.0'
     use_dynamic_moi_rescaling = ET.SubElement(
-        solver, "use_dynamic_moi_rescaling")
+        solver, "use_dynamic_moi_rescaling"
+    )
     use_dynamic_moi_rescaling.text = 'false'
     scene = ET.SubElement(world, "scene")
     ambient = ET.SubElement(scene, "ambient")
@@ -106,7 +126,7 @@ def generate_Mars_wolrd(save_path='', return_record={}):
     include_camera = ET.SubElement(world, "include")
     uri = ET.SubElement(include_camera, "uri")
     uri.text = 'model://ai_camera'
-    
+
     # include_obstacle = ET.SubElement(world, "include")
     # uri = ET.SubElement(include_obstacle, "uri")
     # uri.text = 'model://obstacle'
@@ -115,15 +135,21 @@ def generate_Mars_wolrd(save_path='', return_record={}):
     save_file = os.path.join(save_path, 'MarsWorld.world')
     tree.write(save_file, pretty_print=True, xml_declaration=True)
 
+
 def modify_Mars_wolrd(load_path='', is_label=False):
     '''修改仿真world文件
-    
-    params: 
+
+    params:
         load_path: 文件加载路径
         is_label: 是否面向标注任务修改
     '''
-    Tree = ET.parse(os.path.join(load_path , 'MarsWorld.world') )
-    background_color_text, light_brightness_text, ambient_text, light_pose_text = get_random_world_param()
+    Tree = ET.parse(os.path.join(load_path, 'MarsWorld.world'))
+    (
+        background_color_text,
+        light_brightness_text,
+        ambient_text,
+        light_pose_text,
+    ) = get_random_world_param()
 
     sdf = Tree.getroot()
     world = sdf.find('world')
@@ -149,7 +175,6 @@ def modify_Mars_wolrd(load_path='', is_label=False):
         cast_shadows.text = 'true'
         pose.text = light_pose_text
         diffuse.text = light_brightness_text
-    
+
     save_file = os.path.join(load_path, 'MarsWorld.world')
     Tree.write(save_file, pretty_print=True, xml_declaration=True)
-    

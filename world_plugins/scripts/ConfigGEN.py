@@ -2,16 +2,19 @@
 from lxml import etree as ET
 import os
 
+
 # 生成config文件
-def generate_config(model_name, save_path='', description_text='My Generate Model for Gazebo'):
+def generate_config(
+    model_name, save_path='', description_text='My Generate Model for Gazebo'
+):
     '''生成model的config文件并保存
-    
+
     params:
         model_name: model名称
         save_path: 文件保存路径
         description_text: model描述
     '''
-    
+
     model = ET.Element("model")
 
     name = ET.SubElement(model, "name")
@@ -37,5 +40,8 @@ def generate_config(model_name, save_path='', description_text='My Generate Mode
     # print ET.tostring(model,pretty_print=True,xml_declaration=True)
 
     tree = ET.ElementTree(model)
-    tree.write(os.path.join(save_path,'model.config'),
-               pretty_print=True, xml_declaration=True)
+    tree.write(
+        os.path.join(save_path, 'model.config'),
+        pretty_print=True,
+        xml_declaration=True,
+    )

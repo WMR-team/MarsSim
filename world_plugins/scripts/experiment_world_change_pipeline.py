@@ -9,12 +9,23 @@ import yaml
 import cv2
 from .ModelGEN import *
 from .TerrainGEN import *
+
 # from CameraProcess import *
 from .WorldGEN_exp import *
 from .utils import delete_paging
 from .heightmap_change import gen_heightmap
 
-def change_world(seed, use_user_H=False, default_height=0.1, use_label=False, mode='height', rock_num=3, bedrock_num=3, BN=(-4.4,4.4,-2.4,2.4)):
+
+def change_world(
+    seed,
+    use_user_H=False,
+    default_height=0.1,
+    use_label=False,
+    mode='height',
+    rock_num=3,
+    bedrock_num=3,
+    BN=(-4.4, 4.4, -2.4, 2.4),
+):
     random.seed(seed)
     yaml_file_name = '/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/world_plugins/config/mars_terrain_params_real.yaml'
 
@@ -27,13 +38,13 @@ def change_world(seed, use_user_H=False, default_height=0.1, use_label=False, mo
 
     gen_heightmap(heightmap_num)
     heightmap_num = 9
-    heightmap_name_c = 'HM'+str(heightmap_num)+'.png'
-    heightmap_name = 'HM'+str(heightmap_num)+'_o.png'
+    heightmap_name_c = 'HM' + str(heightmap_num) + '.png'
+    heightmap_name = 'HM' + str(heightmap_num) + '_o.png'
 
     if use_user_H:
-        param_data['terrain_height']=default_height
+        param_data['terrain_height'] = default_height
     # 记录随机数据
-    return_record={}
+    return_record = {}
     return_record['heightmap_num'] = heightmap_num
     return_record['terrain_height'] = param_data['terrain_height']
 
@@ -56,7 +67,16 @@ def change_world(seed, use_user_H=False, default_height=0.1, use_label=False, mo
     height = param_data['terrain_height']
     save_path = '/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/rover_gazebo/models/experiment_terrain'
     # generate_terrain_model_exp(length, height, save_path=save_path, param_data=param_data)
-    min_height_list, _ = generate_terrain_model_exp(heightmap_name_c, length, height, save_path=save_path, seed=seed_terrain, texture_count=param_data['texture_count'], return_record=return_record, param_data=param_data)
+    min_height_list, _ = generate_terrain_model_exp(
+        heightmap_name_c,
+        length,
+        height,
+        save_path=save_path,
+        seed=seed_terrain,
+        texture_count=param_data['texture_count'],
+        return_record=return_record,
+        param_data=param_data,
+    )
     param_data['texture_nums'] = return_record['texture_nums']
     param_data['min_height_list'] = min_height_list
 
@@ -80,7 +100,13 @@ def change_world(seed, use_user_H=False, default_height=0.1, use_label=False, mo
 
     # 生成仿真world文件
     world_save_path = param_data['world_save_path']
-    rock_list = generate_Mars_wolrd(save_path=world_save_path, rock_num=rock_num, bedrock_num=bedrock_num, DEM=DEM, BN=BN)
+    rock_list = generate_Mars_wolrd(
+        save_path=world_save_path,
+        rock_num=rock_num,
+        bedrock_num=bedrock_num,
+        DEM=DEM,
+        BN=BN,
+    )
 
     # 删除paging
     delete_paging()
@@ -89,9 +115,7 @@ def change_world(seed, use_user_H=False, default_height=0.1, use_label=False, mo
 
 
 if __name__ == "__main__":
-    change_world(seed=55, rock_num=3, bedrock_num=0, BN=(-4.4,4.4,-2.4,2.4))
+    change_world(seed=55, rock_num=3, bedrock_num=0, BN=(-4.4, 4.4, -2.4, 2.4))
     # 修改world文件，model文件
     #
     # 输入参数: 岩石个数n, 扁石个数m, 水平边界(x,y)
-
-
