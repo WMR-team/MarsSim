@@ -33,27 +33,25 @@ source ./devel/setup.bash
 cd ./src/MarsSim
 python -m world_plugins.scripts.world_change_pipeline
 ```
-### 5. 启动火星车仿真(二选一)
-高保真场景
-
-    $ roslaunch rover_gazebo zhurong_main_real.launch
-
-简单场景
-
-    $ roslaunch rover_gazebo zhurong_main_simple.launch
-
-## 6. 键盘控制火星车移动
+### 4. 启动火星车仿真(二选一)
+```shell
+# 高保真场景
+roslaunch rover_gazebo zhurong_main_real.launch
+# 简单场景
+roslaunch rover_gazebo zhurong_main_simple.launch
+```
+## 5. 键盘控制火星车移动
 在terminal窗口中输入如下键盘控制指令，控制火星车移动：
-- w: 前进
-- s: 后退
-- a: 左转
-- d: 右转
+- `w`: 前进
+- `s`: 后退
+- `a`: 左转
+- `d`: 右转
 - TODO： `添加停止、加速、减速以及更多模式`
 
 
 
 ## 工程文件架构
-
+```txt
 - rover_control: 火星车底层控制配置
   - config
   - launch
@@ -80,7 +78,7 @@ python -m world_plugins.scripts.world_change_pipeline
   - config
   - scripts
   - src
-
+```
 
 ## 致谢
 
