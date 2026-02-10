@@ -79,6 +79,15 @@ roslaunch rover_gazebo zhurong_main_real.launch
 roslaunch rover_gazebo zhurong_main_simple.launch
 ```
 
+## 6) 键盘控制火星车移动
+在terminal窗口中输入如下键盘控制指令,并回车，控制火星车移动：
+- w: 前进
+- s: 后退
+- a: 左转
+- d: 右转
+- p: 停止
+- TODO： `添加停止、加速、减速以及更多模式`
+
 
 ## 开发与贡献
 ### 代码格式化
