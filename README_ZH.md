@@ -10,6 +10,7 @@
     style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
     loading="lazy"/>
 </div>
+
 ## 安装依赖
 
 - Ubuntu 20.04
