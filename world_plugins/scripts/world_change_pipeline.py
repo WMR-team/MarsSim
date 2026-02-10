@@ -7,13 +7,11 @@ import numpy as np
 from numpy.random import default_rng
 import yaml
 import cv2
-import sys
-sys.path.append('/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/world_plugins/scripts')
-from TerrainGEN import *
-from ModelGEN import *
+from .TerrainGEN import *
+from .ModelGEN import *
 # from CameraProcess import *
-from WorldGEN import *
-from utils import delete_paging
+from .WorldGEN import *
+from .utils import delete_paging
 import pandas as pd
 
 

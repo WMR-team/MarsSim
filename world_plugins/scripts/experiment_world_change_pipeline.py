@@ -7,14 +7,12 @@ import numpy as np
 from numpy.random import default_rng
 import yaml
 import cv2
-import sys
-sys.path.append('/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/world_plugins/scripts')
-from ModelGEN import *
-from TerrainGEN import *
+from .ModelGEN import *
+from .TerrainGEN import *
 # from CameraProcess import *
-from WorldGEN_exp import *
-from utils import delete_paging
-from heightmap_change import gen_heightmap
+from .WorldGEN_exp import *
+from .utils import delete_paging
+from .heightmap_change import gen_heightmap
 
 def change_world(seed, use_user_H=False, default_height=0.1, use_label=False, mode='height', rock_num=3, bedrock_num=3, BN=(-4.4,4.4,-2.4,2.4)):
     random.seed(seed)

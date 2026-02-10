@@ -112,3 +112,8 @@
 - 需要有一个可视化的界面，把joystick啥的都，
 - 最基本的utilize的脚本，rosbag 的记录和显示的脚本，想
 -
+
+
+```
+python -m world_plugins.scripts.world_change_pipeline
+```

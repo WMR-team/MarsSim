@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 from lxml import etree as ET
 import random
-from ConfigGEN import generate_config
-from RockDistCalc import calculate_rock_distribution
+from .ConfigGEN import generate_config
+from .RockDistCalc import calculate_rock_distribution
 import numpy as np
 import os
 import cv2

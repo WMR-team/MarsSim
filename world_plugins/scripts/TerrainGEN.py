@@ -1,8 +1,4 @@
 # -*- coding: UTF-8 -*-
-# import sys
-# ros_p27_path='/opt/ros/melodic/lib/python2.7/dist-packages'
-# if ros_p27_path in sys.path:
-#     sys.path.remove(ros_p27_path)
 
 import numpy as np
 import cv2
@@ -13,7 +9,7 @@ import pandas as pd
 
 def generate_param_tensor(terrain_class_mat, param_data):
     '''根据地形类别矩阵生成地面力学参数张量
-    
+
     params:
         terrain_class_mat: 地形类别矩阵
         param_data: 预设参数字典
@@ -21,7 +17,7 @@ def generate_param_tensor(terrain_class_mat, param_data):
     H = terrain_class_mat.shape[0]
     terrain_classes = param_data['terrain_classes']
     params_num = param_data['parameters_num']
-    
+
     terrain_params = np.zeros((params_num, terrain_classes))
     if terrain_classes==1:
         for t in range(params_num):
@@ -45,7 +41,7 @@ def generate_param_tensor(terrain_class_mat, param_data):
     for i in range(H):
         for j in range(H):
             params_map[:, i, j] = terrain_params[:, int(terrain_class_mat[i, j])]
-    
+
     return params_map
 
 def generate_DEM(height_map, param_data):
@@ -85,14 +81,14 @@ def generate_DEM(height_map, param_data):
 
 def get_terrain_class_mat(param_data, DEM, mode=''):
     '''计算地形类别矩阵
-    
+
     params:
         param_data: 预设参数字典
         DEM: 地形DEM
         mode: 计算模式（如果地形类别为1，则不需要；
                     大于1时，'height'为根据地形高度生成矩阵；'semantic'为根据手工设置的语义图计算）
     return:
-        terrain_class_mat: 
+        terrain_class_mat:
     '''
     l = DEM.shape[1]
     heightmap = DEM[2,:,:]
@@ -111,7 +107,7 @@ def get_terrain_class_mat(param_data, DEM, mode=''):
                 terrain_class_mat[heightmap>min_height_list[0]]=(texture_nums[1]-1)
                 terrain_class_mat[heightmap>min_height_list[1]]=(texture_nums[2]-1)
                 terrain_class_mat[heightmap>min_height_list[2]]=(texture_nums[3]-1)
-            
+
         if mode=='semantic':
             terrain_class_file = param_data['terrain_class_file']
             if terrain_class_file.endswith('.npy'):
@@ -119,12 +115,12 @@ def get_terrain_class_mat(param_data, DEM, mode=''):
             elif terrain_class_file.endswith('.png') or terrain_class_file.endswith('.jpg'):
                 terrain_class_mat = cv2.imread(terrain_class_file, -1)
             terrain_class_mat = terrain_class_mat[::-1, :]
-            
+
     return terrain_class_mat
 
 def save_DTM(DTM, save_path, save_name, plugin_config_modify_path):
     '''保存地形DTM
-    
+
     params:
         DTM: 地形DTM
         save_path: 文件保存路径
@@ -152,13 +148,13 @@ def save_DTM(DTM, save_path, save_name, plugin_config_modify_path):
         content['x_grids'] = DTM.shape[1]
         content['y_grids'] = DTM.shape[1]
         content['TerrainMapFileName'] = os.path.join(save_path, save_name)
-    
+
     with open(plugin_config_modify_path, 'w') as f_n:
         yaml.dump(content, f_n, default_flow_style=False)
 # 生成地形参数文件
 def generate_DTM(param_data, DEM, terrain_class_mat):
     ''' 生成用于轮地力学仿真的参数txt文件
-    
+
     params:
         param_data: 预设参数文件
         DEM: 地形DEM
@@ -168,6 +164,6 @@ def generate_DTM(param_data, DEM, terrain_class_mat):
     '''
     terrain_param_tensor = generate_param_tensor(terrain_class_mat, param_data)
     DTM = np.concatenate((DEM, terrain_param_tensor),axis=0)
-    
+
     return DTM
 
