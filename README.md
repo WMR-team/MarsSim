@@ -1,93 +1,94 @@
-<!-- Project overview and setup instructions for MarsSim_v2. -->
+<!-- MarsSim_v2 中文说明与安装使用指南。 -->
 # MarsSim_v2
 
 ## 概述
+MarsSim_v2 是一个基于 ROS + Gazebo 的火星车仿真与地形/岩石场景生成工程，包含：
+- 地形高度图/纹理/语义类图生成
+- 岩石分布与模型生成
+- Terramechanics 插件（读取 DTM 文件）驱动轮地交互
+- RViz 可视化与相机/传感器话题
+<div align="center" style="margin: 20px 0;">
+  <img src="assets/intro.png"
+    alt="intro img"
+    title="Marsim Gazebo World Environment"
+    width="800"
+    style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
+    loading="lazy"/>
+</div>
 
-## 安装依赖
 
+
+## 环境依赖
 - Ubuntu 20.04
+- ROS Noetic
+- Gazebo（随 ROS Noetic）
 - Python3
-- [ROS Neotic](http://wiki.ros.org/neotic/Installation/Ubuntu)
-- catkin_tools
-- pyyaml
-- cv2
-- numpy
-- matplotlib
-- pandas
+- Python 包：`pyyaml`, `opencv-python`, `numpy`, `pandas`, `hydra-core`, `omegaconf`
 
-## 教程
+## Quickstart（推荐）
+### 1) 克隆并编译
+```bash
+mkdir -p MarsSim_ws/src && cd MarsSim_ws
+git clone git@github.com:WMR-team/MarsSim.git ./src/MarsSim
+catkin build
+source ./devel/setup.bash
+```
 
-## 安装
-### 1. 项目初始化
-    $ mkdir MarsSim_v2_ws
-    $ cd MarsSim_v2_ws
-    $ mkdir src
-    $ cd src
-    $ git clone https://github.com/fengwh123/MarsSim_v2
-    $ cd ..
-    $ catkin build -DPYTHON_EXECUTABLE=/usr/bin/python3
-    $ source ./devel/setup.bash
+### 2) 安装 Python 依赖
+```bash
+python3 -m pip install pyyaml opencv-python numpy pandas hydra-core omegaconf
+```
 
-### 2. Download & install model assets (auto)
-    $ cd ./src/MarsSim
-    $ pip install hydra-core omegaconf
-    $ python -m world_plugins.scripts.download_models --gdrive-file-id <YOUR_FILE_ID>
+### 3) 下载并安装模型资源（自动）
+模型资源不直接入库（体积较大）。请使用脚本自动下载并解压到：
+`<repo>/rover_gazebo/models/`
 
-### 3. 更改路径
-将文件中出现的绝对路径进行全部替换 
+```bash
+cd ./src/MarsSim
+python3 -m world_plugins.scripts.download_models --gdrive-file-id 1WT5JkZ87SlinNSlQP95LfcPy7OwLVmif
+```
 
-### 4. 运行地形生成文件
+如果无法使用脚本自动下载，请在如下的网盘链接下载 `models.zip` 压缩包并手动解压至 `<repo>/rover_gazebo/models/` 目录下:
 
-    $ cd src/world_plugins/
-    $ python ./scripts/world_change_pipeline.py
+模型解压后的期望结构（示例）：
+```txt
+MarsSim
+├── rover_gazebo
+│   ├── models
+│   │   ├── mars_terrain
+│   │   ├── mars_rocks_lbl
+│   │   ├── ai_camera
+│   │   └── ...
+│   └── ...
+└── world_plugins
+    └── ...
+```
 
-### 5. 启动火星车仿真(二选一)
-高保真场景
+### 4) 生成地形与场景
+```bash
+cd ./src/MarsSim
+python3 -m world_plugins.scripts.world_change_pipeline
+```
 
-    $ roslaunch rover_gazebo zhurong_main_real.launch
+### 5) 启动仿真（任选其一）
+```bash
+# 高保真场景
+roslaunch rover_gazebo zhurong_main_real.launch
 
-简单场景
-
-    $ roslaunch rover_gazebo zhurong_main_simple.launch
-
-## 6. 键盘控制火星车移动
-在terminal窗口中输入如下键盘控制指令,并回车，控制火星车移动：
-- w: 前进
-- s: 后退
-- a: 左转
-- d: 右转
-- p: 停止
-- TODO： `添加停止、加速、减速以及更多模式`
-
-
-
-## 工程文件架构
-
-- rover_control: 火星车底层控制配置
-  - config
-  - launch
-  - scripts
-- rover_descriptions: 火星车仿真三维urdf文件
-  - triwheel_rover_descrition
-  - zhurong_rover_description
-- rover_gazebo: 火星车gazebo仿真
-  - data
-  - launch
-  - models
-  - rviz
-  - urdf
-  - worlds
-- rover_gazebo_plugins: 火星车仿真插件
-  - config
-  - include
-  - src
-- world_plugins: 生成仿真场景的插件
-  - config
-  - scripts
-  - src
+# 简单场景
+roslaunch rover_gazebo zhurong_main_simple.launch
+```
 
 
-## 致谢
+## 开发与贡献
+### 代码格式化
+- Python：`black`
+- C/C++：`clang-format`
+- 建议启用 pre-commit（提交时自动格式化/检查）：
+```bash
+pip install pre-commit
+pre-commit install
+```
 
 ## 引用
 ```
@@ -98,3 +99,18 @@
 	year      = {}
 }
 ```
+
+# TODO:
+- 绝对路径
+- world文件云下载，脚本
+- 配置文件()
+- 代码规范(py and cpp)
+
+- log(hydra)
+
+- 三轮车的模型好像有问题
+- 场景自主生成(simple的进来和实际的对不上，main是固定的， 想要直接就能生成+打开一套，不弄那么负责)
+- 数据采集()
+- 需要有一个可视化的界面，把joystick啥的都，
+- 最基本的utilize的脚本，rosbag 的记录和显示的脚本，想
+-
