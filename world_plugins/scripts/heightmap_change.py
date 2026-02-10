@@ -67,8 +67,22 @@ def gen_heightmap(img_num):
     l_min = int(0.8 / 10 * 640)
 
     repo_root = Path(__file__).resolve().parents[2]  # .../MarsSim
-    file_path_16 = repo_root / "rover_gazebo" / "models" / "mars_terrain" / "choose" / "heightmaps_int16"
-    file_path_8 = repo_root / "rover_gazebo" / "models" / "mars_terrain" / "choose" / "heightmaps_int8"
+    file_path_16 = (
+        repo_root
+        / "rover_gazebo"
+        / "models"
+        / "mars_terrain"
+        / "choose"
+        / "heightmaps_int16"
+    )
+    file_path_8 = (
+        repo_root
+        / "rover_gazebo"
+        / "models"
+        / "mars_terrain"
+        / "choose"
+        / "heightmaps_int8"
+    )
 
     img = cv2.imread(str(file_path_16 / f"HM{img_num}.png"), -1)
     ii = random.randint(0, 3)

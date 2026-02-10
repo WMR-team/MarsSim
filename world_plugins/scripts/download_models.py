@@ -82,7 +82,9 @@ def _fmt_eta(seconds: float) -> str:
     return f"{m:02d}:{s:02d}"
 
 
-def _stream_download(req: urllib.request.Request, dst_path: Path, desc: str = "Downloading") -> None:
+def _stream_download(
+    req: urllib.request.Request, dst_path: Path, desc: str = "Downloading"
+) -> None:
     dst_path.parent.mkdir(parents=True, exist_ok=True)
 
     t0 = time.monotonic()
@@ -103,7 +105,11 @@ def _stream_download(req: urllib.request.Request, dst_path: Path, desc: str = "D
 
             elapsed = max(now - t0, 1e-9)
             speed = downloaded / elapsed  # B/s
-            eta = ((total - downloaded) / speed) if (total is not None and speed > 1e-9) else float("inf")
+            eta = (
+                ((total - downloaded) / speed)
+                if (total is not None and speed > 1e-9)
+                else float("inf")
+            )
 
             if total is None:
                 line = f"\r{desc}: { _fmt_bytes(downloaded) }  { _fmt_bytes(speed) }/s  ETA {_fmt_eta(eta)}"
@@ -153,9 +159,13 @@ def _download_gdrive_file(file_id: str, dst_path: Path) -> None:
         html = data.decode("utf-8", errors="ignore")
 
     # 2) Parse form action
-    m_action = re.search(r'<form[^>]+id="download-form"[^>]+action="([^"]+)"', html)
+    m_action = re.search(
+        r'<form[^>]+id="download-form"[^>]+action="([^"]+)"', html
+    )
     if not m_action:
-        raise RuntimeError("Cannot find download-form action in Google Drive HTML page.")
+        raise RuntimeError(
+            "Cannot find download-form action in Google Drive HTML page."
+        )
     action = m_action.group(1)
     action_url = urllib.parse.urljoin("https://drive.google.com", action)
 
@@ -172,7 +182,9 @@ def _download_gdrive_file(file_id: str, dst_path: Path) -> None:
     final_url = f"{action_url}?{query}"
 
     # 4) Stream-download real file with progress
-    req2 = urllib.request.Request(final_url, headers={"User-Agent": "Mozilla/5.0"})
+    req2 = urllib.request.Request(
+        final_url, headers={"User-Agent": "Mozilla/5.0"}
+    )
     _stream_download(req2, dst_path, desc="Downloading (Google Drive)")
 
 
@@ -230,15 +242,33 @@ def _merge_into_models(src_root: Path, models_dir: Path) -> None:
 
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--gdrive-file-id", default=os.getenv("MARS_SIM_MODELS_GDRIVE_FILE_ID"))
-    parser.add_argument("--gdrive-url", default=os.getenv("MARS_SIM_MODELS_GDRIVE_URL"))
-    parser.add_argument("--direct-url", default=os.getenv("MARS_SIM_MODELS_DIRECT_URL"))
-    parser.add_argument("--out", default=None, help="Target models dir (default: <repo>/rover_gazebo/models)")
-    parser.add_argument("--filename", default="models_archive", help="Base name for downloaded archive")
+    parser.add_argument(
+        "--gdrive-file-id", default=os.getenv("MARS_SIM_MODELS_GDRIVE_FILE_ID")
+    )
+    parser.add_argument(
+        "--gdrive-url", default=os.getenv("MARS_SIM_MODELS_GDRIVE_URL")
+    )
+    parser.add_argument(
+        "--direct-url", default=os.getenv("MARS_SIM_MODELS_DIRECT_URL")
+    )
+    parser.add_argument(
+        "--out",
+        default=None,
+        help="Target models dir (default: <repo>/rover_gazebo/models)",
+    )
+    parser.add_argument(
+        "--filename",
+        default="models_archive",
+        help="Base name for downloaded archive",
+    )
     args = parser.parse_args(argv)
 
     repo = _repo_root()
-    models_dir = Path(args.out).expanduser().resolve() if args.out else (repo / "rover_gazebo" / "models").resolve()
+    models_dir = (
+        Path(args.out).expanduser().resolve()
+        if args.out
+        else (repo / "rover_gazebo" / "models").resolve()
+    )
 
     # Decide download source
     archive_path: Path
@@ -252,10 +282,14 @@ def main(argv: Optional[list[str]] = None) -> int:
 
         elif args.direct_url:
             archive_path = td_path / args.filename
-            req = urllib.request.Request(args.direct_url, headers={"User-Agent": "Mozilla/5.0"})
+            req = urllib.request.Request(
+                args.direct_url, headers={"User-Agent": "Mozilla/5.0"}
+            )
             _stream_download(req, archive_path, desc="Downloading (direct url)")
         else:
-            raise SystemExit("Provide --gdrive-file-id / --gdrive-url / --direct-url (or env vars).")
+            raise SystemExit(
+                "Provide --gdrive-file-id / --gdrive-url / --direct-url (or env vars)."
+            )
 
         # Detect archive type (by signature / suffix best-effort)
         extract_dir = td_path / "extract"
@@ -263,8 +297,14 @@ def main(argv: Optional[list[str]] = None) -> int:
 
         # If user didn't provide a suffix, try to guess by magic bytes
         head = archive_path.read_bytes()[:4]
-        is_zip = head.startswith(b"PK\x03\x04") or str(archive_path).lower().endswith(".zip")
-        is_tar = str(archive_path).lower().endswith((".tar", ".tar.gz", ".tgz", ".tar.xz", ".tar.bz2"))
+        is_zip = head.startswith(b"PK\x03\x04") or str(
+            archive_path
+        ).lower().endswith(".zip")
+        is_tar = (
+            str(archive_path)
+            .lower()
+            .endswith((".tar", ".tar.gz", ".tgz", ".tar.xz", ".tar.bz2"))
+        )
 
         if is_zip:
             _safe_extract_zip(archive_path, extract_dir)
@@ -275,7 +315,9 @@ def main(argv: Optional[list[str]] = None) -> int:
             try:
                 _safe_extract_tar(archive_path, extract_dir)
             except Exception as e:
-                raise RuntimeError(f"Unknown archive type: {archive_path}") from e
+                raise RuntimeError(
+                    f"Unknown archive type: {archive_path}"
+                ) from e
 
         root = _pick_extracted_root(extract_dir)
         _merge_into_models(root, models_dir)

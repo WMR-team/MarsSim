@@ -30,7 +30,9 @@ def change_world(
     random.seed(seed)
 
     repo_root = Path(__file__).resolve().parents[2]  # .../MarsSim
-    yaml_file_name = repo_root / "world_plugins" / "config" / "mars_terrain_params_real.yaml"
+    yaml_file_name = (
+        repo_root / "world_plugins" / "config" / "mars_terrain_params_real.yaml"
+    )
 
     # 读取配置yaml文件
     with open(yaml_file_name, "r") as param_file:

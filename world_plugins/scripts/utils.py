@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from typing import Union
 
+
 def quaternion_from_euler(r, p, y):
     '''欧拉角转四元数'''
     q = [0, 0, 0, 0]
@@ -23,7 +24,7 @@ def quaternion_from_euler(r, p, y):
     return q
 
 
-def delete_paging(paging_dir: Union[str, os.PathLike, None]=None):
+def delete_paging(paging_dir: Union[str, os.PathLike, None] = None):
     '''删除gazebo paging文件夹
 
     Args:
