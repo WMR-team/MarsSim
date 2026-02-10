@@ -29,6 +29,7 @@ from pathlib import Path
 from typing import Optional
 import zipfile
 import tarfile
+import time
 
 
 def _repo_root() -> Path:
@@ -60,10 +61,80 @@ def _parse_gdrive_file_id(url_or_id: str) -> str:
     raise ValueError(f"Could not parse Google Drive file id from: {s!r}")
 
 
+def _fmt_bytes(n: float) -> str:
+    units = ["B", "KB", "MB", "GB", "TB"]
+    u = 0
+    while n >= 1024 and u < len(units) - 1:
+        n /= 1024.0
+        u += 1
+    if u == 0:
+        return f"{int(n)}{units[u]}"
+    return f"{n:.2f}{units[u]}"
+
+
+def _fmt_eta(seconds: float) -> str:
+    if seconds <= 0 or seconds == float("inf"):
+        return "--:--"
+    m, s = divmod(int(seconds + 0.5), 60)
+    h, m = divmod(m, 60)
+    if h:
+        return f"{h:d}:{m:02d}:{s:02d}"
+    return f"{m:02d}:{s:02d}"
+
+
+def _stream_download(req: urllib.request.Request, dst_path: Path, desc: str = "Downloading") -> None:
+    dst_path.parent.mkdir(parents=True, exist_ok=True)
+
+    t0 = time.monotonic()
+    last_print = 0.0
+    downloaded = 0
+
+    with urllib.request.urlopen(req) as resp, open(dst_path, "wb") as f:
+        total = resp.headers.get("Content-Length")
+        total = int(total) if total and total.isdigit() else None
+
+        # one-line progress (stderr)
+        def _print(force: bool = False) -> None:
+            nonlocal last_print
+            now = time.monotonic()
+            if not force and (now - last_print) < 0.2:
+                return
+            last_print = now
+
+            elapsed = max(now - t0, 1e-9)
+            speed = downloaded / elapsed  # B/s
+            eta = ((total - downloaded) / speed) if (total is not None and speed > 1e-9) else float("inf")
+
+            if total is None:
+                line = f"\r{desc}: { _fmt_bytes(downloaded) }  { _fmt_bytes(speed) }/s  ETA {_fmt_eta(eta)}"
+            else:
+                pct = (downloaded / total) * 100.0 if total else 0.0
+                line = (
+                    f"\r{desc}: {pct:6.2f}%  "
+                    f"{_fmt_bytes(downloaded)}/{_fmt_bytes(total)}  "
+                    f"{_fmt_bytes(speed)}/s  ETA {_fmt_eta(eta)}"
+                )
+            sys.stderr.write(line)
+            sys.stderr.flush()
+
+        chunk_size = 1024 * 1024  # 1MB
+        while True:
+            chunk = resp.read(chunk_size)
+            if not chunk:
+                break
+            f.write(chunk)
+            downloaded += len(chunk)
+            _print()
+
+        _print(force=True)
+        sys.stderr.write("\n")
+        sys.stderr.flush()
+
+
 def _download_gdrive_file(file_id: str, dst_path: Path) -> None:
     dst_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # 1. 先访问 uc 链接
+    # 1) First request (may return small file directly, or HTML "download-form")
     base = "https://drive.google.com/uc?export=download"
     url = f"{base}&id={urllib.parse.quote(file_id)}"
 
@@ -72,42 +143,37 @@ def _download_gdrive_file(file_id: str, dst_path: Path) -> None:
         data = resp.read()
         ct = resp.headers.get("Content-Type", "")
 
-        # 如果直接返回的是文件（很小的文件会这样），直接写盘
+        # Small files may be returned directly
         if "text/html" not in ct and b"confirm=" not in data:
             with open(dst_path, "wb") as f:
                 f.write(data)
+            sys.stderr.write(f"Downloaded: {_fmt_bytes(len(data))}\n")
             return
 
-        # 否则就是你贴的那个 HTML：含有 download-form
         html = data.decode("utf-8", errors="ignore")
 
-    # 2. 解析 form action
-    m_action = re.search(
-        r'<form[^>]+id="download-form"[^>]+action="([^"]+)"',
-        html
-    )
+    # 2) Parse form action
+    m_action = re.search(r'<form[^>]+id="download-form"[^>]+action="([^"]+)"', html)
     if not m_action:
         raise RuntimeError("Cannot find download-form action in Google Drive HTML page.")
     action = m_action.group(1)
-    # action 可能是相对路径（这里是完整 https://drive.usercontent.google.com/download）
-    # 为保险起见，用 urljoin
     action_url = urllib.parse.urljoin("https://drive.google.com", action)
 
-    # 3. 解析所有 hidden input 字段
-    inputs = dict(re.findall(
-        r'<input[^>]+type="hidden"[^>]+name="([^"]+)"[^>]+value="([^"]*)"',
-        html
-    ))
-    # 确保 id 一定是我们的 file_id（有时页面里可能有多个表单）
+    # 3) Parse hidden inputs
+    inputs = dict(
+        re.findall(
+            r'<input[^>]+type="hidden"[^>]+name="([^"]+)"[^>]+value="([^"]*)"',
+            html,
+        )
+    )
     inputs["id"] = file_id
 
     query = urllib.parse.urlencode(inputs)
     final_url = f"{action_url}?{query}"
 
-    # 4. 用这个 final_url 下载真正的文件
+    # 4) Stream-download real file with progress
     req2 = urllib.request.Request(final_url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req2) as resp2, open(dst_path, "wb") as f:
-        shutil.copyfileobj(resp2, f)
+    _stream_download(req2, dst_path, desc="Downloading (Google Drive)")
 
 
 def _is_within_directory(base: Path, target: Path) -> bool:
@@ -178,16 +244,16 @@ def main(argv: Optional[list[str]] = None) -> int:
     archive_path: Path
     with tempfile.TemporaryDirectory() as td:
         td_path = Path(td)
-        # download to temp
+
         if args.gdrive_file_id or args.gdrive_url:
             fid = _parse_gdrive_file_id(args.gdrive_file_id or args.gdrive_url)
             archive_path = td_path / args.filename
             _download_gdrive_file(fid, archive_path)
+
         elif args.direct_url:
             archive_path = td_path / args.filename
             req = urllib.request.Request(args.direct_url, headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req) as resp, open(archive_path, "wb") as f:
-                shutil.copyfileobj(resp, f)
+            _stream_download(req, archive_path, desc="Downloading (direct url)")
         else:
             raise SystemExit("Provide --gdrive-file-id / --gdrive-url / --direct-url (or env vars).")
 

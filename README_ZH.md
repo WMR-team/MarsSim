@@ -26,7 +26,7 @@ git clone --branch remove_abs_path git@github.com:WMR-team/MarsSim.git ./src/Mar
 catkin build
 source ./devel/setup.bash
 ```
-### 2. 下载并安装模型资源（自动）
+### 2. 下载并安装模型资源
 ```shell
 cd ./src/MarsSim
 pip install hydra-core omegaconf
@@ -34,9 +34,10 @@ pip install hydra-core omegaconf
 # 方式1：用 Google Drive file id（推荐）
 python -m world_plugins.scripts.download_models --gdrive-file-id 1WT5JkZ87SlinNSlQP95LfcPy7OwLVmif
 
-# 方式2：用 Google Drive 分享链接
-# python -m world_plugins.scripts.download_models --gdrive-url "https://drive.google.com/file/d/1WT5JkZ87SlinNSlQP95LfcPy7OwLVmif/view?usp=sharing"
+# 方式2：用 Google Drive 分享链接，下载后请手动将模型解压至`Marsim/rover_gazebo`路径下
 ```
+[Google Drive 分享链接](https://drive.google.com/file/d/1WT5JkZ87SlinNSlQP95LfcPy7OwLVmif/view?usp=drive_link)
+
 ### 3. 运行地形生成文件
 ```shell
 cd ./src/MarsSim
