@@ -7,6 +7,7 @@ import numpy as np
 from numpy.random import default_rng
 import yaml
 import cv2
+from pathlib import Path
 from .ModelGEN import *
 from .TerrainGEN import *
 
@@ -27,11 +28,34 @@ def change_world(
     BN=(-4.4, 4.4, -2.4, 2.4),
 ):
     random.seed(seed)
-    yaml_file_name = '/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/world_plugins/config/mars_terrain_params_real.yaml'
+
+    repo_root = Path(__file__).resolve().parents[2]  # .../MarsSim
+    yaml_file_name = repo_root / "world_plugins" / "config" / "mars_terrain_params_real.yaml"
 
     # 读取配置yaml文件
-    param_file = open(yaml_file_name)
-    param_data = yaml.load(param_file, Loader=yaml.FullLoader)
+    with open(yaml_file_name, "r") as param_file:
+        param_data = yaml.load(param_file, Loader=yaml.FullLoader)
+
+    def _abs(p):
+        if p is None:
+            return None
+        p = str(p)
+        if os.path.isabs(p):
+            return p
+        return str((repo_root / p).resolve())
+
+    for k in [
+        "heightmap_path",
+        "terrain_model_save_path",
+        "DTM_save_path",
+        "rock_model_save_path",
+        "world_save_path",
+        "plugin_config_file",
+        "terrain_data_file",
+        "terrain_class_file",
+    ]:
+        if k in param_data and param_data[k] is not None:
+            param_data[k] = _abs(param_data[k])
 
     heightmap_num = 8
     # heightmap_name = 'HM'+str(heightmap_num)+'.png'
@@ -49,7 +73,7 @@ def change_world(
     return_record['terrain_height'] = param_data['terrain_height']
 
     # 读取高度图
-    heightmap_path = param_data['heightmap_path']
+    heightmap_path = param_data["heightmap_path"]
 
     heightmap_c = cv2.imread(os.path.join(heightmap_path, heightmap_name_c), -1)
     heightmap = cv2.imread(os.path.join(heightmap_path, heightmap_name), -1)
@@ -58,21 +82,22 @@ def change_world(
     DEM = generate_DEM(heightmap, param_data)
     DEM_c = generate_DEM(heightmap_c, param_data)
 
-    # 生成地形model文件
-    # return_record={}
-    seed_terrain = time.time()
-    seed_terrain = seed
-    save_path = param_data['terrain_model_save_path']
-    length = param_data['terrain_length']
-    height = param_data['terrain_height']
-    save_path = '/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/rover_gazebo/models/experiment_terrain'
+    # 生成地形model文件（use repo-relative path, resolved to abs at runtime）
+    save_path = str(
+        (repo_root / "rover_gazebo" / "models" / "experiment_terrain").resolve()
+    )
+    length = param_data["terrain_length"]
+    height = param_data["terrain_height"]
+    # NOTE: do NOT override save_path with hard-coded absolute paths
+    # save_path = '/home/tipriest/Documents/.../rover_gazebo/models/experiment_terrain'
+
     # generate_terrain_model_exp(length, height, save_path=save_path, param_data=param_data)
     min_height_list, _ = generate_terrain_model_exp(
         heightmap_name_c,
         length,
         height,
         save_path=save_path,
-        seed=seed_terrain,
+        seed=seed,
         texture_count=param_data['texture_count'],
         return_record=return_record,
         param_data=param_data,

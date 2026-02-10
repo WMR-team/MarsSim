@@ -5,13 +5,14 @@
 #include "ros/subscription_callback_helper.h"
 #include "std_msgs/Bool.h"
 #include <gazebo/rendering/rendering.hh>
+#include <ros/package.h>
 
 #include "TerramechanicsPlugin.hh"
 
 namespace gazebo
 {
     TerramachanicsPlugin::TerramachanicsPlugin() {}
-    TerramachanicsPlugin::~TerramachanicsPlugin() 
+    TerramachanicsPlugin::~TerramachanicsPlugin()
     {
         delete[] TerrainData;
     }
@@ -62,7 +63,44 @@ namespace gazebo
     void TerramachanicsPlugin::InitTerrain()
     {
         TerrainData = new double[x_grids*y_grids*DTM_params];
-        TerrainMapFile.open(TerrainMapFileName);
+
+        // Resolve relative TerrainMapFileName against MarsSim repo root.
+        // YAML now may provide: "rover_gazebo/data/simulated_terrain_data.txt"
+        std::string dtmPath = TerrainMapFileName;
+        const bool isAbs =
+            (!dtmPath.empty() && (dtmPath[0] == '/' /* unix */));
+
+        if (!isAbs)
+        {
+            // rover_gazebo_plugins is under <MarsSim>/rover_gazebo_plugins
+            const std::string pluginPkgPath = ros::package::getPath("rover_gazebo_plugins");
+            if (!pluginPkgPath.empty())
+            {
+                // <MarsSim> = <MarsSim>/rover_gazebo_plugins/..
+                dtmPath = pluginPkgPath + "/../" + dtmPath;
+            }
+        }
+
+        TerrainMapFile.open(dtmPath);
+        if (!TerrainMapFile.is_open())
+        {
+            // Fallback: try the raw value (in case user expects CWD-based relative path)
+            TerrainMapFile.clear();
+            TerrainMapFile.open(TerrainMapFileName);
+        }
+
+        if (!TerrainMapFile.is_open())
+        {
+            std::cerr
+                << "[TerramechanicsPlugin] Failed to open TerrainMapFileName.\n"
+                << "  param value: " << TerrainMapFileName << "\n"
+                << "  resolved:    " << dtmPath << "\n";
+            return; // keep plugin alive; forces will effectively be invalid
+        }
+
+        // Optionally store resolved absolute-ish path for internal use (does not write back to YAML)
+        TerrainMapFileName = dtmPath;
+
         std::string data;
         getline(TerrainMapFile, data);
         x_0 = std::stod(data);
@@ -115,7 +153,7 @@ namespace gazebo
 
             wheel_force = ignition::math::Vector3d(force_torque.Force[0], force_torque.Force[1], force_torque.Force[2]);
             this->WheelLink->AddForce(wheel_force);
-            
+
             wheel_torque = ignition::math::Vector3d(force_torque.Torque[0], force_torque.Torque[1], force_torque.Torque[2]);
             this->WheelLink->AddTorque(wheel_torque);
             int PublishStep = 1000/PublishRate;
@@ -145,7 +183,7 @@ namespace gazebo
             std::cout << "=======================" << WheelName << "======================" << std::endl;
         FT ForceTorque;
         static double FriDirection[3];
-        
+
 
         // if (FrictionFlag == 0)
         // {
@@ -286,7 +324,7 @@ namespace gazebo
             // std::cout<< this->WheelName << "sigma_m=" << sigma_m << std::endl;
             if (fabs(AngleVelocity) >= 0.01)
             {
-                WheelTerrainInteraction(theta11);   
+                WheelTerrainInteraction(theta11);
             }
             else
             {
@@ -436,7 +474,7 @@ namespace gazebo
         if(Velocity_Local_Real[1]>=0)
         {
             FY_Local = -FY_Local;
-        } 
+        }
         if (AngleVelocity < -0.0)
         {
             // FY_Local = -FY_Local;

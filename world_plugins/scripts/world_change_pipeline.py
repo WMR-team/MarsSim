@@ -14,7 +14,7 @@ from .WorldGEN import *
 from .utils import delete_paging
 from .utils import omegaconf_to_dict, print_dict
 from omegaconf import DictConfig, OmegaConf
-from hydra.utils import to_absolute_path
+from pathlib import Path
 
 
 def change_world_core(
@@ -32,6 +32,34 @@ def change_world_core(
 
     random.seed(seed)
 
+    # Resolve repo-relative paths at runtime (keep YAML/config values relative)
+    repo_root = Path(__file__).resolve().parents[2]  # .../MarsSim
+
+    def _abs(p):
+        if p is None:
+            return None
+        p = str(p)
+        if os.path.isabs(p):
+            return p
+        return str((repo_root / p).resolve())
+
+    # IMPORTANT:
+    # - Do resolve filesystem paths (read/write on disk).
+    # - Do NOT resolve "in-model" subpaths used in SDF URIs (e.g. heightmap_int8_path).
+    for k in [
+        "heightmap_path",
+        # "heightmap_int8_path",  # keep as-is (used in model:// URI concatenation)
+        "terrain_model_save_path",
+        "DTM_save_path",
+        "rock_model_save_path",
+        "world_save_path",
+        "plugin_config_file",
+        "terrain_data_file",
+        "terrain_class_file",
+    ]:
+        if k in param_data and param_data[k] is not None:
+            param_data[k] = _abs(param_data[k])
+
     # 随机获取地形高度图
     # heightmap_num = random.randint(1,param_data['heightmap_count'])
     heightmap_num = heightmap_num
@@ -46,7 +74,7 @@ def change_world_core(
     return_record['terrain_height'] = param_data['terrain_height']
 
     # 读取高度图
-    heightmap_path = param_data['heightmap_path']
+    heightmap_path = param_data["heightmap_path"]
     heightmap = cv2.imread(os.path.join(heightmap_path, heightmap_name), -1)
 
     # 生成地形DEM
@@ -55,7 +83,7 @@ def change_world_core(
     # 生成地形model文件
     seed_terrain = time.time()
     seed_terrain = seed
-    save_path = param_data['terrain_model_save_path']
+    save_path = param_data["terrain_model_save_path"]
     length = param_data['terrain_length']
     height = param_data['terrain_height']
     min_height_list, _ = generate_terrain_model(
@@ -79,15 +107,15 @@ def change_world_core(
     # 生成地形DTM
     # TODO: 选择典型地形参数随机生成
     DTM = generate_DTM(param_data, DEM, terrain_class_mat)
-    DTM_save_path = param_data['DTM_save_path']
-    DTM_save_name = param_data['DTM_save_name']
-    plugin_config_modify_path = param_data['plugin_config_file']
+    DTM_save_path = param_data["DTM_save_path"]
+    DTM_save_name = param_data["DTM_save_name"]
+    plugin_config_modify_path = param_data["plugin_config_file"]
     save_DTM(DTM, DTM_save_path, DTM_save_name, plugin_config_modify_path)
 
     # 生成岩石分布
     seed_rock = time.time()
     seed_rock = seed
-    rock_save_path = param_data['rock_model_save_path']
+    rock_save_path = param_data["rock_model_save_path"]
     if collide_mode == 'origin':
         rock_list = generate_rocks_model(
             DEM,
@@ -123,7 +151,7 @@ def change_world_core(
         )
 
     # 生成仿真world文件
-    world_save_path = param_data['world_save_path']
+    world_save_path = param_data["world_save_path"]
     generate_Mars_wolrd(save_path=world_save_path, return_record=return_record)
     modify_Mars_wolrd(load_path=world_save_path, is_label=use_label)
 
@@ -153,19 +181,7 @@ def hydra_entry(cfg: DictConfig):
     # 先把 cfg 转 dict
     cfg_dict = omegaconf_to_dict(cfg)
 
-    # 把和磁盘相关的字段统一转为绝对路径（如果你在 yaml 里用的是相对路径）
-    path_keys = [
-        "heightmap_path",
-        "terrain_model_save_path",
-        "DTM_save_path",
-        "rock_model_save_path",
-        "world_save_path",
-        "plugin_config_file",
-    ]
-    for k in path_keys:
-        if k in cfg_dict and cfg_dict[k] is not None:
-            cfg_dict[k] = to_absolute_path(cfg_dict[k])
-
+    # NOTE: do NOT rewrite to absolute paths here; keep config repo-relative.
     print_dict(cfg_dict)
 
     return change_world_core(

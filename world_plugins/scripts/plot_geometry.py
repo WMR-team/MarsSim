@@ -1,6 +1,5 @@
 """Procedural geometry generator for terrain class maps and textures."""
 
-""""""
 import cv2
 import numpy as np
 import random
@@ -50,15 +49,26 @@ def _resolve_output_dir(save_base_path=None) -> Path:
     Returns:
         Path: Directory that should contain terrain_tex.png and terrain_class.npy
     """
-    if save_base_path is not None and str(save_base_path).strip() != "":
-        base = Path(save_base_path).expanduser().resolve()
-    else:
-        # plot_geometry.py: .../MarsSim/world_plugins/scripts/plot_geometry.py
-        # parents[2] -> .../MarsSim
-        base = Path(__file__).resolve().parents[2]
+    repo_root = Path(__file__).resolve().parents[2]  # .../MarsSim
 
-    out_dir = base / "rover_gazebo" / "models" / "mars_terrain" / "whole_tex"
-    return out_dir
+    if save_base_path is None or str(save_base_path).strip() == "":
+        base = repo_root
+    else:
+        base = Path(str(save_base_path)).expanduser()
+        if not base.is_absolute():
+            base = (repo_root / base).resolve()
+        else:
+            base = base.resolve()
+
+    # If caller passed ".../mars_terrain" -> write into its "whole_tex"
+    if base.name == "mars_terrain":
+        return base / "whole_tex"
+    # If caller passed ".../whole_tex" directly
+    if base.name == "whole_tex":
+        return base
+
+    # Otherwise treat as repo root
+    return base / "rover_gazebo" / "models" / "mars_terrain" / "whole_tex"
 
 
 def generate_class_mat(save_base_path=None):

@@ -3,6 +3,7 @@
 import numpy as np
 import cv2
 import os
+from pathlib import Path
 
 # from ruamel import yaml
 import yaml
@@ -142,10 +143,24 @@ def save_DTM(DTM, save_path, save_name, plugin_config_modify_path):
 
     params:
         DTM: 地形DTM
-        save_path: 文件保存路径
+        save_path: 文件保存路径（可相对 MarsSim 根目录）
         save_name: 文件保存名称
+        plugin_config_modify_path: 插件 yaml 路径（可相对 MarsSim 根目录）
     '''
-    with open(os.path.join(save_path, save_name), 'w') as f:
+    repo_root = Path(__file__).resolve().parents[2]  # .../MarsSim
+
+    save_dir = Path(save_path)
+    if not save_dir.is_absolute():
+        save_dir = (repo_root / save_dir).resolve()
+    save_dir.mkdir(parents=True, exist_ok=True)
+
+    dtm_file = (save_dir / save_name).resolve()
+
+    plugin_yaml = Path(plugin_config_modify_path)
+    if not plugin_yaml.is_absolute():
+        plugin_yaml = (repo_root / plugin_yaml).resolve()
+
+    with open(dtm_file, 'w') as f:
         f.write(str(DTM[0, 0, 0]))
         f.write('\n')
         f.write(str(DTM[0, 0, 1] - DTM[0, 0, 0]))
@@ -158,7 +173,7 @@ def save_DTM(DTM, save_path, save_name, plugin_config_modify_path):
                 for k in range(10):
                     f.write(str(DTM[k, j, i]))
                     f.write('\n')
-    with open(plugin_config_modify_path, 'r') as f_y:
+    with open(plugin_yaml, 'r') as f_y:
         content = yaml.load(f_y, Loader=yaml.FullLoader)
         content['x_min'] = float(DTM[0, 0, 0])
         content['x_max'] = float(DTM[0, 0, -1])
@@ -166,9 +181,12 @@ def save_DTM(DTM, save_path, save_name, plugin_config_modify_path):
         content['y_max'] = float(DTM[0, 0, -1])
         content['x_grids'] = DTM.shape[1]
         content['y_grids'] = DTM.shape[1]
-        content['TerrainMapFileName'] = os.path.join(save_path, save_name)
 
-    with open(plugin_config_modify_path, 'w') as f_n:
+        # store repo-relative path in YAML (no absolute paths)
+        rel = os.path.relpath(str(dtm_file), str(repo_root))
+        content['TerrainMapFileName'] = rel.replace("\\", "/")
+
+    with open(plugin_yaml, 'w') as f_n:
         yaml.dump(content, f_n, default_flow_style=False)
 
 

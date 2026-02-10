@@ -33,7 +33,6 @@ include_directories(${gazebo_msgs_INCLUDE_DIRS})
 include_directories( "/usr/include/eigen3" )
 include_directories( "/usr/local/" )
 include_directories(include)
-include_directories("/home/tipriest/Documents/MarsSim_v2_ws/devel/include")
 
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})

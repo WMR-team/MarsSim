@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import os
 import random
+from pathlib import Path
 
 
 def noise(img, snr):
@@ -65,21 +66,20 @@ def gen_heightmap(img_num):
 
     l_min = int(0.8 / 10 * 640)
 
-    file_path_16 = '/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/rover_gazebo/models/mars_terrain/choose/heightmaps_int16'
-    file_path_8 = '/home/tipriest/Documents/MarsSim_v2_ws/src/MarsSim/rover_gazebo/models/mars_terrain/choose/heightmaps_int8'
-    # img_name = 'HM8.png'
-    img = cv2.imread(
-        os.path.join(file_path_16, 'HM' + str(img_num) + '.png'), -1
-    )
+    repo_root = Path(__file__).resolve().parents[2]  # .../MarsSim
+    file_path_16 = repo_root / "rover_gazebo" / "models" / "mars_terrain" / "choose" / "heightmaps_int16"
+    file_path_8 = repo_root / "rover_gazebo" / "models" / "mars_terrain" / "choose" / "heightmaps_int8"
+
+    img = cv2.imread(str(file_path_16 / f"HM{img_num}.png"), -1)
     ii = random.randint(0, 3)
     for i in range(ii):
         img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
 
     img_cp = (img.copy() * 0.85).astype('uint16')
-    cv2.imwrite(os.path.join(file_path_16, 'HM9_o.png'), img_cp)
+    cv2.imwrite(str(file_path_16 / "HM9_o.png"), img_cp)
     img_cp_o = cv2.resize(img_cp.copy(), (513, 513))
     img_cp_o = (img_cp_o // 256).astype('uint8')
-    cv2.imwrite(os.path.join(file_path_8, 'HM9_o.png'), img_cp_o)
+    cv2.imwrite(str(file_path_8 / "HM9_o.png"), img_cp_o)
 
     label = np.zeros((640, 640), dtype=np.uint8)
     num = random.randint(1, 3)
@@ -129,11 +129,11 @@ def gen_heightmap(img_num):
     # img_end = noise_label(img_cp_, label, 0.8)
     # img_end = cv2.GaussianBlur(img_end, (5, 5), 2)
     img_end = img_cp_
-    cv2.imwrite(os.path.join(file_path_16, 'HM9.png'), img_end)
+    cv2.imwrite(str(file_path_16 / "HM9.png"), img_end)
 
     img_end = cv2.resize(img_end, (513, 513))
     img_end = (img_end // 256).astype('uint8')
-    cv2.imwrite(os.path.join(file_path_8, 'HM9.png'), img_end)
+    cv2.imwrite(str(file_path_8 / "HM9.png"), img_end)
     # cv2.imshow('img', img_cp_)
     # cv2.waitKey()
 

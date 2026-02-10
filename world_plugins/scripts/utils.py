@@ -2,6 +2,7 @@
 import math
 import shutil
 import os
+from pathlib import Path
 
 
 def quaternion_from_euler(r, p, y):
@@ -22,10 +23,21 @@ def quaternion_from_euler(r, p, y):
     return q
 
 
-def delete_paging():
-    '''删除gazebo paging文件夹'''
-    if os.path.exists('/home/tipriest/.gazebo/paging'):
-        shutil.rmtree('/home/tipriest/.gazebo/paging')
+def delete_paging(paging_dir: str | os.PathLike | None = None):
+    '''删除gazebo paging文件夹
+
+    Args:
+        paging_dir: 要删除的 paging 目录。
+            - None: 默认删除 ~/.gazebo/paging(不再硬编码用户名)
+            - str/PathLike: 支持相对路径(相对于当前工作目录)，内部会 resolve
+    '''
+    if paging_dir is None:
+        paging_path = Path.home() / ".gazebo" / "paging"
+    else:
+        paging_path = Path(paging_dir).expanduser().resolve()
+
+    if paging_path.exists():
+        shutil.rmtree(paging_path)
 
 
 from omegaconf import DictConfig, OmegaConf
