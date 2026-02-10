@@ -121,8 +121,9 @@ roslaunch rover_gazebo zhurong_main_simple.launch
 # TODO:
 - 绝对路径
 - world文件云下载，脚本
-- 代码规范
 - 配置文件()
+- 代码规范
+
 - log(hydra)
 
 - 三轮车的模型好像有问题

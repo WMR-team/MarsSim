@@ -7,7 +7,7 @@ from typing import Union
 
 
 def quaternion_from_euler(r, p, y):
-    '''欧拉角转四元数'''
+    """欧拉角转四元数"""
     q = [0, 0, 0, 0]
     q[3] = math.cos(r / 2) * math.cos(p / 2) * math.cos(y / 2) + math.sin(
         r / 2
@@ -25,13 +25,13 @@ def quaternion_from_euler(r, p, y):
 
 
 def delete_paging(paging_dir: Union[str, os.PathLike, None] = None):
-    '''删除gazebo paging文件夹
+    """删除gazebo paging文件夹
 
     Args:
         paging_dir: 要删除的 paging 目录。
             - None: 默认删除 ~/.gazebo/paging(不再硬编码用户名)
             - str/PathLike: 支持相对路径(相对于当前工作目录)，内部会 resolve
-    '''
+    """
     if paging_dir is None:
         paging_path = Path.home() / ".gazebo" / "paging"
     else:
@@ -60,11 +60,11 @@ def print_dict(val, nesting: int = -4, start: bool = True):
     """Outputs a nested dictionory."""
     if type(val) == dict:
         if not start:
-            print('')
+            print("")
         nesting += 4
         for k in val:
-            print(nesting * ' ', end='')
-            print(k, end=': ')
+            print(nesting * " ", end="")
+            print(k, end=": ")
             print_dict(val[k], nesting, start=False)
     else:
         print(val)

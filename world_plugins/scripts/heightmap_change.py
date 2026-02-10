@@ -89,10 +89,10 @@ def gen_heightmap(img_num):
     for i in range(ii):
         img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
 
-    img_cp = (img.copy() * 0.85).astype('uint16')
+    img_cp = (img.copy() * 0.85).astype("uint16")
     cv2.imwrite(str(file_path_16 / "HM9_o.png"), img_cp)
     img_cp_o = cv2.resize(img_cp.copy(), (513, 513))
-    img_cp_o = (img_cp_o // 256).astype('uint8')
+    img_cp_o = (img_cp_o // 256).astype("uint8")
     cv2.imwrite(str(file_path_8 / "HM9_o.png"), img_cp_o)
 
     label = np.zeros((640, 640), dtype=np.uint8)
@@ -139,14 +139,14 @@ def gen_heightmap(img_num):
     img_cp_ = (
         (img_cp_ - np.min(img_cp_))
         * ((2**16 - 1) / (np.max(img_cp_) - np.min(img_cp_)))
-    ).astype('uint16')
+    ).astype("uint16")
     # img_end = noise_label(img_cp_, label, 0.8)
     # img_end = cv2.GaussianBlur(img_end, (5, 5), 2)
     img_end = img_cp_
     cv2.imwrite(str(file_path_16 / "HM9.png"), img_end)
 
     img_end = cv2.resize(img_end, (513, 513))
-    img_end = (img_end // 256).astype('uint8')
+    img_end = (img_end // 256).astype("uint8")
     cv2.imwrite(str(file_path_8 / "HM9.png"), img_end)
     # cv2.imshow('img', img_cp_)
     # cv2.waitKey()

@@ -13,7 +13,7 @@ class ZhurongMarsRoverControl(object):
 
         rospy.init_node("zhurong_control_node", anonymous=True)
         self.rate = rospy.Rate(100.0)
-        self.pub = rospy.Publisher('/gazebo/wheel_cmd', Float64, queue_size=10)
+        self.pub = rospy.Publisher("/gazebo/wheel_cmd", Float64, queue_size=10)
         rospy.loginfo("ZhurongRoverControl Initialising...")
         self.control_msg = Float64()
 
@@ -46,7 +46,7 @@ class ZhurongMarsRoverControl(object):
         self.cmd_vel_msg = Twist()
         cmd_vel_topic = "/mars_environment/cmd_vel"
         rospy.Subscriber(cmd_vel_topic, Twist, self.cmd_vel_callback)
-        rospy.Service('/init_controller', SetBool, self.init_response)
+        rospy.Service("/init_controller", SetBool, self.init_response)
 
         self.init_publisher_variables()
         self.wait_publishers_to_be_ready()
@@ -67,7 +67,7 @@ class ZhurongMarsRoverControl(object):
         self.pub.publish(self.control_msg)
         # print('init success!!!!')
         return SetBoolResponse(
-            success=True, message='initial rover controllers!'
+            success=True, message="initial rover controllers!"
         )
 
     def wait_publishers_to_be_ready(self):
@@ -132,25 +132,25 @@ class ZhurongMarsRoverControl(object):
         self.body_velocity = 0.3
         self.body_omega = 0
         self.move_with_cmd_vel()
-        print('forward')
+        print("forward")
 
     def move_backwards(self):
         self.body_velocity = -0.3
         self.body_omega = 0
         self.move_with_cmd_vel()
-        print('backward')
+        print("backward")
 
     def move_slow_forwards(self):
         self.body_velocity = 0.1
         self.body_omega = 0
         self.move_with_cmd_vel()
-        print('slow forward')
+        print("slow forward")
 
     def move_slow_backwards(self):
         self.body_velocity = -0.1
         self.body_omega = 0
         self.move_with_cmd_vel()
-        print('slow backward')
+        print("slow backward")
 
     def move_turn_left(self):
         self.body_velocity = 0.3
@@ -211,31 +211,31 @@ class ZhurongMarsRoverControl(object):
             # keyboard.wait()
             # while 1:
             x = input()
-            if x == 'w':
+            if x == "w":
                 zhurong_mars_rover_control.move_forwards()
                 self.control_msg.data = 2
                 self.pub.publish(self.control_msg)
-            elif x == 's':
+            elif x == "s":
                 zhurong_mars_rover_control.move_backwards()
                 self.control_msg.data = -2
                 self.pub.publish(self.control_msg)
-            elif x == 'a':
+            elif x == "a":
                 zhurong_mars_rover_control.move_turn_left()
                 self.control_msg.data = 2
                 self.pub.publish(self.control_msg)
-            elif x == 'd':
+            elif x == "d":
                 zhurong_mars_rover_control.move_turn_right()
                 self.control_msg.data = 2
                 self.pub.publish(self.control_msg)
-            elif x == 'p':
+            elif x == "p":
                 zhurong_mars_rover_control.move_turn_stop()
                 self.control_msg.data = 0
                 self.pub.publish(self.control_msg)
-            elif x == 'k':
+            elif x == "k":
                 zhurong_mars_rover_control.move_slow_forwards()
                 self.control_msg.data = 0.6
                 self.pub.publish(self.control_msg)
-            elif x == 'l':
+            elif x == "l":
                 zhurong_mars_rover_control.move_slow_backwards()
                 self.control_msg.data = -0.6
                 self.pub.publish(self.control_msg)

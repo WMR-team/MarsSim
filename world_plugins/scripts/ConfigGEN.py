@@ -7,7 +7,7 @@ import os
 
 # 生成config文件
 def generate_config(
-    model_name, save_path='', description_text='My Generate Model for Gazebo'
+    model_name, save_path="", description_text="My Generate Model for Gazebo"
 ):
     """Create a Gazebo model.config file on disk.
     生成model的config文件并保存
@@ -43,7 +43,7 @@ def generate_config(
 
     tree = ET.ElementTree(model)
     tree.write(
-        os.path.join(save_path, 'model.config'),
+        os.path.join(save_path, "model.config"),
         pretty_print=True,
         xml_declaration=True,
     )

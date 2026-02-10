@@ -52,7 +52,7 @@ target-version = ["py310"]
 # 默认情况下，Black 会统一把字符串改为双引号：
 #   'hello' -> "hello"
 # 如果你想保留自己写的单引号/双引号风格，则设为 true
-skip-string-normalization = true
+skip-string-normalization = false
 
 # 4. 是否跳过魔法尾逗号（magic trailing comma）
 # 默认：false（开启 magic trailing comma）

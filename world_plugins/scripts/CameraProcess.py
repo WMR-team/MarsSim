@@ -43,21 +43,21 @@ def generate_camera_path(DEM, points, is_debug=False):
         camera_pose_list.append([x, y, point_z, pitch, yaw])
 
     if is_debug:
-        with open('camera_path.txt', 'w') as f:
+        with open("camera_path.txt", "w") as f:
             for camera_pose in range(camera_pose_list):
                 pose = (
                     str(camera_pose[0])
-                    + '\t'
+                    + "\t"
                     + str(camera_pose[1])
-                    + '\t'
+                    + "\t"
                     + str(camera_pose[2])
-                    + '\t'
+                    + "\t"
                     + str(camera_pose[3])
-                    + '\t'
+                    + "\t"
                     + str(camera_pose[4])
                 )
                 f.write(pose)
-                f.write('\n')
+                f.write("\n")
 
     return camera_pose_list
 

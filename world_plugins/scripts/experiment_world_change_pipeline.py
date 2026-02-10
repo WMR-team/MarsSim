@@ -22,7 +22,7 @@ def change_world(
     use_user_H=False,
     default_height=0.1,
     use_label=False,
-    mode='height',
+    mode="height",
     rock_num=3,
     bedrock_num=3,
     BN=(-4.4, 4.4, -2.4, 2.4),
@@ -64,15 +64,15 @@ def change_world(
 
     gen_heightmap(heightmap_num)
     heightmap_num = 9
-    heightmap_name_c = 'HM' + str(heightmap_num) + '.png'
-    heightmap_name = 'HM' + str(heightmap_num) + '_o.png'
+    heightmap_name_c = "HM" + str(heightmap_num) + ".png"
+    heightmap_name = "HM" + str(heightmap_num) + "_o.png"
 
     if use_user_H:
-        param_data['terrain_height'] = default_height
+        param_data["terrain_height"] = default_height
     # 记录随机数据
     return_record = {}
-    return_record['heightmap_num'] = heightmap_num
-    return_record['terrain_height'] = param_data['terrain_height']
+    return_record["heightmap_num"] = heightmap_num
+    return_record["terrain_height"] = param_data["terrain_height"]
 
     # 读取高度图
     heightmap_path = param_data["heightmap_path"]
@@ -100,12 +100,12 @@ def change_world(
         height,
         save_path=save_path,
         seed=seed,
-        texture_count=param_data['texture_count'],
+        texture_count=param_data["texture_count"],
         return_record=return_record,
         param_data=param_data,
     )
-    param_data['texture_nums'] = return_record['texture_nums']
-    param_data['min_height_list'] = min_height_list
+    param_data["texture_nums"] = return_record["texture_nums"]
+    param_data["min_height_list"] = min_height_list
 
     # 生成地形类别矩阵
     terrain_class_mat = get_terrain_class_mat(param_data, DEM_c, mode=mode)
@@ -113,20 +113,20 @@ def change_world(
     # 生成地形DTM
     # TODO: 选择典型地形参数随机生成
     DTM = generate_DTM(param_data, DEM, terrain_class_mat)
-    DTM_save_path = param_data['DTM_save_path']
-    DTM_save_name = param_data['DTM_save_name']
-    plugin_config_modify_path = param_data['plugin_config_file']
+    DTM_save_path = param_data["DTM_save_path"]
+    DTM_save_name = param_data["DTM_save_name"]
+    plugin_config_modify_path = param_data["plugin_config_file"]
     save_DTM(DTM, DTM_save_path, DTM_save_name, plugin_config_modify_path)
 
     # 生成岩石分布
     seed_rock = time.time()
     seed_rock = seed
-    rock_save_path = param_data['rock_model_save_path']
+    rock_save_path = param_data["rock_model_save_path"]
     # rock_list = generate_rocks_model(DEM, param_data, terrain_class_mat, seed=seed_rock, save_path=rock_save_path, rock_dis_rate=default_rock_dis, return_record=return_record, is_label=use_label)
     # generate_rocks_model()
 
     # 生成仿真world文件
-    world_save_path = param_data['world_save_path']
+    world_save_path = param_data["world_save_path"]
     rock_list = generate_Mars_wolrd(
         save_path=world_save_path,
         rock_num=rock_num,

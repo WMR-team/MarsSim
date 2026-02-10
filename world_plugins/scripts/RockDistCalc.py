@@ -60,9 +60,9 @@ def check_collision(rock_list, x, y, D):
     """
     if len(rock_list) > 0:
         for i in range(len(rock_list)):
-            x1 = rock_list[i]['x']
-            y1 = rock_list[i]['y']
-            D1 = rock_list[i]['D']
+            x1 = rock_list[i]["x"]
+            y1 = rock_list[i]["y"]
+            D1 = rock_list[i]["D"]
             dis = get_distance(x1, y1, x, y)
             if dis > D1 + D:
                 return False
@@ -97,14 +97,14 @@ def calculate_rock_distribution(
     rock_size_list = [0.4, 0.8, 1.6, 3.2, 6.4]
     # rock_size_list = [0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1]
     rock_size_list = rock_size_list[-1::-1]
-    terrain_classes = param_data['terrain_classes']
+    terrain_classes = param_data["terrain_classes"]
     # TODO: 不同地形岩石密度改变
     k_range = [0, 0.0]
     # k_list = [0.02+random.random()*k_range[1] for _ in range(terrain_classes)]
     k_list = [0.07 for _ in range(terrain_classes)]
     if rock_dis_rate != None:
         k_list = [rock_dis_rate for _ in range(terrain_classes)]
-    return_record['rock_distri'] = k_list
+    return_record["rock_distri"] = k_list
     rock_list = []
     F_last = 0
     if is_show:
@@ -153,9 +153,9 @@ def calculate_rock_distribution(
                 else:
                     if terrain_class_mat[int(x / step), int(y / step)] == c:
                         rock = {}
-                        rock['x'] = x
-                        rock['y'] = y
-                        rock['D'] = D
+                        rock["x"] = x
+                        rock["y"] = y
+                        rock["D"] = D
                         rock_list.append(rock)
                         j = j + 1
                         cir = Circle(xy=(x, y), radius=D * 2, alpha=0.5)
@@ -165,9 +165,9 @@ def calculate_rock_distribution(
                         pass
             F_last = F + F_last
     if is_show:
-        plt.axis('scaled')
+        plt.axis("scaled")
         # changes limits of x or y axis so that equal increments of x and y have the same length
-        plt.axis('equal')
+        plt.axis("equal")
         ax.set_xlim(0, l)
         ax.set_ylim(0, l)
         plt.show()

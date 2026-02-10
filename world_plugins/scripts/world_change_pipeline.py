@@ -24,9 +24,9 @@ def change_world_core(
     default_height=1.5,
     default_rock_dis=None,
     use_label=False,
-    mode='height',
+    mode="height",
     heightmap_num=5,
-    collide_mode='origin',
+    collide_mode="origin",
     terrain_len=80,
 ):
 
@@ -63,15 +63,15 @@ def change_world_core(
     # 随机获取地形高度图
     # heightmap_num = random.randint(1,param_data['heightmap_count'])
     heightmap_num = heightmap_num
-    heightmap_name = 'HM' + str(heightmap_num) + '.png'
+    heightmap_name = "HM" + str(heightmap_num) + ".png"
 
     if use_user_H:
-        param_data['terrain_height'] = default_height
-        param_data['terrain_length'] = terrain_len
+        param_data["terrain_height"] = default_height
+        param_data["terrain_length"] = terrain_len
     # 记录随机数据
     return_record = {}
-    return_record['heightmap_num'] = heightmap_num
-    return_record['terrain_height'] = param_data['terrain_height']
+    return_record["heightmap_num"] = heightmap_num
+    return_record["terrain_height"] = param_data["terrain_height"]
 
     # 读取高度图
     heightmap_path = param_data["heightmap_path"]
@@ -84,22 +84,22 @@ def change_world_core(
     seed_terrain = time.time()
     seed_terrain = seed
     save_path = param_data["terrain_model_save_path"]
-    length = param_data['terrain_length']
-    height = param_data['terrain_height']
+    length = param_data["terrain_length"]
+    height = param_data["terrain_height"]
     min_height_list, _ = generate_terrain_model(
         heightmap_name,
         length,
         height,
         save_path=save_path,
         seed=seed_terrain,
-        texture_count=param_data['texture_count'],
+        texture_count=param_data["texture_count"],
         return_record=return_record,
         is_label=use_label,
         use_whole_tex=use_label,
         param_data=param_data,
     )
-    param_data['min_height_list'] = min_height_list
-    param_data['texture_nums'] = return_record['texture_nums']
+    param_data["min_height_list"] = min_height_list
+    param_data["texture_nums"] = return_record["texture_nums"]
 
     # 生成地形类别矩阵
     terrain_class_mat = get_terrain_class_mat(param_data, DEM, mode=mode)
@@ -116,7 +116,7 @@ def change_world_core(
     seed_rock = time.time()
     seed_rock = seed
     rock_save_path = param_data["rock_model_save_path"]
-    if collide_mode == 'origin':
+    if collide_mode == "origin":
         rock_list = generate_rocks_model(
             DEM,
             param_data,
@@ -127,7 +127,7 @@ def change_world_core(
             return_record=return_record,
             is_label=use_label,
         )
-    elif collide_mode == 'cylinder':
+    elif collide_mode == "cylinder":
         rock_list = generate_rocks_model_cylinder(
             DEM,
             param_data,
@@ -138,7 +138,7 @@ def change_world_core(
             return_record=return_record,
             is_label=use_label,
         )
-    elif collide_mode == 'no':
+    elif collide_mode == "no":
         rock_list = generate_rocks_model_no_collision(
             DEM,
             param_data,
