@@ -1,8 +1,8 @@
-<!-- English documentation for MarsSim_v2 (ROS + Gazebo). -->
-# MarsSim_v2
+<!-- English documentation for MarsSim (ROS + Gazebo). -->
+# MarsSim
 
 ## Overview
-MarsSim_v2 is a ROS + Gazebo simulation project for Mars rover scenarios and terrain/rock world generation, including:
+MarsSim is a ROS + Gazebo simulation project for Mars rover scenarios and terrain/rock world generation, including:
 - Terrain heightmap / texture / semantic class-map generation
 - Rock distribution and model generation
 - Terramechanics plugin (reads DTM files) for wheel–terrain interaction
