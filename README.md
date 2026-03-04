@@ -82,14 +82,37 @@ roslaunch rover_gazebo zhurong_main_real.launch
 roslaunch rover_gazebo zhurong_main_simple.launch
 ```
 
-## 6) 键盘控制火星车移动
-在terminal窗口中输入如下键盘控制指令,并回车，控制火星车移动：
-- w: 前进
-- s: 后退
-- a: 左转
-- d: 右转
-- p: 停止
-- TODO： `添加停止、加速、减速以及更多模式`
+### 6) 键盘控制火星车移动
+我们使用`teleop-twist-keyboard`包发布`/mars_environment/cmd_vel`消息控制轮式机器人运动
+```shell
+sudo apt install ros-noetic-teleop-twist-keyboard
+```
+请启动一个新的终端：
+```shell
+cd your-folder-path/MarsSim_ws
+source devel/setup.bash
+roslaunch rover_control teleop_keyboard.launch
+```
+在terminal窗口中输入如下键盘控制指令, 控制火星车移动:
+- `i`: 前进
+- `,`: 后退
+- `j`: 左转
+- `l`: 右转
+- `k`: 停止
+更具体的:
+```
+Reading from the keyboard  and Publishing to Twist!
+---------------------------
+Moving around:
+   u    i    o
+   j    k    l
+   m    ,    .
+
+q/z : increase/decrease max speeds by 10%
+w/x : increase/decrease only linear speed by 10%
+e/c : increase/decrease only angular speed by 10%
+anything else : stop
+```
 
 
 ## 开发与贡献
