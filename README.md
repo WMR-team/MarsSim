@@ -82,14 +82,37 @@ roslaunch rover_gazebo zhurong_main_real.launch
 roslaunch rover_gazebo zhurong_main_simple.launch
 ```
 
-## 6) 键盘控制火星车移动
-在terminal窗口中输入如下键盘控制指令,并回车，控制火星车移动：
-- w: 前进
-- s: 后退
-- a: 左转
-- d: 右转
-- p: 停止
-- TODO： `添加停止、加速、减速以及更多模式`
+### 6) 键盘控制火星车移动
+我们使用`teleop-twist-keyboard`包发布`/mars_environment/cmd_vel`消息控制轮式机器人运动
+```shell
+sudo apt install ros-noetic-teleop-twist-keyboard
+```
+请启动一个新的终端：
+```shell
+cd your-folder-path/MarsSim_ws
+source devel/setup.bash
+roslaunch rover_control teleop_keyboard.launch
+```
+在terminal窗口中输入如下键盘控制指令, 控制火星车移动:
+- `i`: 前进
+- `,`: 后退
+- `j`: 左转
+- `l`: 右转
+- `k`: 停止
+更具体的:
+```
+Reading from the keyboard  and Publishing to Twist!
+---------------------------
+Moving around:
+   u    i    o
+   j    k    l
+   m    ,    .
+
+q/z : increase/decrease max speeds by 10%
+w/x : increase/decrease only linear speed by 10%
+e/c : increase/decrease only angular speed by 10%
+anything else : stop
+```
 
 
 ## 开发与贡献
@@ -123,12 +146,18 @@ pre-commit install
 
 # TODO:
 - 配置文件的README
-- 一些生成的说明
 - 每次生成的时候会根据日期保存一个生成后的结果，另外一边在加载的时候加载的默认是最新的，但是之前的也不会消失，可以通过一些方式自己执行需要加载哪一次的结果
+  - 把生成内容的文件夹进行统一，统一到一个临时生成的文件夹中，然后每一个文件夹的名字是开始生成的日期和时间，然后有一个链接是每次把最新的一个日期给软链到最新生成的一个文件夹内
+- 场景自主生成(simple的进来和实际的对不上，main是固定的， 想要直接就能生成+打开一套，不弄那么复杂)
+- 数据采集的脚本
+  - 具体的数据采集形式需要固定
+  - 可能是一个简单的TUI界面
+- 需要有一个可视化的界面
+  - 这个界面现在有一个方案是用Qt做的，但是问题是可能不能够在另外一台机器上进行显示
+  - 要不然就是用rerun做，但是rerun上面的回传?
+  - 这个界面最好能够开一个模块，这个模块负责接收手柄的消息or导航代码的消息，然后可以根据界面上的选择把最终选择的消息发给车的/cmd_vel，类似一个选择开关的作用
+- 画一个模块化的框图
 
-
+# BUG:
+- 车一跑到边上就死了，就segmentation fault了
 - 三轮车的模型好像有问题
-- 场景自主生成(simple的进来和实际的对不上，main是固定的， 想要直接就能生成+打开一套，不弄那么负责)
-- 数据采集()
-- 需要有一个可视化的界面，把joystick啥的都，
-- 最基本的utilize的脚本，rosbag 的记录和显示的脚本，想
