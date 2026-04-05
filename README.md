@@ -127,11 +127,15 @@ pre-commit install
 
 ## 引用
 ```
-@InProceedings{,
-	author    = {},
-	title     = {{}},
-	booktitle = {{}},
-	year      = {}
+@article{zhou2022marssim,
+  title={MarsSim: A high-fidelity physical and visual simulation for Mars rovers},
+  author={Zhou, Ruyi and Feng, Wenhao and Ding, Liang and Yang, Huaiguang and Gao, Haibo and Liu, Guangjun and Deng, Zongquan},
+  journal={IEEE Transactions on Aerospace and Electronic Systems},
+  volume={59},
+  number={2},
+  pages={1879--1892},
+  year={2022},
+  publisher={IEEE}
 }
 ```
 
