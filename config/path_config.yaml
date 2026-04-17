@@ -1,0 +1,51 @@
+# Mars Simulation Path Configuration
+# This file centralizes all path configurations for the mars_sim project
+# Paths use ROS $(find package_name) syntax for portability
+
+# Workspace root - will be automatically detected by ROS
+workspace_root: "$(find rover_gazebo)/.."
+
+# Terrain and World Configuration
+terrain:
+  heightmap_dir: "$(find rover_gazebo)/models/mars_terrain/heightmaps_int16"
+  heightmap_int8_dir: "$(find rover_gazebo)/models/mars_terrain/heightmaps_int8"
+  heightmap_name: "HM1.png"
+  terrain_model_save_path: "$(find rover_gazebo)/models/mars_terrain"
+  terrain_class_file: "$(find rover_gazebo)/models/mars_terrain/whole_tex/terrain_class.npy"
+  terrain_tex_file: "$(find rover_gazebo)/models/mars_terrain/whole_tex/terrain_tex.png"
+  texture_dir: "$(find rover_gazebo)/models/mars_terrain/simulation_tex"
+  custom_heightmap_dir: "$(find rover_gazebo)/models/mars_terrain/custom_heightmap"
+
+# Rock Models
+rocks:
+  rock_model_save_path: "$(find rover_gazebo)/models/mars_rocks_lbl"
+
+# World Files
+world:
+  world_save_path: "$(find rover_gazebo)/worlds"
+
+# Data Files (需要创建这些目录)
+# Note: These directories may need to be created manually or by scripts
+data:
+  # DTM数据保存路径 - 如果不存在需要创建
+  DTM_save_path: "$(find rover_gazebo)/data"
+  terrain_data_file: "$(find world_plugins)/config/terrain_data.csv"
+  # 地形数据文件 - 由地形生成脚本创建
+  simulated_terrain_data: "$(find rover_gazebo)/data/simulated_terrain_data.txt"
+  rock_list: "$(find world_plugins)/config/rock_list.csv"
+
+# Launch Files
+launch:
+  image_collect_launch: "$(find rover_gazebo)/launch/image_collect.launch"
+
+# Dataset and Results (需要创建这些目录)
+# Note: These directories will be created when running simulations
+results:
+  # 数据集保存路径 - 如果不存在需要创建  
+  dataset_images_save_path: "$(find rover_gazebo)/results/dataset"
+
+# Plugin Configuration
+plugins:
+  terramechanics_config: "$(find rover_gazebo_plugins)/config/TerramechanicsPluginParam.yaml"
+  world_plugins_scripts: "$(find world_plugins)/scripts"
+

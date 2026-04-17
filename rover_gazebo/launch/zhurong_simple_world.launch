@@ -10,7 +10,11 @@
 	<arg name="verbose" default="true" />
 	<arg name="world" default="$(find rover_gazebo)/worlds/simple.world"/>
 
+	<!-- Load plugin parameters -->
 	<rosparam file="$(find rover_gazebo_plugins)/config/TerramechanicsPluginParam.yaml" command="load" ns="zhurong" />
+	
+	<!-- Set terrain data file path using ROS package path -->
+	<param name="/zhurong/TerrainMapFileName" value="$(find rover_gazebo)/data/simulated_terrain_data.txt" />
 
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
 		<arg name="world_name" value="$(arg world)"/>

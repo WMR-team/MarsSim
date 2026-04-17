@@ -1,7 +1,16 @@
 import cv2
 import numpy as np
 import os
+import sys
 import random
+
+# Add scripts directory to path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, current_dir)
+
+# Import workspace configuration
+from workspace_config import get_models_path
+
 
 def noise(img,snr):
     h=img.shape[0]
@@ -42,8 +51,9 @@ def gen_heightmap(img_num):
 
     l_min = int(0.8/10*640)
 
-    file_path_16 = '/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/choose/heightmaps_int16'
-    file_path_8 = '/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/choose/heightmaps_int8'
+    # Use unified workspace config for path resolution
+    file_path_16 = get_models_path('mars_terrain', 'heightmaps_int16')
+    file_path_8 = get_models_path('mars_terrain', 'heightmaps_int8')
     # img_name = 'HM8.png'
     img = cv2.imread(os.path.join(file_path_16,'HM'+str(img_num)+'.png'), -1)
     ii = random.randint(0,3)

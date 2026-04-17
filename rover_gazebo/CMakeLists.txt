@@ -1,3 +1,5 @@
+# CMake configuration for the rover_gazebo package (Gazebo simulation assets).
+
 cmake_minimum_required(VERSION 3.0.2)
 project(rover_gazebo)
 

@@ -1,7 +1,17 @@
 import cv2
 import numpy as np
 import random
+import os
+import sys
 from numpy.random import randint
+
+# Add scripts directory to path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, current_dir)
+
+# Import workspace configuration
+from workspace_config import get_models_path
+
 
 def label_colormap(N=256):
 
@@ -63,9 +73,13 @@ def generate_class_mat():
     #设置图片添加高斯噪声之后的像素值的范围
     img = np.clip(noisy_img,a_min=0,a_max=255)
     
-    cv2.imwrite('/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/whole_tex/terrain_tex.png', img)
+    # Use unified workspace config for path resolution
+    tex_save_path = os.path.join(get_models_path('mars_terrain', 'whole_tex'), 'terrain_tex.png')
+    class_save_path = os.path.join(get_models_path('mars_terrain', 'whole_tex'), 'terrain_class.npy')
+    
+    cv2.imwrite(tex_save_path, img)
     # class_mat = class_mat[::-1,:]
-    np.save('/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/whole_tex/terrain_class.npy', class_mat)
+    np.save(class_save_path, class_mat)
     # cv2.imshow('img', img)
     # cv2.imshow('class_mat', class_mat)
     # cv2.waitKey()

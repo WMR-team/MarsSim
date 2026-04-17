@@ -76,9 +76,9 @@
 			<camera>
 				<horizontal_fov>1.91</horizontal_fov>
 				<image>
-					<format>R8G8B8</format>
-					<width>640</width>
-					<height>360</height>
+					<format>B8G8R8</format>
+					<width>1280</width>
+					<height>720</height>
 				</image>
 				<clip>
 					<near>0.2</near>
@@ -119,9 +119,9 @@
 			<camera>
 				<horizontal_fov>1.91</horizontal_fov>
 				<image>
-					<format>R8G8B8</format>
-					<width>640</width>
-					<height>360</height>
+					<format>B8G8R8</format>
+					<width>1280</width>
+					<height>720</height>
 				</image>
 				<clip>
 					<near>0.2</near>
@@ -142,7 +142,7 @@
 				<pointCloudTopicName>depth/points</pointCloudTopicName>
 				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
 				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
-				<frameName>camera_frame_optical</frameName>
+				<frameName>camera_obs_F_pointcloud_link</frameName>
 				<baseline>0.1</baseline>
 				<distortion_k1>0.0</distortion_k1>
 				<distortion_k2>0.0</distortion_k2>
@@ -155,16 +155,16 @@
 		</sensor>
 	</gazebo>
 
-	<!-- <gazebo reference="camera_obs_B_link">
+	<gazebo reference="camera_obs_B_link">
 		<sensor type="depth" name="Camera">
 			<always_on>true</always_on>
 			<update_rate>10.0</update_rate>
 			<camera>
-				<horizontal_fov>1.045</horizontal_fov>
+				<horizontal_fov>1.91</horizontal_fov>
 				<image>
-					<format>R8G8B8</format>
-					<width>512</width>
-					<height>512</height>
+					<format>B8G8R8</format>
+					<width>1280</width>
+					<height>720</height>
 				</image>
 				<clip>
 					<near>0.2</near>
@@ -176,7 +176,7 @@
 					<stddev>0.007</stddev>
 				</noise>
 			</camera>
-			<plugin name="kinect" filename="libgazebo_ros_openni_kinect.so">
+			<plugin name="kinect_obs_b" filename="libgazebo_ros_openni_kinect.so">
 				<cameraName>ZED/camera_obs_b</cameraName>
 				<alwaysOn>true</alwaysOn>
 				<updateRate>10</updateRate>
@@ -185,7 +185,7 @@
 				<pointCloudTopicName>depth/points</pointCloudTopicName>
 				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
 				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
-				<frameName>camera_frame_optical</frameName>
+				<frameName>camera_obs_B_pointcloud_link</frameName>
 				<baseline>0.1</baseline>
 				<distortion_k1>0.0</distortion_k1>
 				<distortion_k2>0.0</distortion_k2>
@@ -193,9 +193,96 @@
 				<distortion_t1>0.0</distortion_t1>
 				<distortion_t2>0.0</distortion_t2>
 				<pointCloudCutoff>0.2</pointCloudCutoff>
+				<pointCloudCutoffMax>20</pointCloudCutoffMax>
 			</plugin>
 		</sensor>
-	</gazebo> -->
+	</gazebo>
+
+	<gazebo reference="camera_obs_L_link">
+		<sensor type="depth" name="Camera">
+			<always_on>true</always_on>
+			<update_rate>10.0</update_rate>
+			<camera>
+				<horizontal_fov>1.91</horizontal_fov>
+				<image>
+					<format>B8G8R8</format>
+					<width>1280</width>
+					<height>720</height>
+				</image>
+				<clip>
+					<near>0.2</near>
+					<far>200</far>
+				</clip>
+				<noise>
+					<type>gaussian</type>
+					<mean>0.0</mean>
+					<stddev>0.007</stddev>
+				</noise>
+			</camera>
+			<plugin name="kinect_obs_l" filename="libgazebo_ros_openni_kinect.so">
+				<cameraName>ZED/camera_obs_l</cameraName>
+				<alwaysOn>true</alwaysOn>
+				<updateRate>10</updateRate>
+				<imageTopicName>rgb/image_raw</imageTopicName>
+				<depthImageTopicName>depth/image_raw</depthImageTopicName>
+				<pointCloudTopicName>depth/points</pointCloudTopicName>
+				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+				<frameName>camera_obs_L_pointcloud_link</frameName>
+				<baseline>0.1</baseline>
+				<distortion_k1>0.0</distortion_k1>
+				<distortion_k2>0.0</distortion_k2>
+				<distortion_k3>0.0</distortion_k3>
+				<distortion_t1>0.0</distortion_t1>
+				<distortion_t2>0.0</distortion_t2>
+				<pointCloudCutoff>0.2</pointCloudCutoff>
+				<pointCloudCutoffMax>20</pointCloudCutoffMax>
+			</plugin>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="camera_obs_R_link">
+		<sensor type="depth" name="Camera">
+			<always_on>true</always_on>
+			<update_rate>10.0</update_rate>
+			<camera>
+				<horizontal_fov>1.91</horizontal_fov>
+				<image>
+					<format>B8G8R8</format>
+					<width>1280</width>
+					<height>720</height>
+				</image>
+				<clip>
+					<near>0.2</near>
+					<far>200</far>
+				</clip>
+				<noise>
+					<type>gaussian</type>
+					<mean>0.0</mean>
+					<stddev>0.007</stddev>
+				</noise>
+			</camera>
+			<plugin name="kinect_obs_r" filename="libgazebo_ros_openni_kinect.so">
+				<cameraName>ZED/camera_obs_r</cameraName>
+				<alwaysOn>true</alwaysOn>
+				<updateRate>10</updateRate>
+				<imageTopicName>rgb/image_raw</imageTopicName>
+				<depthImageTopicName>depth/image_raw</depthImageTopicName>
+				<pointCloudTopicName>depth/points</pointCloudTopicName>
+				<cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+				<depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+				<frameName>camera_obs_R_pointcloud_link</frameName>
+				<baseline>0.1</baseline>
+				<distortion_k1>0.0</distortion_k1>
+				<distortion_k2>0.0</distortion_k2>
+				<distortion_k3>0.0</distortion_k3>
+				<distortion_t1>0.0</distortion_t1>
+				<distortion_t2>0.0</distortion_t2>
+				<pointCloudCutoff>0.2</pointCloudCutoff>
+				<pointCloudCutoffMax>20</pointCloudCutoffMax>
+			</plugin>
+		</sensor>
+	</gazebo>
 
 
 	<gazebo>

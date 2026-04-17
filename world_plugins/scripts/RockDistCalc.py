@@ -70,16 +70,18 @@ def calculate_rock_distribution(DEM, param_data, terrain_class_mat, rock_dis_rat
     step = DEM[0, 0, 1] - DEM[0, 0, 0]
 
     area_list = []
-    for i in range(terrain_classes):
+    # 注意：terrain_class_mat的材质ID从1开始，所以这里也要从1开始
+    for i in range(1, terrain_classes + 1):
         area_list.append(np.sum(terrain_class_mat == i)/(H*H)*l*l)
-    for c in range(terrain_classes):
+    for c in range(1, terrain_classes + 1):
         for i in range(len(rock_size_list)):
             D = rock_size_list[i]
             # 计算该直径岩石的分布函数
-            F = rock_distribution_function(k_list[c], D)
+            # c从1开始，访问数组时需要-1
+            F = rock_distribution_function(k_list[c - 1], D)
             F = F-F_last
             # 计算该直径岩石在该地形的个数
-            N = calculate_N(F, area_list[c])
+            N = calculate_N(F, area_list[c - 1])
             # if D==0.6:
             #     N = N*2
             # elif D==0.2:

@@ -1,0 +1,212 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="sensor_obsZED_side" params="">
+
+    <link name="obsZEDSupport_L_Link">
+      <inertial>
+        <origin
+          xyz="0.0151792010643734 -1.62608833649752E-10 -0.0164550848153409"
+          rpy="0 0 0" />
+        <mass value="0.376147449515164" />
+        <inertia
+          ixx="0.00171533896494787"
+          ixy="1.84199637089927E-12"
+          ixz="0.000117545576933345"
+          iyy="0.000274679733799598"
+          iyz="-1.93806495440437E-12"
+          izz="0.00163063630880377" />
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://zhurong_description/meshes/obsZEDSupport_Link.STL" />
+        </geometry>
+        <material name="">
+          <color rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+        </material>
+      </visual>
+    </link>
+
+    <joint name="obsZEDSupport_L_joint" type="fixed">
+      <origin
+        xyz="0 0.415 0.34"
+        rpy="0 0 1.57" />
+      <parent link="chassis" />
+      <child link="obsZEDSupport_L_Link" />
+      <axis xyz="0 0 0" />
+    </joint>
+
+    <link name="obsZED_L_Link">
+      <inertial>
+          <origin
+              xyz="-0.00118777429950807 6.03060640675875E-17 0.0144098051030268"
+              rpy="0 0 0" />
+          <mass
+              value="1.16992693197709" />
+          <inertia
+              ixx="0.00282762622842795"
+              ixy="5.66397131385283E-19"
+              ixz="4.60187260244833E-07"
+              iyy="0.000176645869741829"
+              iyz="-2.52135615410609E-18"
+              izz="0.00284681487698757" />
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://zhurong_description/meshes/obsZED_Link.STL" />
+        </geometry>
+        <material name="">
+          <color rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+        </material>
+      </visual>
+    </link>
+
+    <gazebo reference="obsZED_L_Link">
+      <visual name='v'>
+        <material>
+          <ambient>0 0 0 1</ambient>
+          <diffuse>0. 0. 0. 1</diffuse>
+          <specular>1 1 1 1</specular>
+        </material>
+      </visual>
+    </gazebo>
+
+    <joint name="obsZED_L_joint" type="fixed">
+      <origin
+        xyz="0.03 0 -0.036993"
+        rpy="0 0.4 0" />
+      <parent link="obsZEDSupport_L_Link" />
+      <child link="obsZED_L_Link" />
+      <axis xyz="0 0 0" />
+    </joint>
+
+    <link name="camera_obs_L_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.001" />
+        <inertia ixx="9.1875e-09" ixy="0.0" ixz="0.0" iyy="9.1875e-09" iyz="0.0" izz="1.378125e-08"/>
+      </inertial>
+      <visual>
+        <origin rpy="0.0 0 0" xyz="0 0 0"/>
+        <geometry>
+          <box size="0.005 0.005 0.005"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="obs_l_camera_joint" type="fixed">
+      <parent link="obsZED_L_Link"/>
+      <child link="camera_obs_L_link"/>
+      <origin xyz="0.012 0 0.015" rpy="0 0 0"/>
+    </joint>
+
+    <link name="obsZEDSupport_R_Link">
+      <inertial>
+        <origin
+            xyz="0.0151792010643734 -1.62608833649752E-10 -0.0164550848153409"
+            rpy="0 0 0" />
+        <mass value="0.376147449515164" />
+        <inertia
+          ixx="0.00171533896494787"
+          ixy="1.84199637089927E-12"
+          ixz="0.000117545576933345"
+          iyy="0.000274679733799598"
+          iyz="-1.93806495440437E-12"
+          izz="0.00163063630880377" />
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://zhurong_description/meshes/obsZEDSupport_Link.STL" />
+        </geometry>
+        <material name="">
+          <color rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+        </material>
+      </visual>
+    </link>
+
+    <joint name="obsZEDSupport_R_joint" type="fixed">
+      <origin
+        xyz="0 -0.415 0.34"
+        rpy="0 0 -1.57" />
+      <parent link="chassis" />
+      <child link="obsZEDSupport_R_Link" />
+      <axis xyz="0 0 0" />
+    </joint>
+
+    <link name="obsZED_R_Link">
+      <inertial>
+        <origin
+          xyz="-0.00118777429950807 6.03060640675875E-17 0.0144098051030268"
+          rpy="0 0 0" />
+        <mass value="1.16992693197709" />
+        <inertia
+          ixx="0.00282762622842795"
+          ixy="5.66397131385283E-19"
+          ixz="4.60187260244833E-07"
+          iyy="0.000176645869741829"
+          iyz="-2.52135615410609E-18"
+          izz="0.00284681487698757" />
+      </inertial>
+      <visual>
+        <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://zhurong_description/meshes/obsZED_Link.STL" />
+        </geometry>
+        <material name="">
+          <color rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+        </material>
+      </visual>
+    </link>
+
+    <gazebo reference="obsZED_R_Link">
+      <visual name='v'>
+        <material>
+          <ambient>0 0 0 1</ambient>
+          <diffuse>0. 0. 0. 1</diffuse>
+          <specular>1 1 1 1</specular>
+        </material>
+      </visual>
+    </gazebo>
+
+    <joint name="obsZED_R_joint" type="fixed">
+      <origin
+        xyz="0.03 0 -0.036993"
+        rpy="0 0.4 0" />
+      <parent link="obsZEDSupport_R_Link" />
+      <child link="obsZED_R_Link" />
+      <axis xyz="0 0 0" />
+    </joint>
+
+    <link name="camera_obs_R_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.001" />
+        <inertia ixx="9.1875e-09" ixy="0.0" ixz="0.0" iyy="9.1875e-09" iyz="0.0" izz="1.378125e-08"/>
+      </inertial>
+      <visual>
+        <origin rpy="0.0 0 0" xyz="0 0 0"/>
+        <geometry>
+          <box size="0.005 0.005 0.005"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="obs_r_camera_joint" type="fixed">
+      <parent link="obsZED_R_Link"/>
+      <child link="camera_obs_R_link"/>
+      <origin xyz="0.012 0 0.015" rpy="0 0 0"/>
+    </joint>
+
+  </xacro:macro>
+
+</robot>

@@ -3,12 +3,19 @@
 import random
 import time
 import os
+import sys
 import numpy as np
 from numpy.random import default_rng
 import yaml
 import cv2
-import sys
-sys.path.append('/home/fwh/FWH/MarsSim_v2/src/world_plugins/scripts')
+
+# Add scripts directory to path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, current_dir)
+
+# Import workspace configuration
+from workspace_config import get_config_path, get_models_path
+
 from ModelGEN import *
 from TerrainGEN import *
 # from CameraProcess import *
@@ -16,13 +23,54 @@ from WorldGEN_exp import *
 from utils import delete_paging
 from heightmap_change import gen_heightmap
 
+
+def resolve_config_paths(param_data):
+    """
+    Resolve ROS-style paths in configuration to absolute paths.
+    Converts $(find package_name)/path to actual absolute paths.
+    """
+    import re
+    from workspace_config import WorkspaceConfig
+    
+    def resolve_path(path_str):
+        if isinstance(path_str, str) and '$(find ' in path_str:
+            # Extract package name and relative path
+            match = re.match(r'\$\(find\s+(\w+)\)(.*)', path_str)
+            if match:
+                package_name, rel_path = match.groups()
+                try:
+                    # Get package path and append relative path
+                    package_path = WorkspaceConfig.get_package_path(package_name)
+                    return str(package_path / rel_path.lstrip('/'))
+                except Exception as e:
+                    print(f"Warning: Could not resolve path {path_str}: {e}")
+                    return path_str
+        return path_str
+    
+    # Recursively resolve paths in the configuration
+    def resolve_dict(d):
+        for key, value in d.items():
+            if isinstance(value, dict):
+                resolve_dict(value)
+            elif isinstance(value, str):
+                d[key] = resolve_path(value)
+    
+    resolve_dict(param_data)
+    return param_data
+
+
 def change_world(seed, use_user_H=False, default_height=0.1, use_label=False, mode='height', rock_num=3, bedrock_num=3, BN=(-4.4,4.4,-2.4,2.4)):
     random.seed(seed)
-    yaml_file_name = '/home/fwh/FWH/MarsSim_v2/src/world_plugins/config/mars_terrain_params_real.yaml'
+    
+    # Load configuration using unified path system
+    yaml_file_name = get_config_path('mars_terrain_params_real.yaml')
     
     # 读取配置yaml文件
     param_file = open(yaml_file_name)
     param_data = yaml.load(param_file, Loader=yaml.FullLoader)
+    
+    # Resolve ROS-style paths to absolute paths
+    param_data = resolve_config_paths(param_data)
     
     heightmap_num = 8
     # heightmap_name = 'HM'+str(heightmap_num)+'.png'
@@ -56,7 +104,10 @@ def change_world(seed, use_user_H=False, default_height=0.1, use_label=False, mo
     save_path = param_data['terrain_model_save_path']
     length = param_data['terrain_length']
     height = param_data['terrain_height']
-    save_path = '/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/experiment_terrain'
+    
+    # Use unified path system for experiment_terrain directory
+    save_path = get_models_path('experiment_terrain')
+    
     # generate_terrain_model_exp(length, height, save_path=save_path, param_data=param_data)
     min_height_list, _ = generate_terrain_model_exp(heightmap_name_c, length, height, save_path=save_path, seed=seed_terrain, texture_count=param_data['texture_count'], return_record=return_record, param_data=param_data)
     param_data['texture_nums'] = return_record['texture_nums']

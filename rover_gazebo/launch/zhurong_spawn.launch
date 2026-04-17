@@ -1,11 +1,13 @@
 <launch>
 	
-	<arg name="x" default="0" />
-	<arg name="y" default="0" />
-	<arg name="z" default="1.5" />
+	<arg name="x" default="-20.0" />
+	<arg name="y" default="-20.0" />
+	<arg name="z" default="3.0" />
 	<arg name="roll" default="0"/>
+	
 	<arg name="pitch" default="0"/>
 	<arg name="yaw" default="0" />
+	<!-- <arg name="yaw" default="-1.57" /> -->
 
 	<arg name="model" default="$(find rover_gazebo)/urdf/zhurong_gazebo.xacro"/>
 	
@@ -14,7 +16,7 @@
 		<!-- 
 			Converts the xacro robot information to UDRF and use it as a robot_description parameter
 		-->
-		<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+		<param name="robot_description" command="$(find xacro)/xacro -i $(arg model)" />
 
 		
 		<!-- 
@@ -42,7 +44,13 @@
         	<param name="tf_prefix" value="zhurong_mars_rover" />	
 		</node>
 
+		<!-- Keep a static map<->odom transform (Gazebo plugin originally publishes odom->map) -->
 		<node pkg="tf" type="static_transform_publisher" name="base_to_world" args="0.0 0.0 0.0 0 0 0.0 odom map 100"/>
+
+		<!-- Add an identity static transform so the URDF's base_link is present in TF tree
+			 Robot URDF contains base_link while Gazebo/robot_state_publisher uses 'chassis'.
+			 This maps chassis -> base_link (identity) so RViz RobotModel can find base_link. -->
+		<node pkg="tf" type="static_transform_publisher" name="chassis_to_base_link" args="0 0 0 0 0 0 zhurong_mars_rover/chassis zhurong_mars_rover/base_link 100"/>
 		<node name="tf_odom_pub" pkg="rover_gazebo_plugins" type="tf_odom_pub" args="zhurong_mars_rover"></node>
 	</group>
 </launch>

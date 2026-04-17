@@ -1,10 +1,10 @@
 DTM_params: 10
 FirstDampCoef: 5000
-Plugin: libTerramechanicsPlugin_new.so
+Plugin: libTerramechanicsPlugin.so
 PrintStep: 1000000
 PublishRate: 20
 SecondDampCoef: 5000
-TerrainMapFileName: /home/fwh/FWH/MarsSim_v2/src/rover_gazebo/data/simulated_terrain_data.txt
+TerrainMapFileName: /root/sim_ws/src/mars_sim/rover_gazebo/data/simulated_terrain_data.txt
 TerrainParamsNum: 7
 c1: 0.5
 c2: -0.3
@@ -16,8 +16,8 @@ c_d3: -0.224
 enable_plugin: true
 sinkage_max: 0.15
 x_grids: 641
-x_max: 40.0
-x_min: -40.0
+x_max: 50.0
+x_min: -50.0
 y_grids: 641
-y_max: 40.0
-y_min: -40.0
+y_max: 50.0
+y_min: -50.0

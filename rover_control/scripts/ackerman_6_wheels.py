@@ -7,7 +7,6 @@ from std_msgs.msg import Float64
 from geometry_msgs.msg import Twist
 from std_srvs.srv import SetBool, SetBoolResponse
 
-
 class ZhurongMarsRoverControl(object):
     def __init__(self, NameSpace = ""):		
      
@@ -23,6 +22,12 @@ class ZhurongMarsRoverControl(object):
   
         self.cam_pitch = 0
         self.cam_yaw = 0
+        self.body_velocity = 0.5  # 全局线速度参数（m/s） - 初始写死 0.5
+        self.body_omega = 0.2      # 全局角速度参数（rad/s） - 初始写死 0.2
+        self.velocity_increment = 0.1  # rf 按键改变的线速度增量
+        self.omega_increment = 0.1     # tg 按键改变的角速度增量
+        self.min_velocity = 0.1        # 线速度最小值
+        
         self.zhurong_publishers = {}
         self.controller_ns = NameSpace
         self.controller_command = "command"
@@ -68,6 +73,7 @@ class ZhurongMarsRoverControl(object):
         rospy.Subscriber("/wheel_LB_cmd", Twist, self.wheel_LB_cmd_callback)
         rospy.Subscriber("/wheel_RB_cmd", Twist, self.wheel_RB_cmd_callback)
         rospy.Subscriber('/mars_environment/cam_ctl', Float64, self.cam_ctl_callback)
+
         rospy.Service('/init_controller', SetBool, self.init_response)
         self.control_msg.data=0
         self.pub.publish(self.control_msg)
@@ -233,43 +239,76 @@ class ZhurongMarsRoverControl(object):
         self.cam_pitch_ctl_publisher.publish(self.cam_pitch_msg.data)
 
     def move_forwards(self):
-        self.body_velocity = 0.3
+        # 使用全局参数，omega设为0前进
+        omega_tmp = self.body_omega
         self.body_omega = 0
         self.move_with_cmd_vel()
-        print('forward')
+        self.body_omega = omega_tmp  # 恢复
+        print(f'forward (v={self.body_velocity})')
 
     def move_backwards(self):
-        self.body_velocity = -0.3
+        # 使用全局参数，反向
+        vel_tmp = self.body_velocity
+        omega_tmp = self.body_omega
+        self.body_velocity = -vel_tmp
         self.body_omega = 0
         self.move_with_cmd_vel()
-        print('backward')
+        self.body_velocity = vel_tmp  # 恢复
+        self.body_omega = omega_tmp   # 恢复
+        print(f'backward (v={-vel_tmp})')
 
-    def move_slow_forwards(self):
-        self.body_velocity = 0.1
-        self.body_omega = 0
+    def rotate_left(self):
+        # 使用全局角速度 omega，线速度置0
+        vel_tmp = self.body_velocity
+        omega_tmp = self.body_omega
+        # 左转使用正的角速度符号
+        self.body_velocity = 0
+        self.body_omega = abs(omega_tmp)
         self.move_with_cmd_vel()
-        print('slow forward')
+        # 恢复原始参数
+        self.body_velocity = vel_tmp
+        self.body_omega = omega_tmp
+        print(f'rotate_left used ω={self.body_omega} (param {omega_tmp})')
   
-    def move_slow_backwards(self):
-        self.body_velocity = -0.1
-        self.body_omega = 0
+    def rotate_right(self):
+        # 使用全局角速度 omega，线速度置0
+        vel_tmp = self.body_velocity
+        omega_tmp = self.body_omega
+        # 右转使用负的角速度符号
+        self.body_velocity = 0
+        self.body_omega = -abs(omega_tmp)
         self.move_with_cmd_vel()
-        print('slow backward')
+        # 恢复原始参数
+        self.body_velocity = vel_tmp
+        self.body_omega = omega_tmp
+        print(f'rotate_right used ω={self.body_omega} (param {omega_tmp})')
 
     def move_turn_left(self):
-        self.body_velocity = 0.3
-        self.body_omega = 0.08
+        # 使用全局 velocity 和 omega，加上左转 omega
+        omega_tmp = self.body_omega
+        self.body_omega = abs(self.body_omega)  # 确保是正方向
         self.move_with_cmd_vel()
+        self.body_omega = omega_tmp  # 恢复
+        print(f'turn_left (v={self.body_velocity}, ω={abs(omega_tmp)})')
 
     def move_turn_right(self):
-        self.body_velocity = 0.3
-        self.body_omega = -0.08
+        # 使用全局 velocity 和 omega，加上右转 omega
+        omega_tmp = self.body_omega
+        self.body_omega = -abs(self.body_omega)  # 确保是负方向
         self.move_with_cmd_vel()
+        self.body_omega = omega_tmp  # 恢复
+        print(f'turn_right (v={self.body_velocity}, ω={-abs(omega_tmp)})')
+        
 
     def move_turn_stop(self):
+        # 临时置0执行
+        vel_tmp = self.body_velocity
+        omega_tmp = self.body_omega
         self.body_velocity = 0
         self.body_omega = 0
         self.move_with_cmd_vel()
+        self.body_velocity = vel_tmp  # 恢复
+        self.body_omega = omega_tmp   # 恢复
   
     def cam_pitch_ctl_1(self):
         self.cam_pitch += 0.1
@@ -302,8 +341,14 @@ class ZhurongMarsRoverControl(object):
             r_arr[3] = abs(turning_radius+self.h)
             r_arr[4] = r_arr[0]
             r_arr[5] = r_arr[1]
-            vel_arr = abs(self.body_omega) * r_arr / self.r
-            # print(vel_arr)
+            if self.body_velocity > 0:
+                vel_arr = abs(self.body_omega) * r_arr / self.r
+            elif self.body_velocity < 0:
+                vel_arr = -abs(self.body_omega) * r_arr / self.r
+            else:
+                # 原地旋转(v=0)
+                vel_arr = np.sign(self.body_omega) * abs(self.body_omega) * r_arr / self.r
+            print(vel_arr)
 
             theta = np.zeros(6)
             theta[0] = np.arctan(self.l/(turning_radius-self.h))
@@ -327,7 +372,7 @@ class ZhurongMarsRoverControl(object):
 
             self.set_turning_radius(theta)
             self.set_wheels_speed(vel_arr)
-    
+
     def wait_for_keyboard_ctl(self, x):
 
         if(x=='w'):
@@ -350,19 +395,33 @@ class ZhurongMarsRoverControl(object):
             self.move_turn_stop()
             self.control_msg.data=0
             self.pub.publish(self.control_msg)
-        elif(x=='k'):
-            self.move_slow_forwards()
+        elif(x=='q'):
+            self.rotate_left()
             self.control_msg.data=0.6
             self.pub.publish(self.control_msg)
-        elif(x=='l'):
-            self.move_slow_backwards()
+        elif(x=='e'):
+            self.rotate_right()
             self.control_msg.data=-0.6
             self.pub.publish(self.control_msg)
+        # 线速度增减（rf）- 只改参数，不执行运动
+        elif(x=='r'):
+            self.body_velocity += self.velocity_increment
+            print(f'增加线速度参数 -> v={self.body_velocity:.2f} m/s')
+        elif(x=='f'):
+            self.body_velocity = max(self.min_velocity, self.body_velocity - self.velocity_increment)
+            print(f'减少线速度参数 -> v={self.body_velocity:.2f} m/s (min={self.min_velocity})')
+        # 角速度增减（tg）- 只改参数，不执行运动
+        elif(x=='t'):
+            self.body_omega += self.omega_increment
+            print(f'增加角速度参数 -> ω={self.body_omega:.2f} rad/s')
+        elif(x=='g'):
+            self.body_omega -= self.omega_increment
+            print(f'减少角速度参数 -> ω={self.body_omega:.2f} rad/s')
+        # 云台控制（zxcv）
         elif(x=='z'):
             self.cam_pitch_ctl_1()
         elif(x=='x'):
             self.cam_pitch_ctl_2()
-
         elif(x=='c'):
             self.cam_yaw_ctl_1()
         elif(x=='v'):
@@ -380,6 +439,7 @@ if __name__ == "__main__":
     while not rospy.is_shutdown():
         x=input()
         zhurong_mars_rover_control.wait_for_keyboard_ctl(x)
+
         # rover2_control.wait_for_keyboard_ctl(x)
         rate.sleep()
         

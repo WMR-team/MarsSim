@@ -96,7 +96,7 @@
     <joint name="obsZED_F_joint" type="fixed">
       <origin
         xyz="0.035358 0 -0.036993"
-        rpy="0 0.7 0" />
+        rpy="0 0.4 0" />
       <parent link="obsZEDSupport_F_Link" />
       <child link="obsZED_F_Link" />
       <axis xyz="0 0 0" />
@@ -216,7 +216,7 @@
     <joint name="obsZED_B_joint" type="fixed">
       <origin
         xyz="0.035358 0 -0.036993"
-        rpy="0 0.92502 0" />
+        rpy="0 0.4 0" />
       <parent link="obsZEDSupport_B_Link" />
       <child link="obsZED_B_Link" />
       <axis xyz="0 0 0" />
@@ -243,6 +243,34 @@
       <origin xyz="0.012 0 0.015" rpy="0 0 0"/>
     </joint>
     
+    <link name="camera_obs_F_pointcloud_link"/>
+		<joint name="camera_obs_F_pointcloud_joint" type="fixed">
+			<origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+			<parent link="camera_obs_F_link"/>
+			<child link="camera_obs_F_pointcloud_link"/>
+		</joint>
+
+    <link name="camera_obs_B_pointcloud_link"/>
+    <joint name="camera_obs_B_pointcloud_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+      <parent link="camera_obs_B_link"/>
+      <child link="camera_obs_B_pointcloud_link"/>
+    </joint>
+
+    <link name="camera_obs_L_pointcloud_link"/>
+    <joint name="camera_obs_L_pointcloud_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+      <parent link="camera_obs_L_link"/>
+      <child link="camera_obs_L_pointcloud_link"/>
+    </joint>  
+
+    <link name="camera_obs_R_pointcloud_link"/>
+    <joint name="camera_obs_R_pointcloud_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+      <parent link="camera_obs_R_link"/>
+      <child link="camera_obs_R_pointcloud_link"/>
+    </joint>
+
   </xacro:macro>
 
 </robot>

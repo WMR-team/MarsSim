@@ -70,7 +70,6 @@ def generate_DEM(height_map, param_data):
 
     height_map = (height_map).astype('float')
     height_map = height_map*terrain_height/(2**16-1)
-    height_map = height_map[::-1, :]
     start_point = -terrain_length/2
     end_point = terrain_length/2
 
@@ -118,7 +117,7 @@ def get_terrain_class_mat(param_data, DEM, mode=''):
                 terrain_class_mat = np.load(terrain_class_file)
             elif terrain_class_file.endswith('.png') or terrain_class_file.endswith('.jpg'):
                 terrain_class_mat = cv2.imread(terrain_class_file, -1)
-            terrain_class_mat = terrain_class_mat[::-1, :]
+            # terrain_class_mat = terrain_class_mat[::-1, :]  # 去掉y翻转，与DTM坐标系保持一致
             
     return terrain_class_mat
 

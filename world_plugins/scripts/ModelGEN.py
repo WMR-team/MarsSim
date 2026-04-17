@@ -5,7 +5,16 @@ from ConfigGEN import generate_config
 from RockDistCalc import calculate_rock_distribution
 import numpy as np
 import os
+import sys
 import cv2
+import csv
+
+# Add scripts directory to path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, current_dir)
+
+# Import workspace configuration
+from workspace_config import get_models_path
 
 def generate_rocks_model(DEM, param_data, terrain_class_mat, save_path='', seed=1, is_label=False, rock_dis_rate=None, return_record={}):
     '''生成岩石model文件
@@ -23,6 +32,7 @@ def generate_rocks_model(DEM, param_data, terrain_class_mat, save_path='', seed=
     np.random.seed(int(seed))
     generate_config('mars_rocks_lbl', save_path=save_path)
     rock_list = calculate_rock_distribution(DEM, param_data, terrain_class_mat, rock_dis_rate, return_record)
+    #print(rock_list)
     step = DEM[0, 0, 1] - DEM[0, 0, 0]
     min_l = DEM[0, 0, 0]
     max_l = DEM[0, 0, -1]
@@ -47,6 +57,8 @@ def generate_rocks_model(DEM, param_data, terrain_class_mat, save_path='', seed=
         D = rock_list[i]['D']
 
         z = DEM[2, round(x/step), round(y/step)]+0.7*D*random.random()-0.4*D
+        rock_list[i]['z'] = 0.7*D*random.random()-0.4*D
+        #print("rock num",i,"x",x,"y",y,"z",0.7*D*random.random()-0.4*D,'scale',D)
         # z = DEM[2, round(x/step), round(y/step)]
         roll = np.random.random()*np.pi*2-np.pi
         pitch = np.random.random()*np.pi*2-np.pi
@@ -82,6 +94,19 @@ def generate_rocks_model(DEM, param_data, terrain_class_mat, save_path='', seed=
     tree = ET.ElementTree(sdf)
     save_file = os.path.join(save_path, 'model.sdf')
     tree.write(save_file, pretty_print=True, xml_declaration=True)
+
+    # rocklist to csv
+    # Use the rock_list path from param_data if available, otherwise use default
+    rock_list_path = param_data.get('rock_list_path', '../config/rock_list.csv')
+    with open(rock_list_path, 'w') as csvfile:
+        fieldnames = ['x', 'y','D','z']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        print(rock_list)
+        rock_num = len(rock_list)
+        for i in range(rock_num):
+            writer.writerow({'x': rock_list[i]['x'], 'y': rock_list[i]['y'],'D':rock_list[i]['D'],'z':rock_list[i]['z']})
+
     return rock_list
 
 def generate_rocks_model_cylinder(DEM, param_data, terrain_class_mat, save_path='', seed=1, is_label=False, rock_dis_rate=None, return_record={}):
@@ -299,7 +324,11 @@ def generate_terrain_model(heightmap_name, length, height, save_path='', seed=1,
     lbl_viz = colormap[sem_img]
     lbl_viz = lbl_viz.astype(np.uint8)
     # lbl_viz = lbl_viz[:,:,::-1]
-    cv2.imwrite('/home/fwh/FWH/MarsSim_v2/src/rover_gazebo/models/mars_terrain/whole_tex/class.png',lbl_viz)
+    
+    # Use unified workspace config for path resolution
+    class_viz_path = os.path.join(get_models_path('mars_terrain', 'whole_tex'), 'class.png')
+    
+    cv2.imwrite(class_viz_path, lbl_viz)
     
     return_record['min_heights'] = min_height_list
     
@@ -604,3 +633,114 @@ def label_colormap(N=256):
         cmap[i, 2] = b
     # cmap = cmap.astype(np.float32) / 255
     return cmap
+
+
+def generate_terrain_model_with_custom_textures(heightmap_name, length, height, save_path='', seed=1, 
+                                                 texture_nums=None, min_height_list=None,
+                                                 return_record={}, is_label=False, 
+                                                 use_whole_tex=False, param_data={}, blend_fade_dist=0.02):
+    """
+    生成地形模型文件，使用自定义的贴图编号（用于材质系统）
+    
+    Args:
+        texture_nums: 自定义贴图编号列表 [tex1, tex2, tex3, tex4]
+        min_height_list: 自定义高度过渡点列表
+        blend_fade_dist: blend过渡距离（米），默认0.02m
+    """
+    import xml.etree.ElementTree as ET
+    from workspace_config import get_models_path
+    
+    if texture_nums is None:
+        texture_nums = [1, 5, 10, 3]
+    if min_height_list is None:
+        min_height_list = [height/5, height/2, height*4/5]
+    
+    texture_num_list = texture_nums
+    
+    # 生成config文件
+    generate_config('mars_terrain', save_path=save_path)
+
+    sdf = ET.Element("sdf", version="1.6")
+    model = ET.SubElement(sdf, "model", name='mars_terrain')
+    model_pose = ET.SubElement(model, "pose")
+    model_pose.text = '0 0 0 0 0 0'
+    static = ET.SubElement(model, "static")
+    static.text = 'true'
+    link = ET.SubElement(model, "link", name='link')
+
+    visual = ET.SubElement(link, "visual", name="visual")
+    geometry = ET.SubElement(visual, 'geometry')
+    heightmap = ET.SubElement(geometry, 'heightmap')
+    
+    if use_whole_tex:
+        import plot_geometry
+        plot_geometry.generate_class_mat()
+        texture = ET.SubElement(heightmap, 'texture')
+        diffuse = ET.SubElement(texture, 'diffuse')
+        normal = ET.SubElement(texture, 'normal')
+        diffuse.text = 'model://mars_terrain/whole_tex/terrain_tex.png'
+        normal.text = 'model://mars_terrain/simulation_label/NRM.png'
+        size = ET.SubElement(texture, 'size')
+        size.text = str(length)
+    else:
+        # 使用自定义贴图编号
+        for i in range(len(texture_num_list)):
+            texture = ET.SubElement(heightmap, 'texture')
+            diffuse = ET.SubElement(texture, 'diffuse')
+            normal = ET.SubElement(texture, 'normal')
+            texture_path = param_data['texture_path']
+            if is_label:
+                diffuse.text = 'model://mars_terrain/simulation_label/' + \
+                    str((texture_num_list[i]-1)//3+1)+'_color.jpg'
+                normal.text = 'model://mars_terrain/simulation_label/NRM.png'
+            else:
+                diffuse.text = 'model://mars_terrain/'+ texture_path + \
+                    str(texture_num_list[i])+'.jpg'
+                normal.text = 'model://mars_terrain/'+ texture_path + \
+                    str(texture_num_list[i])+'_NRM.png'
+            size = ET.SubElement(texture, 'size')
+            size.text = '1'
+
+        # 使用自定义高度过渡点
+        for i in range(len(min_height_list)):
+            blend = ET.SubElement(heightmap, 'blend')
+            min_h = ET.SubElement(blend, 'min_height')
+            min_h.text = str(min_height_list[i])
+            fade_dist = ET.SubElement(blend, 'fade_dist')
+            # Label模式保持硬边界；非Label模式使用可配置视觉blend
+            if is_label:
+                fade_dist.text = '0'
+            else:
+                fade_dist.text = str(max(0.0, float(blend_fade_dist)))
+
+    uri = ET.SubElement(heightmap, 'uri')
+    heightmap_int8_path = param_data['heightmap_int8_path']
+    uri.text = 'model://mars_terrain/'+heightmap_int8_path+heightmap_name
+    size = ET.SubElement(heightmap, 'size')
+    # Flat模式建议使用毫米级高度（如0.001m）保证渲染稳定
+    # 注意：Gazebo的heightmap不支持完全的0高度，需要一个极小的非零值
+    terrain_size = str(length)+' '+str(length)+' '+str(height)
+    size.text = terrain_size
+    pos = ET.SubElement(heightmap, 'pos')
+    pos.text = '0 0 0'
+
+    collision = ET.SubElement(link, "collision", name="collision")
+    geometry = ET.SubElement(collision, 'geometry')
+    heightmap = ET.SubElement(geometry, 'heightmap')
+    uri = ET.SubElement(heightmap, 'uri')
+    uri.text = 'model://mars_terrain/'+heightmap_int8_path+heightmap_name
+    size = ET.SubElement(heightmap, 'size')
+    size.text = terrain_size
+    pos = ET.SubElement(heightmap, 'pos')
+    pos.text = '0 0 0'
+
+    tree = ET.ElementTree(sdf)
+    
+    # 使用 get_models_path 获取正确的路径
+    model_path = os.path.join(get_models_path('mars_terrain'), 'model.sdf')
+    tree.write(model_path, encoding='utf-8', xml_declaration=True)
+    
+    return_record['min_heights'] = min_height_list
+    return_record['texture_nums'] = texture_num_list
+    
+    return min_height_list, texture_num_list

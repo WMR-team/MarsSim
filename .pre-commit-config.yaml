@@ -1,0 +1,27 @@
+repos:
+  # 1) 使用 clang-format 格式化 C/C++/Objective-C
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v18.1.8          # 选一个明确的版本号，和你本地 clang-format 接近
+    hooks:
+      - id: clang-format
+        name: clang-format (C/C++)
+        files: \.(c|cc|cpp|cxx|h|hpp|hh|hxx)$
+        # 可以按需增加/排除路径：
+        exclude: ^third_party/
+
+  # 2) 使用 black 格式化 Python
+  - repo: https://github.com/psf/black
+    rev: 24.8.0           # Black 的版本
+    hooks:
+      - id: black
+        name: black (Python)
+        language_version: python3
+        # 默认会只对改动的 .py 文件运行
+
+  # 3) 可选：一些通用检查，如去除尾部空格、检查文件末尾换行等
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict

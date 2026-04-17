@@ -1,3 +1,5 @@
+# CMake configuration for rover_gazebo_plugins (Gazebo/ROS plugins).
+
 cmake_minimum_required(VERSION 3.0.2)
 project(rover_gazebo_plugins)
 
@@ -31,7 +33,6 @@ include_directories(${gazebo_msgs_INCLUDE_DIRS})
 include_directories( "/usr/include/eigen3" )
 include_directories( "/usr/local/" )
 include_directories(include)
-include_directories("/home/fwh/FWH/MarsSim_v2/devel/include")
 
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
@@ -126,7 +127,7 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES rover_plugin
 #  CATKIN_DEPENDS other_catkin_pkg
-  DEPENDS 
+  DEPENDS
   roscpp
   gazebo_ros
 )

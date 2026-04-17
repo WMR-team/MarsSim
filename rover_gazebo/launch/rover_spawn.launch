@@ -2,7 +2,7 @@
 	
 	<arg name="x" default="0" />
 	<arg name="y" default="0" />
-	<arg name="z" default="1.5" />
+	<arg name="z" default="0.75" />
 	<arg name="roll" default="0"/>
 	<arg name="pitch" default="0"/>
 	<arg name="yaw" default="0" />
@@ -12,7 +12,7 @@
 	<!-- 
 		Converts the xacro robot information to UDRF and use it as a robot_description parameter
 	-->
-	<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+	<param name="robot_description" command="$(find xacro)/xacro -i $(arg model)" />
 
 	
 	<!-- 

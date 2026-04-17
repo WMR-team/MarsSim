@@ -47,6 +47,15 @@
       args="">
   </node>
 
+<node name="cmd_mode_node"
+      pkg="rover_control"
+      type="rover_mode_control.py"
+      respawn="false"
+      output="screen"
+      args="">
+  </node>
+
+
 </launch>
 
 <!-- suspension_arm_B2_L_joint_position_controller -->
