@@ -15,7 +15,6 @@ class ZhurongMarsRoverControl(object):
         self.rate = rospy.Rate(100.0)
         self.pub = rospy.Publisher("/gazebo/wheel_cmd", Float64, queue_size=10)
         rospy.loginfo("ZhurongRoverControl Initialising...")
-        self.control_msg = Float64()
 
         self.h = 0.652  # 1/2 width
         self.l = 0.775  # 1/2 length
@@ -23,113 +22,166 @@ class ZhurongMarsRoverControl(object):
 
         self.cam_pitch = 0
         self.cam_yaw = 0
-        self.zhurong_publishers = {}
+
         self.controller_ns = NameSpace
-        self.controller_command = "command"
-        self.controllers_list = [
+
+        self.init_publishers()
+        self.init_msgs()
+        self.wait_publishers_to_be_ready()
+
+        self.init_subscribers()
+        rospy.Service("/init_controller", SetBool, self.init_response)
+
+        self.init_state()
+
+        rospy.logwarn("ZhurongMarsRoverControl...READY")
+
+    def init_subscribers(self):
+        rospy.Subscriber("/wheel_LF_cmd", Twist, lambda msg: self.wheel_cmd_callback(msg, 0))
+        rospy.Subscriber("/wheel_RF_cmd", Twist, lambda msg: self.wheel_cmd_callback(msg, 1))
+        rospy.Subscriber("/wheel_LM_cmd", Twist, lambda msg: self.wheel_cmd_callback(msg, 2))
+        rospy.Subscriber("/wheel_RM_cmd", Twist, lambda msg: self.wheel_cmd_callback(msg, 3))
+        rospy.Subscriber("/wheel_LB_cmd", Twist, lambda msg: self.wheel_cmd_callback(msg, 4))
+        rospy.Subscriber("/wheel_RB_cmd", Twist, lambda msg: self.wheel_cmd_callback(msg, 5))
+
+        cmd_vel_topic = "/mars_environment/cmd_vel"     
+        rospy.Subscriber(cmd_vel_topic, Twist, self.cmd_vel_callback)
+        cmd_camera_topic = "/mars_environment/cam_ctl"
+        rospy.Subscriber(cmd_camera_topic, Float64, self.cam_ctl_callback)
+    
+    def init_publishers(self):
+        """
+        We create variables for more pythonic access access to publishers
+        and not need to access any more
+        :return:
+        """
+
+        # Get the publishers for wheel speed
+        self.wheel_controller_list = [
             "front_wheel_L_joint_velocity_controller",
             "front_wheel_R_joint_velocity_controller",
             "middle_wheel_L_joint_velocity_controller",
             "middle_wheel_R_joint_velocity_controller",
             "back_wheel_L_joint_velocity_controller",
             "back_wheel_R_joint_velocity_controller",
-            # "suspension_arm_B2_L_joint_position_controller",
-            # "suspension_arm_B2_R_joint_position_controller",
-            "suspension_arm_B_L_joint_position_controller",
-            "suspension_arm_B_R_joint_position_controller",
-            "suspension_arm_F_L_joint_position_controller",
-            "suspension_arm_F_R_joint_position_controller",
+        ]
+        self.wheel_publishers = [
+            rospy.Publisher(self._assemble_topic_name(controller_name), Float64, queue_size=1)
+            for controller_name in self.wheel_controller_list
+        ]
+
+        self.steer_controller_list = [
             "suspension_steer_F_L_joint_position_controller",
             "suspension_steer_F_R_joint_position_controller",
             "suspension_steer_M_L_joint_position_controller",
             "suspension_steer_M_R_joint_position_controller",
             "suspension_steer_B_L_joint_position_controller",
             "suspension_steer_B_R_joint_position_controller",
+        ]
+        self.steer_publishers = [
+            rospy.Publisher(self._assemble_topic_name(controller_name), Float64, queue_size=1)
+            for controller_name in self.steer_controller_list
+        ]
+
+        # Get the publishers for suspension
+        self.suspension_controller_list = [
+            # "suspension_arm_B2_L_joint_position_controller",
+            # "suspension_arm_B2_R_joint_position_controller",
+            "suspension_arm_B_L_joint_position_controller",
+            "suspension_arm_B_R_joint_position_controller",
+            "suspension_arm_F_L_joint_position_controller",
+            "suspension_arm_F_R_joint_position_controller",
+        ]
+        # self.suspension_arm_B2_L = rospy.Publisher(self._assemble_topic_name(self.suspension_controller_list[-6]), Float64, queue_size=1)
+        # self.suspension_arm_B2_R = rospy.Publisher(self._assemble_topic_name(self.suspension_controller_list[-5]), Float64, queue_size=1)
+        self.suspension_arm_B_L = rospy.Publisher(self._assemble_topic_name(self.suspension_controller_list[-4]), Float64, queue_size=1)
+        self.suspension_arm_B_R = rospy.Publisher(self._assemble_topic_name(self.suspension_controller_list[-3]), Float64, queue_size=1)
+        self.suspension_arm_F_L = rospy.Publisher(self._assemble_topic_name(self.suspension_controller_list[-2]), Float64, queue_size=1)
+        self.suspension_arm_F_R = rospy.Publisher(self._assemble_topic_name(self.suspension_controller_list[-1]), Float64, queue_size=1)
+        self.suspension_publishers = [
+            self.suspension_arm_B_L,
+            self.suspension_arm_B_R,
+            self.suspension_arm_F_L,
+            self.suspension_arm_F_R,
+        ]
+
+        # Get the publisher for navigation camera
+        self.camera_controller_list = [
             "PTZYaw_joint_position_controller",
             "PTZPitch_joint_position_controller",
         ]
+        self.cam_yaw_ctl_publisher = rospy.Publisher(self._assemble_topic_name(self.camera_controller_list[-2]), Float64, queue_size=1)
+        self.cam_pitch_ctl_publisher = rospy.Publisher(self._assemble_topic_name(self.camera_controller_list[-1]), Float64, queue_size=1)
+        self.camera_publishers = [
+            self.cam_yaw_ctl_publisher,
+            self.cam_pitch_ctl_publisher,
+        ]
 
-        for controller_name in self.controllers_list:
-            if len(self.controller_ns) > 0:
-                topic_name = (
-                    "/"
-                    + self.controller_ns
-                    + "/"
-                    + controller_name
-                    + "/"
-                    + self.controller_command
-                )
-            else:
-                topic_name = (
-                    "/" + controller_name + "/" + self.controller_command
-                )
-            self.zhurong_publishers[controller_name] = rospy.Publisher(
-                topic_name, Float64, queue_size=1
+    def _assemble_topic_name(self, controller_name):
+        self.controller_command = "command"
+
+        if len(self.controller_ns) > 0:
+            topic_name = (
+                "/"
+                + self.controller_ns
+                + "/"
+                + controller_name
+                + "/"
+                + self.controller_command
             )
+        else:
+            topic_name = (
+                "/" + controller_name + "/" + self.controller_command
+            )
+        return topic_name
+    
+    def init_msgs(self):
+        # Init Messages
+        self.control_msg = Float64()
 
-        self.cmd_vel_msg = Twist()
-        cmd_vel_topic = "/mars_environment/cmd_vel"
-        rospy.Subscriber(cmd_vel_topic, Twist, self.cmd_vel_callback)
-        rospy.Subscriber("/wheel_LF_cmd", Twist, self.wheel_LF_cmd_callback)
-        rospy.Subscriber("/wheel_RF_cmd", Twist, self.wheel_RF_cmd_callback)
-        rospy.Subscriber("/wheel_LM_cmd", Twist, self.wheel_LM_cmd_callback)
-        rospy.Subscriber("/wheel_RM_cmd", Twist, self.wheel_RM_cmd_callback)
-        rospy.Subscriber("/wheel_LB_cmd", Twist, self.wheel_LB_cmd_callback)
-        rospy.Subscriber("/wheel_RB_cmd", Twist, self.wheel_RB_cmd_callback)
-        rospy.Subscriber(
-            "/mars_environment/cam_ctl", Float64, self.cam_ctl_callback
-        )
-        rospy.Service("/init_controller", SetBool, self.init_response)
-        self.control_msg.data = 0
-        self.pub.publish(self.control_msg)
+        self.wheel_velocity_msg = [Float64() for _ in range(6)]
+        self.wheel_steer_msg = [Float64() for _ in range(6)]
 
-        self.init_publisher_variables()
-        self.wait_publishers_to_be_ready()
-        self.init_state()
+        # self.suspension_arm_B2_L_pos_msg = Float64()
+        # self.suspension_arm_B2_R_pos_msg = Float64()
+        self.suspension_arm_B_L_pos_msg = Float64()
+        self.suspension_arm_B_R_pos_msg = Float64()
+        self.suspension_arm_F_L_pos_msg = Float64()
+        self.suspension_arm_F_R_pos_msg = Float64()
 
-        rospy.logwarn("ZhurongMarsRoverControl...READY")
+        self.cam_yaw_msg = Float64()
+        self.cam_pitch_msg = Float64()
 
+    def wait_publishers_to_be_ready(self):
+        rate_wait = rospy.Rate(10)
+        for publisher_obj in self.wheel_publishers + self.steer_publishers + self.suspension_publishers + self.camera_publishers:
+            publisher_ready = False
+            while not publisher_ready:
+                rospy.logwarn(
+                    "Checking Publisher for ==>" + str(publisher_obj.resolved_name)
+                )
+                pub_num = publisher_obj.get_num_connections()
+                publisher_ready = pub_num > 0
+                rate_wait.sleep()
+            rospy.loginfo("Publisher ==>" + str(publisher_obj.resolved_name) + "...READY")
+    
+    def init_state(self):
+        self.set_suspension_mode("standard")
+        self.set_turning_radius(np.zeros(6))
+        self.set_wheels_speed(np.zeros(6))
+        self.set_navcam_angle()
+    
     def cmd_vel_callback(self, msg: Twist):
         # print('received!!!')
         self.body_velocity = msg.linear.x
         self.body_omega = msg.angular.z
         self.move_with_cmd_vel()
 
-    def wheel_LF_cmd_callback(self, msg: Twist):
-        self.wheel_velocity_msg[0].data = msg.linear.x
-        self.wheel_publisher[0].publish(self.wheel_velocity_msg[0])
-        self.wheel_steer_msg[0].data = msg.angular.z
-        self.steer_publisher[0].publish(self.wheel_steer_msg[0])
-
-    def wheel_RF_cmd_callback(self, msg: Twist):
-        self.wheel_velocity_msg[1].data = msg.linear.x
-        self.wheel_publisher[1].publish(self.wheel_velocity_msg[1])
-        self.wheel_steer_msg[1].data = msg.angular.z
-        self.steer_publisher[1].publish(self.wheel_steer_msg[1])
-
-    def wheel_LM_cmd_callback(self, msg: Twist):
-        self.wheel_velocity_msg[2].data = msg.linear.x
-        self.wheel_publisher[2].publish(self.wheel_velocity_msg[2])
-        self.wheel_steer_msg[2].data = msg.angular.z
-        self.steer_publisher[2].publish(self.wheel_steer_msg[2])
-
-    def wheel_RM_cmd_callback(self, msg: Twist):
-        self.wheel_velocity_msg[3].data = msg.linear.x
-        self.wheel_publisher[3].publish(self.wheel_velocity_msg[3])
-        self.wheel_steer_msg[3].data = msg.angular.z
-        self.steer_publisher[3].publish(self.wheel_steer_msg[3])
-
-    def wheel_LB_cmd_callback(self, msg: Twist):
-        self.wheel_velocity_msg[4].data = msg.linear.x
-        self.wheel_publisher[4].publish(self.wheel_velocity_msg[4])
-        self.wheel_steer_msg[4].data = msg.angular.z
-        self.steer_publisher[4].publish(self.wheel_steer_msg[4])
-
-    def wheel_RB_cmd_callback(self, msg: Twist):
-        self.wheel_velocity_msg[5].data = msg.linear.x
-        self.wheel_publisher[5].publish(self.wheel_velocity_msg[5])
-        self.wheel_steer_msg[5].data = msg.angular.z
-        self.steer_publisher[5].publish(self.wheel_steer_msg[5])
+    def wheel_cmd_callback(self, msg: Twist, wheel_index):
+        self.wheel_velocity_msg[wheel_index].data = msg.linear.x
+        self.wheel_publishers[wheel_index].publish(self.wheel_velocity_msg[wheel_index])
+        self.wheel_steer_msg[wheel_index].data = msg.angular.z
+        self.steer_publishers[wheel_index].publish(self.wheel_steer_msg[wheel_index])
 
     def cam_ctl_callback(self, msg):
         self.cam_yaw = msg.data
@@ -144,83 +196,6 @@ class ZhurongMarsRoverControl(object):
         return SetBoolResponse(
             success=True, message="initial rover controllers!"
         )
-
-    def wait_publishers_to_be_ready(self):
-
-        rate_wait = rospy.Rate(10)
-        for controller_name, publisher_obj in self.zhurong_publishers.items():
-            publisher_ready = False
-            while not publisher_ready:
-                rospy.logwarn(
-                    "Checking Publisher for ==>" + str(controller_name)
-                )
-                pub_num = publisher_obj.get_num_connections()
-                publisher_ready = pub_num > 0
-                rate_wait.sleep()
-            rospy.loginfo("Publisher ==>" + str(controller_name) + "...READY")
-
-    def init_publisher_variables(self):
-        """
-        We create variables for more pythonic access access to publishers
-        and not need to access any more
-        :return:
-        """
-        # Get the publishers for wheel speed
-
-        self.wheel_publisher = []
-        self.steer_publisher = []
-        for i in range(6):
-            self.wheel_publisher.append(
-                self.zhurong_publishers[self.controllers_list[i]]
-            )
-            self.steer_publisher.append(
-                self.zhurong_publishers[self.controllers_list[-8 + i]]
-            )
-        # Get the publishers for suspension
-        # self.suspension_arm_B2_L = self.zhurong_publishers[self.controllers_list[6]]
-        # self.suspension_arm_B2_R = self.zhurong_publishers[self.controllers_list[7]]
-        self.suspension_arm_B_L = self.zhurong_publishers[
-            self.controllers_list[6]
-        ]
-        self.suspension_arm_B_R = self.zhurong_publishers[
-            self.controllers_list[7]
-        ]
-        self.suspension_arm_F_L = self.zhurong_publishers[
-            self.controllers_list[8]
-        ]
-        self.suspension_arm_F_R = self.zhurong_publishers[
-            self.controllers_list[9]
-        ]
-
-        self.cam_yaw_ctl_publisher = self.zhurong_publishers[
-            self.controllers_list[-2]
-        ]
-        self.cam_pitch_ctl_publisher = self.zhurong_publishers[
-            self.controllers_list[-1]
-        ]
-
-        # Init Messages
-        self.wheel_velocity_msg = []
-        self.wheel_steer_msg = []
-        for i in range(6):
-            self.wheel_velocity_msg.append(Float64())
-            self.wheel_steer_msg.append(Float64())
-
-        # self.suspension_arm_B2_L_pos_msg = Float64()
-        # self.suspension_arm_B2_R_pos_msg = Float64()
-        self.suspension_arm_B_L_pos_msg = Float64()
-        self.suspension_arm_B_R_pos_msg = Float64()
-        self.suspension_arm_F_L_pos_msg = Float64()
-        self.suspension_arm_F_R_pos_msg = Float64()
-
-        self.cam_yaw_msg = Float64()
-        self.cam_pitch_msg = Float64()
-
-    def init_state(self):
-        self.set_suspension_mode("standard")
-        self.set_turning_radius(np.zeros(6))
-        self.set_wheels_speed(np.zeros(6))
-        self.set_navcam_angle()
 
     def set_suspension_mode(self, mode_name):
 
@@ -239,11 +214,12 @@ class ZhurongMarsRoverControl(object):
             self.suspension_arm_B_R.publish(self.suspension_arm_B_R_pos_msg)
             self.suspension_arm_F_L.publish(self.suspension_arm_F_L_pos_msg)
             self.suspension_arm_F_R.publish(self.suspension_arm_F_R_pos_msg)
+        
 
     def set_turning_radius(self, turn_radius):
         for i in range(6):
             self.wheel_steer_msg[i].data = turn_radius[i]
-            self.steer_publisher[i].publish(self.wheel_steer_msg[i])
+            self.steer_publishers[i].publish(self.wheel_steer_msg[i])
 
     def set_wheels_speed(self, turning_speed):
         """
@@ -254,7 +230,7 @@ class ZhurongMarsRoverControl(object):
         # TODO: turning_speed for each wheel should change based on ackerman.
         for i in range(6):
             self.wheel_velocity_msg[i].data = turning_speed[i]
-            self.wheel_publisher[i].publish(self.wheel_velocity_msg[i])
+            self.wheel_publishers[i].publish(self.wheel_velocity_msg[i])
 
     def set_navcam_angle(self):
 
