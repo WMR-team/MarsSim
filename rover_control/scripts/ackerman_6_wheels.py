@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-import time
 import rospy
 import numpy as np
 from std_msgs.msg import Float64
@@ -13,7 +12,6 @@ class ZhurongMarsRoverControl(object):
 
         rospy.init_node("zhurong_control_node", anonymous=True)
         self.rate = rospy.Rate(100.0)
-        self.pub = rospy.Publisher("/gazebo/wheel_cmd", Float64, queue_size=10)
         rospy.loginfo("ZhurongRoverControl Initialising...")
 
         self.h = 0.652  # 1/2 width
@@ -25,6 +23,12 @@ class ZhurongMarsRoverControl(object):
 
         self.controller_ns = NameSpace
 
+        self._setup_ros_interfaces()
+        self._setup_initial_state()
+
+        rospy.loginfo("ZhurongMarsRoverControl...READY")
+
+    def _setup_ros_interfaces(self):
         self.init_publishers()
         self.init_msgs()
         self.wait_publishers_to_be_ready()
@@ -32,9 +36,11 @@ class ZhurongMarsRoverControl(object):
         self.init_subscribers()
         rospy.Service("/init_controller", SetBool, self.init_response)
 
-        self.init_state()
-
-        rospy.logwarn("ZhurongMarsRoverControl...READY")
+    def _setup_initial_state(self):
+        self.set_suspension_mode("standard")
+        self.set_turning_radius(np.zeros(6))
+        self.set_wheels_speed(np.zeros(6))
+        self.set_navcam_angle()
 
     def init_subscribers(self):
         rospy.Subscriber("/wheel_LF_cmd", Twist, lambda msg: self.wheel_cmd_callback(msg, 0))
@@ -46,8 +52,10 @@ class ZhurongMarsRoverControl(object):
 
         cmd_vel_topic = "/mars_environment/cmd_vel"     
         rospy.Subscriber(cmd_vel_topic, Twist, self.cmd_vel_callback)
-        cmd_camera_topic = "/mars_environment/cam_ctl"
-        rospy.Subscriber(cmd_camera_topic, Float64, self.cam_ctl_callback)
+        cmd_camera_yaw_topic = "/mars_environment/cam_ctl"
+        rospy.Subscriber(cmd_camera_yaw_topic, Float64, self.cam_yaw_callback)
+        cmd_camera_pitch_topic = "/mars_environment/cam_pitch_ctl"
+        rospy.Subscriber(cmd_camera_pitch_topic, Float64, self.cam_pitch_callback)
     
     def init_publishers(self):
         """
@@ -136,8 +144,6 @@ class ZhurongMarsRoverControl(object):
         return topic_name
     
     def init_msgs(self):
-        # Init Messages
-        self.control_msg = Float64()
 
         self.wheel_velocity_msg = [Float64() for _ in range(6)]
         self.wheel_steer_msg = [Float64() for _ in range(6)]
@@ -157,7 +163,7 @@ class ZhurongMarsRoverControl(object):
         for publisher_obj in self.wheel_publishers + self.steer_publishers + self.suspension_publishers + self.camera_publishers:
             publisher_ready = False
             while not publisher_ready:
-                rospy.logwarn(
+                rospy.loginfo(
                     "Checking Publisher for ==>" + str(publisher_obj.resolved_name)
                 )
                 pub_num = publisher_obj.get_num_connections()
@@ -165,14 +171,8 @@ class ZhurongMarsRoverControl(object):
                 rate_wait.sleep()
             rospy.loginfo("Publisher ==>" + str(publisher_obj.resolved_name) + "...READY")
     
-    def init_state(self):
-        self.set_suspension_mode("standard")
-        self.set_turning_radius(np.zeros(6))
-        self.set_wheels_speed(np.zeros(6))
-        self.set_navcam_angle()
-    
     def cmd_vel_callback(self, msg: Twist):
-        # print('received!!!')
+        rospy.logdebug('cmd vel received!')
         self.body_velocity = msg.linear.x
         self.body_omega = msg.angular.z
         self.move_with_cmd_vel()
@@ -183,16 +183,16 @@ class ZhurongMarsRoverControl(object):
         self.wheel_steer_msg[wheel_index].data = msg.angular.z
         self.steer_publishers[wheel_index].publish(self.wheel_steer_msg[wheel_index])
 
-    def cam_ctl_callback(self, msg):
+    def cam_yaw_callback(self, msg):
         self.cam_yaw = msg.data
         self.set_navcam_angle()
 
+    def cam_pitch_callback(self, msg):
+        self.cam_pitch = msg.data
+        self.set_navcam_angle()
+
     def init_response(self, request):
-        # self.init_publisher_variables()
-        self.init_state()
-        self.control_msg.data = 0
-        self.pub.publish(self.control_msg)
-        # print('init success!!!!')
+        self._setup_initial_state()
         return SetBoolResponse(
             success=True, message="initial rover controllers!"
         )
@@ -233,66 +233,22 @@ class ZhurongMarsRoverControl(object):
             self.wheel_publishers[i].publish(self.wheel_velocity_msg[i])
 
     def set_navcam_angle(self):
+        """
+        Set the navigation camera angle by publishing yaw and pitch control messages.
+
+        This method updates the camera's yaw and pitch angles by packaging the current
+        yaw and pitch values into ROS messages and publishing them to their respective
+        control topics. The actual camera movement is handled by the subscribers to
+        these published topics.
+
+        Returns:
+            None
+        """
 
         self.cam_yaw_msg.data = self.cam_yaw
         self.cam_pitch_msg.data = self.cam_pitch
         self.cam_yaw_ctl_publisher.publish(self.cam_yaw_msg.data)
         self.cam_pitch_ctl_publisher.publish(self.cam_pitch_msg.data)
-
-    def move_forwards(self):
-        self.body_velocity = 0.3
-        self.body_omega = 0
-        self.move_with_cmd_vel()
-        print("forward")
-
-    def move_backwards(self):
-        self.body_velocity = -0.3
-        self.body_omega = 0
-        self.move_with_cmd_vel()
-        print("backward")
-
-    def move_slow_forwards(self):
-        self.body_velocity = 0.1
-        self.body_omega = 0
-        self.move_with_cmd_vel()
-        print("slow forward")
-
-    def move_slow_backwards(self):
-        self.body_velocity = -0.1
-        self.body_omega = 0
-        self.move_with_cmd_vel()
-        print("slow backward")
-
-    def move_turn_left(self):
-        self.body_velocity = 0.3
-        self.body_omega = 0.08
-        self.move_with_cmd_vel()
-
-    def move_turn_right(self):
-        self.body_velocity = 0.3
-        self.body_omega = -0.08
-        self.move_with_cmd_vel()
-
-    def move_turn_stop(self):
-        self.body_velocity = 0
-        self.body_omega = 0
-        self.move_with_cmd_vel()
-
-    def cam_pitch_ctl_1(self):
-        self.cam_pitch += 0.1
-        self.set_navcam_angle()
-
-    def cam_pitch_ctl_2(self):
-        self.cam_pitch -= 0.1
-        self.set_navcam_angle()
-
-    def cam_yaw_ctl_1(self):
-        self.cam_yaw += 0.1
-        self.set_navcam_angle()
-
-    def cam_yaw_ctl_2(self):
-        self.cam_yaw -= 0.1
-        self.set_navcam_angle()
 
     def move_with_cmd_vel(self):
         if self.body_omega == 0:
@@ -339,56 +295,6 @@ class ZhurongMarsRoverControl(object):
             self.set_turning_radius(theta)
             self.set_wheels_speed(vel_arr)
 
-    def wait_for_keyboard_ctl(self, x):
-
-        if x == "w":
-            self.move_forwards()
-            self.control_msg.data = 2
-            self.pub.publish(self.control_msg)
-        elif x == "s":
-            self.move_backwards()
-            self.control_msg.data = -2
-            self.pub.publish(self.control_msg)
-        elif x == "a":
-            self.move_turn_left()
-            self.control_msg.data = 2
-            self.pub.publish(self.control_msg)
-        elif x == "d":
-            self.move_turn_right()
-            self.control_msg.data = 2
-            self.pub.publish(self.control_msg)
-        elif x == "p":
-            self.move_turn_stop()
-            self.control_msg.data = 0
-            self.pub.publish(self.control_msg)
-        elif x == "k":
-            self.move_slow_forwards()
-            self.control_msg.data = 0.6
-            self.pub.publish(self.control_msg)
-        elif x == "l":
-            self.move_slow_backwards()
-            self.control_msg.data = -0.6
-            self.pub.publish(self.control_msg)
-        elif x == "z":
-            self.cam_pitch_ctl_1()
-        elif x == "x":
-            self.cam_pitch_ctl_2()
-
-        elif x == "c":
-            self.cam_yaw_ctl_1()
-        elif x == "v":
-            self.cam_yaw_ctl_2()
-
-        # self.rate.sleep()
-
-
 if __name__ == "__main__":
-
-    zhurong_mars_rover_control = ZhurongMarsRoverControl()
-    # rover2_control = ZhurongMarsRoverControl("rover_2")
-    rate = rospy.Rate(100.0)
-    while not rospy.is_shutdown():
-        x = input()
-        zhurong_mars_rover_control.wait_for_keyboard_ctl(x)
-        # rover2_control.wait_for_keyboard_ctl(x)
-        rate.sleep()
+    ZhurongMarsRoverControl()
+    rospy.spin()

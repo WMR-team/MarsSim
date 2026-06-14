@@ -179,6 +179,7 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 catkin_install_python(PROGRAMS
     scripts/ackerman_6_wheels.py
     scripts/ackerman_3_wheels.py
+    scripts/zhurong_keyboard_teleop.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

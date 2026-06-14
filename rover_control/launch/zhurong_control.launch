@@ -47,6 +47,13 @@
       args="">
   </node>
 
+  <node name="zhurong_keyboard_teleop"
+        pkg="rover_control"
+        type="zhurong_keyboard_teleop.py"
+        respawn="false"
+        output="screen">
+</node>
+
 </launch>
 
 <!-- suspension_arm_B2_L_joint_position_controller -->
