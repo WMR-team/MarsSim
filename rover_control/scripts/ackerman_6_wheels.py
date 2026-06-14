@@ -157,6 +157,9 @@ class ZhurongMarsRoverControl(object):
         self.suspension_arm_F_L_pos_msg = Float64()
         self.suspension_arm_F_R_pos_msg = Float64()
 
+        self.cam_yaw_msg = Float64()
+        self.cam_pitch_msg = Float64()
+
     def wait_publishers_to_be_ready(self):
         rate_wait = rospy.Rate(10)
         for publisher_obj in self.wheel_publishers + self.steer_publishers + self.suspension_publishers + self.camera_publishers:
@@ -239,12 +242,10 @@ class ZhurongMarsRoverControl(object):
             None
         """
 
-        cam_pitch_msg = Float64()
-        cam_pitch_msg.data = pitch
-        cam_yaw_msg = Float64()
-        cam_yaw_msg.data = yaw
-        self.cam_yaw_ctl_publisher.publish(cam_yaw_msg.data)
-        self.cam_pitch_ctl_publisher.publish(cam_pitch_msg.data)
+        self.cam_pitch_msg.data = pitch
+        self.cam_yaw_msg.data = yaw
+        self.cam_yaw_ctl_publisher.publish(self.cam_yaw_msg.data)
+        self.cam_pitch_ctl_publisher.publish(self.cam_pitch_msg.data)
 
     def move_with_cmd_vel(self):
         if self.body_omega == 0:
@@ -266,7 +267,7 @@ class ZhurongMarsRoverControl(object):
                 vel_arr = -vel_arr
             elif self.body_velocity == 0 and self.body_omega < 0:
                 vel_arr = -vel_arr
-            # print(vel_arr)
+            rospy.logdebug(vel_arr)
 
             theta = np.zeros(6)
             theta[0] = np.arctan(self.l / (turning_radius - self.h))
@@ -275,6 +276,7 @@ class ZhurongMarsRoverControl(object):
             theta[3] = 0
             theta[4] = -theta[0]
             theta[5] = -theta[1]
+            rospy.logdebug(theta)
 
             if turning_radius >= 0 and abs(turning_radius) < self.h:
                 vel_arr[0] = -vel_arr[0]
@@ -285,8 +287,6 @@ class ZhurongMarsRoverControl(object):
                 vel_arr[1] = -vel_arr[1]
                 vel_arr[3] = -vel_arr[3]
                 vel_arr[5] = -vel_arr[5]
-
-            # print(theta)
 
             self.set_turning_radius(theta)
             self.set_wheels_speed(vel_arr)
