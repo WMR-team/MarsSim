@@ -8,39 +8,41 @@ from std_srvs.srv import SetBool, SetBoolResponse
 
 
 class ZhurongMarsRoverControl(object):
+    HALF_WIDTH = 0.652  # 1/2 width
+    HALF_LENGTH = 0.775  # 1/2 length
+    WHEEL_RADIUS = 0.15
+
     def __init__(self, NameSpace=""):
 
         rospy.init_node("zhurong_control_node", anonymous=True)
+        self.controller_ns = NameSpace
         self.rate = rospy.Rate(100.0)
         rospy.loginfo("ZhurongRoverControl Initialising...")
 
-        self.h = 0.652  # 1/2 width
-        self.l = 0.775  # 1/2 length
-        self.r = 0.15
+        self.h = self.HALF_WIDTH
+        self.l = self.HALF_LENGTH
+        self.r = self.WHEEL_RADIUS
 
+        # defined to track camera state
         self.cam_pitch = 0
         self.cam_yaw = 0
 
-        self.controller_ns = NameSpace
-
         self._setup_ros_interfaces()
-        self._setup_initial_state()
+        self._reset_to_initial_state()
 
         rospy.loginfo("ZhurongMarsRoverControl...READY")
 
     def _setup_ros_interfaces(self):
         self.init_publishers()
-        self.init_msgs()
         self.wait_publishers_to_be_ready()
-
+        self.init_msgs()  # TODO: do I need to init msgs? I can directly create msg and publish without init.
         self.init_subscribers()
-        rospy.Service("/init_controller", SetBool, self.init_response)
 
-    def _setup_initial_state(self):
+    def _reset_to_initial_state(self):
         self.set_suspension_mode("standard")
         self.set_turning_radius(np.zeros(6))
         self.set_wheels_speed(np.zeros(6))
-        self.set_navcam_angle()
+        self.set_navcam_angle(self.cam_pitch, self.cam_yaw)
 
     def init_subscribers(self):
         rospy.Subscriber("/wheel_LF_cmd", Twist, lambda msg: self.wheel_cmd_callback(msg, 0))
@@ -50,11 +52,11 @@ class ZhurongMarsRoverControl(object):
         rospy.Subscriber("/wheel_LB_cmd", Twist, lambda msg: self.wheel_cmd_callback(msg, 4))
         rospy.Subscriber("/wheel_RB_cmd", Twist, lambda msg: self.wheel_cmd_callback(msg, 5))
 
-        cmd_vel_topic = "/mars_environment/cmd_vel"     
+        cmd_vel_topic = "/mars_environment/cmd_vel"  # TODO: move this topic name to a parameter server or launch file     
         rospy.Subscriber(cmd_vel_topic, Twist, self.cmd_vel_callback)
-        cmd_camera_yaw_topic = "/mars_environment/cam_ctl"
+        cmd_camera_yaw_topic = "/mars_environment/cam_yaw_ctl"  # TODO: move this topic name to a parameter server or launch file
         rospy.Subscriber(cmd_camera_yaw_topic, Float64, self.cam_yaw_callback)
-        cmd_camera_pitch_topic = "/mars_environment/cam_pitch_ctl"
+        cmd_camera_pitch_topic = "/mars_environment/cam_pitch_ctl"  # TODO: move this topic name to a parameter server or launch file
         rospy.Subscriber(cmd_camera_pitch_topic, Float64, self.cam_pitch_callback)
     
     def init_publishers(self):
@@ -155,9 +157,6 @@ class ZhurongMarsRoverControl(object):
         self.suspension_arm_F_L_pos_msg = Float64()
         self.suspension_arm_F_R_pos_msg = Float64()
 
-        self.cam_yaw_msg = Float64()
-        self.cam_pitch_msg = Float64()
-
     def wait_publishers_to_be_ready(self):
         rate_wait = rospy.Rate(10)
         for publisher_obj in self.wheel_publishers + self.steer_publishers + self.suspension_publishers + self.camera_publishers:
@@ -185,20 +184,13 @@ class ZhurongMarsRoverControl(object):
 
     def cam_yaw_callback(self, msg):
         self.cam_yaw = msg.data
-        self.set_navcam_angle()
+        self.set_navcam_angle(self.cam_pitch, self.cam_yaw)
 
     def cam_pitch_callback(self, msg):
         self.cam_pitch = msg.data
-        self.set_navcam_angle()
-
-    def init_response(self, request):
-        self._setup_initial_state()
-        return SetBoolResponse(
-            success=True, message="initial rover controllers!"
-        )
+        self.set_navcam_angle(self.cam_pitch, self.cam_yaw)
 
     def set_suspension_mode(self, mode_name):
-
         if mode_name == "standard":
 
             # self.suspension_arm_B2_L_pos_msg.data = -0
@@ -214,7 +206,9 @@ class ZhurongMarsRoverControl(object):
             self.suspension_arm_B_R.publish(self.suspension_arm_B_R_pos_msg)
             self.suspension_arm_F_L.publish(self.suspension_arm_F_L_pos_msg)
             self.suspension_arm_F_R.publish(self.suspension_arm_F_R_pos_msg)
-        
+
+        else:
+            rospy.logwarn("Unsupported suspension mode: %s", mode_name)
 
     def set_turning_radius(self, turn_radius):
         for i in range(6):
@@ -232,7 +226,7 @@ class ZhurongMarsRoverControl(object):
             self.wheel_velocity_msg[i].data = turning_speed[i]
             self.wheel_publishers[i].publish(self.wheel_velocity_msg[i])
 
-    def set_navcam_angle(self):
+    def set_navcam_angle(self, pitch=0, yaw=0):
         """
         Set the navigation camera angle by publishing yaw and pitch control messages.
 
@@ -245,10 +239,12 @@ class ZhurongMarsRoverControl(object):
             None
         """
 
-        self.cam_yaw_msg.data = self.cam_yaw
-        self.cam_pitch_msg.data = self.cam_pitch
-        self.cam_yaw_ctl_publisher.publish(self.cam_yaw_msg.data)
-        self.cam_pitch_ctl_publisher.publish(self.cam_pitch_msg.data)
+        cam_pitch_msg = Float64()
+        cam_pitch_msg.data = pitch
+        cam_yaw_msg = Float64()
+        cam_yaw_msg.data = yaw
+        self.cam_yaw_ctl_publisher.publish(cam_yaw_msg.data)
+        self.cam_pitch_ctl_publisher.publish(cam_pitch_msg.data)
 
     def move_with_cmd_vel(self):
         if self.body_omega == 0:
