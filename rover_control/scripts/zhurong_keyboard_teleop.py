@@ -21,7 +21,7 @@ class ZhurongKeyboardTeleop(object):
             "/gazebo/wheel_cmd", Float64, queue_size=1
         )
         self.cam_yaw_publisher = rospy.Publisher(
-            "/mars_environment/cam_ctl", Float64, queue_size=1
+            "/mars_environment/cam_yaw_ctl", Float64, queue_size=1
         )
         self.cam_pitch_publisher = rospy.Publisher(
             "/mars_environment/cam_pitch_ctl", Float64, queue_size=1
